@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en"  manifest="/pxt-holidays/release.manifest" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8">
+    <title>simulator</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <style>
+        html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            height: 100%;
+        }
+
+        div.simframe {
+            border: none;
+            margin: 0 0 0.5rem 0;
+            position: relative;
+            background: transparent;
+            width: 100%;
+            padding-bottom: 81.96%;
+            display: inline-block;
+        }
+
+        div.simframe > iframe {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            z-index: 1;
+            font-size: 0.75rem;
+            font-family: "Lucida Console", Monaco, monospace;
+            color: #333;
+            padding: 0.5em;
+            margin: 0;
+            background: #fff;
+        }
+
+        footer img {
+            max-height: 1rem;
+            vertical-align: middle;
+            margin-left: 0.5rem;
+        }
+
+        footer a,
+        footer a:visited {
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            color: #333;
+        }
+
+        a.center {
+            font-size: 3em;
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+    <div id='loading' style='font-size: 25px; font-family:monospace; margin: 20% auto; width: 200px;'>
+        loading...
+    </div>
+    <div id="simulators">
+    </div>
+    <footer id="footer" style="display:none;">
+    </footer>
+
+    <script>
+        // This line gets patched up by the cloud
+        var pxtConfig = {
+    "relprefix": "/pxt-holidays/",
+    "workerjs": "/pxt-holidays/worker.js",
+    "tdworkerjs": "/pxt-holidays/tdworker.js",
+    "monacoworkerjs": "/pxt-holidays/monacoworker.js",
+    "pxtVersion": "2.3.24",
+    "pxtRelId": "",
+    "pxtCdnUrl": "/pxt-holidays/",
+    "commitCdnUrl": "/pxt-holidays/",
+    "blobCdnUrl": "/pxt-holidays/",
+    "cdnUrl": "/pxt-holidays/",
+    "targetVersion": "0.0.0",
+    "targetRelId": "",
+    "targetUrl": "",
+    "targetId": "holidays",
+    "simUrl": "/pxt-holidays/simulator.html",
+    "partsUrl": "/pxt-holidays/siminstructions.html",
+    "runUrl": "/pxt-holidays/run.html",
+    "docsUrl": "/pxt-holidays/docs.html",
+    "isStatic": true
+};
+    </script>
+    <!-- @include apptracking.html -->
+    <script type="text/javascript" src="/pxt-holidays/embed.js"></script>
+    <script type="text/javascript">
+        (function () {
+        var loading = document.getElementById('loading');
+        var id = /id(?:[:=])([^&?]+)/i.exec(window.location.href);
+        var code = /code(?:[:=])([^&?]+)/i.exec(window.location.href);
+        var localToken = /local_token(?:[:=])([^&?]+)/i.exec(window.location.href);
+        var hex = !!/hex(?:[:=])1/i.exec(window.location.href);
+        var footer = !/nofooter(?:[:=])1/i.exec(window.location.href);
+        var debugSim = !!/debugSim(?:[:=])1/i.exec(window.location.href);
+        var sims = document.getElementById('simulators');
+
+        if (!id && !code && !debugSim) {
+            console.error("missing id or code");
+            loading.textContent = 'Oops, wrong arguments...';
+            return;
+        }
+
+        function initAppCache() {
+            window.applicationCache.addEventListener('updateready', () => {
+                window.location.reload();
+            });
+        }
+        initAppCache();
+
+        ksRunnerReady(function() {
+            var theme = pxt.appTarget.appTheme;
+            document.title = theme.title;
+            if (footer) pxt.runner.initFooter(document.getElementById('footer'), id);
+            if (hex) {
+                console.log('compiling script to hex')
+                pxt.runner.generateHexFileAsync(options).done(function(hex) {
+                    $(loading).remove();
+                    var name = pxt.appTarget.id + '-' + ts.pxt.BINARY_HEX;
+                    var uri = pxt.BrowserUtils.browserDownloadBinText(hex, name)
+                    var a = document.createElement("a");
+                    a.href = uri;
+                    a.download = name;
+                    a.appendChild(document.createTextNode("Right click to save to another location."))
+                    sims.appendChild(a);
+                })
+            }
+            else if (!debugSim) {
+                var options = { id: id ? id[1] : undefined, code: code ? decodeURIComponent(code[1]) : undefined };
+                console.log('simulating script')
+                pxt.runner.simulateAsync(sims, options).done(function() {
+                    console.log('simulator started...')
+                    $(loading).remove();
+                })
+            }
+            else {
+                $(loading).remove();
+                if (localToken) {
+                    pxt.Cloud.localToken = localToken[1];
+                }
+                pxt.runner.startDebuggerAsync(sims);
+            }
+        })
+})()
+    </script>
+</body>
+
+</html>

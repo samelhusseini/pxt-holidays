@@ -1,1 +1,199 @@
-Under construction.
+<!DOCTYPE html>
+<html lang="en" manifest="/pxt-holidays/release.manifest" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+
+    
+<!-- include appmeta.html -->
+
+<!-- include robotsmeta.html -->
+
+<!-- end include robotsmeta.html -->
+
+<title>MakeCode Holidays</title>
+<meta name="description" content="" />
+<link rel="manifest" href="/pxt-holidays/sim.webmanifest">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MakeCode Holidays">
+<meta name="apple-mobile-web-app-status-bar-style" content="translucent-black">
+<meta name="format-detection" content="telephone=no">
+<meta name="application-name" content="MakeCode Holidays">
+
+<meta name="msapplication-TileColor" content="">
+<meta name="msapplication-TileImage" content="">
+<meta name="msapplication-config" content="/static/icons/browserconfig.xml">
+<meta name="theme-color" content="">
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="" />
+<meta name="twitter:title" content="MakeCode Holidays" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:image" content="" />
+
+<meta property="og:title" content="MakeCode Holidays" />
+<meta property="og:site_name" content="MakeCode Holidays" />
+<meta property="og:description" content="" />
+<meta property="og:image" content="" />
+
+<link rel="apple-touch-icon" href="">
+<link rel="icon" type="image/png" href="">
+<link rel="shortcut icon" href="">
+
+<!-- end include appmeta.html -->
+
+
+    <link id="blocklycss" rel="stylesheet" data-rtl="/pxt-holidays/rtlblockly.css" href="/pxt-holidays/blockly.css" type="text/css">
+    <link rel="stylesheet" data-rtl="/pxt-holidays/rtlsemantic.css" href="/pxt-holidays/semantic.css" type="text/css">
+    <style type="text/css">
+        @import "/pxt-holidays/custom.css";
+        @import "/pxt-holidays/icons.css";
+    </style>
+</head>
+
+<body class="main">
+    <div id='loading' class="ui active dimmer">
+        <div class="ui large loader"></div>
+    </div>
+
+    <div id='custom-content'>
+    </div>
+
+    <div id='content' class="ui dimmable full-abs">
+    </div>
+
+    <div id='msg' aria-live="polite">
+        <div id='errmsg' class="ui red inverted segment"></div>
+        <div id='warnmsg' class="ui orange inverted segment"></div>
+        <div id='infomsg' class="ui teal inverted segment"></div>
+        <div id='compilemsg' class="ui ignored info message"></div>
+    </div>
+
+    <script>
+        // This line gets patched up by the cloud
+        var pxtConfig = {
+    "relprefix": "/pxt-holidays/",
+    "workerjs": "/pxt-holidays/worker.js",
+    "tdworkerjs": "/pxt-holidays/tdworker.js",
+    "monacoworkerjs": "/pxt-holidays/monacoworker.js",
+    "pxtVersion": "2.3.24",
+    "pxtRelId": "",
+    "pxtCdnUrl": "/pxt-holidays/",
+    "commitCdnUrl": "/pxt-holidays/",
+    "blobCdnUrl": "/pxt-holidays/",
+    "cdnUrl": "/pxt-holidays/",
+    "targetVersion": "0.0.0",
+    "targetRelId": "",
+    "targetUrl": "",
+    "targetId": "holidays",
+    "simUrl": "/pxt-holidays/simulator.html",
+    "partsUrl": "/pxt-holidays/siminstructions.html",
+    "runUrl": "/pxt-holidays/run.html",
+    "docsUrl": "/pxt-holidays/docs.html",
+    "isStatic": true
+};
+    </script>
+    
+<!-- include apptracking.html -->
+
+<!-- include tracking.html -->
+<script type="text/javascript">
+    var appInsights=window.appInsights||function(config){
+        function i(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},u=document,e=window,o="script",s="AuthenticatedUserContext",h="start",c="stop",l="Track",a=l+"Event",v=l+"Page",y=u.createElement(o),r,f;y.src=config.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js";u.getElementsByTagName(o)[0].parentNode.appendChild(y);try{t.cookie=u.cookie}catch(p){}for(t.queue=[],t.version="1.0",r=["Event","Exception","Metric","PageView","Trace","Dependency"];r.length;)i("track"+r.pop());return i("set"+s),i("clear"+s),i(h+a),i(c+a),i(h+v),i(c+v),i("flush"),config.disableExceptionTracking||(r="onerror",i("_"+r),f=e[r],e[r]=function(config,i,u,e,o){var s=f&&f(config,i,u,e,o);return s!==!0&&t["_"+r](config,i,u,e,o),s}),t
+    }({
+        instrumentationKey:"9801ed01-c40f-46ec-aa40-2a1742a9e71c",
+        disableAjaxTracking: true,
+        overridePageViewDuration: false,
+        disableExceptionTracking: true,
+        isCookieUseDisabled: true,
+        isStorageUseDisabled: true
+    });
+    window.appInsights=appInsights;
+    appInsights.queue.push(function () {
+        appInsights.context.addTelemetryInitializer(function (envelope) {
+            if (typeof pxtConfig === "undefined") return;
+            var telemetryItem = envelope.data.baseData;
+            telemetryItem.properties = telemetryItem.properties || {};
+            telemetryItem.properties["target"] = pxtConfig.targetId;
+            telemetryItem.properties["version"] = pxtConfig.targetVersion;
+            telemetryItem.properties["stage"] = (pxtConfig.relprefix || "/--").replace(/[^a-z]/ig, '')
+            if (typeof window !== "undefined" && window.location && /[?&]electron=1/i.test(window.location.href))
+                telemetryItem.properties["electron"] = 1;
+            if (typeof Windows !== "undefined")
+                telemetryItem.properties["WindowsApp"] = 1;
+        });
+    });
+    appInsights.trackPageView(null, scrubUrl(window.location.toString()), {urlReferrer: scrubUrl(document.referrer.toString())});
+
+    var scriptIdRegex = /(?:\d{5}-\d{5}-\d{5}-\d{5})|(?:_[0-9a-zA-Z]{12})/g;
+    function scrubUrl(url) {
+        return url.replace(scriptIdRegex, "xxxxx-xxxxx-xxxxx-xxxxx");
+    }
+</script>
+
+<!-- end include tracking.html -->
+
+
+<!-- end include apptracking.html -->
+
+    <!-- patch to load JS in electron -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script type="text/javascript" src="/pxt-holidays/jquery.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/blockly_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/msg/js/en.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/smoothie/smoothie_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/semantic.js"></script>
+    <!-- unpatch to load JS in electron -->
+    <script>if (window.module) module = window.module;</script>
+
+    <script type="text/javascript" src="/pxt-holidays/pxtlib.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtblocks.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtwinrt.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxteditor.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtsim.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/target.js"></script>
+    <script id="mainscript" type="text/javascript" src="/pxt-holidays/main.js"></script>
+    <xml id="blocklyToolboxDefinitionCategory" style="display: none">
+        <!-- An empty category is required so that Blockly launches in category mode -->
+        <category name="">
+        </category>
+    </xml>
+    <xml id="blocklyToolboxDefinitionFlyout" style="display: none">
+    </xml>
+    <script>
+        // Before loading vs/editor/editor.main, define a global MonacoEnvironment that overwrites
+        // the default worker url location (used when creating WebWorkers). The problem here is that
+        // HTML5 does not (yet) allow cross-domain web workers, so we need to proxy the instantion of
+        // a web worker through a same-domain script
+        window.MonacoEnvironment = {
+            getWorkerUrl: function(workerId, label) {
+                return pxt.webConfig.monacoworkerjs;
+            }
+        };
+
+        // this get rewritten to blob URLs with SHAs while uploading to the cloud
+        // keep in sync with release.manifest
+        window.MonacoPaths = {
+            "vs/loader": "/pxt-holidays/vs/loader.js",
+            "vs/base/worker/workerMain": "/pxt-holidays/vs/base/worker/workerMain.js",
+            "vs/basic-languages/src/bat": "/pxt-holidays/vs/basic-languages/src/bat.js",
+            "vs/basic-languages/src/cpp": "/pxt-holidays/vs/basic-languages/src/cpp.js",
+            "vs/editor/editor.main.css": "/pxt-holidays/vs/editor/editor.main.css",
+            "vs/editor/editor.main": "/pxt-holidays/vs/editor/editor.main.js",
+            "vs/editor/editor.main.nls": "/pxt-holidays/vs/editor/editor.main.nls.js",
+            "vs/language/json/jsonMode": "/pxt-holidays/vs/language/json/jsonMode.js",
+            "vs/language/json/jsonWorker": "/pxt-holidays/vs/language/json/jsonWorker.js",
+            "vs/language/typescript/lib/typescriptServices": "/pxt-holidays/vs/language/typescript/lib/typescriptServices.js",
+            "vs/language/typescript/src/mode": "/pxt-holidays/vs/language/typescript/src/mode.js",
+            "vs/language/typescript/src/worker": "/pxt-holidays/vs/language/typescript/src/worker.js",
+            "lzma/lzma_worker-min.js": "/pxt-holidays/lzma/lzma_worker-min.js"
+        }
+    </script>
+</body>
+
+</html>

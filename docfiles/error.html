@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:og="http://ogp.me/ns#" xmlns:fb="http://www.facebook.com/2008/fbml">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Page not found - Microsoft MakeCode</title>
+
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
+
+  <style>
+    @targetstyle@
+  </style>
+
+</head>
+
+<body id='root' class='root'>
+
+  <style>
+    .lead {
+      margin-top: 2em;
+    }
+    
+    .smile {
+      font-size: 200px;
+      line-height: 0.6em;
+      float: left;
+      margin-right: 70px;
+      margin-bottom: 100px;
+      margin-left: 50px;
+      display: none;
+      font-weight: 200;
+      color: #0091ff;
+    }
+    
+    @media screen and (min-width: 768px) {
+      .smile {
+        display: block;
+      }
+      #root .jumbotron {
+        min-height: 20em;
+        margin-bottom: 8em;
+      }
+    }
+    
+    .message {
+      opacity: 0.5;
+      font-size: 0.8em;
+    }
+    
+    .message a {
+      color: #000;
+    }
+    
+    body {
+      font-family: 'Segoe UI', "Helvetica Neue", Helvetica, Tahoma, Geneva, Verdana, sans-serif;
+      font-size: 16px;
+    }
+    
+    .main {
+      max-width: 700px;
+      margin: 4em auto;
+    }
+  </style>
+
+  <div class="ui main text container mainbody">
+    <div class="ui jumbotron">
+      <div class='smile'>
+        :(
+      </div>
+
+      <h1 dir="auto">Sorry, the page is missing</h1>
+
+      <p dir="auto" class='lead'>
+        You can go back to <a href="/">home page</a> or <a href="/contact">contact us</a>.
+      </p>
+
+      <p dir="auto" class="message">
+        <a href="#" id="more">More info</a>
+      </p>
+
+      <p dir="auto" id="msg" style="clear:both; display:none" class="message">
+        @-body-@
+      </p>
+
+    </div>
+
+  </div>
+
+  <script>
+    window.addEventListener("load", function () {
+      var more = document.getElementById("more");
+      var msg = document.getElementById("msg");
+      function show() {
+        msg.style.display = "block";
+        more.style.display = "none";
+        if (msg.textContent && msg.textContent.length < 200) {
+          msg.style.clear = "none";
+        }
+      }
+      //if (msg.textContent && msg.textContent.length < 100)
+      //  show()
+      more.addEventListener("click", show);
+    });
+  </script>
+
+  <!-- @include tracking.html -->
+
+</body>
+
+</html>

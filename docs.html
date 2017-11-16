@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="@locale@" data-framework="typescript">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <style>
+        #content {
+            margin-bottom: 3rem !important;
+            margin-top: 0.5rem !important;
+        }
+        
+        svg {
+            max-width: 100%;
+        }
+        
+        .blocklyText {
+            font-family:'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace !important;
+        }
+        
+        .blocklyCheckbox,
+        .blocklyLed {
+            fill: #ff3030 !important;
+            text-shadow: 0px 0px 6px #f00;
+            font-size: 17pt !important;
+        }
+        
+        .ui.card .blocklyPreview {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% - 1em);
+            max-height: calc(100% - 1em);
+        }
+        
+        code {
+            white-space: pre-wrap;
+        }
+        code.lang-config, code.lang-package { display:none; }
+
+        code.lang-blocks::before,
+        code.lang-sig::before,
+        code.lang-block::before,
+        code.lang-sim::before,
+        code.lang-cards::before,
+        code.lang-namespaces::before,
+        code.lang-codecard::before {
+            content: "...";
+            position: absolute;
+            top: calc(50% - 0.5em);
+            left: calc(50% - 5em);
+        }
+        
+        code.lang-blocks,
+        code.lang-sig,
+        code.lang-block,
+        code.lang-sim,
+        code.lang-cards,
+        code.lang-namespaces,
+        code.lang-codecard {
+            color: transparent;
+        }
+    </style>
+    <link rel="stylesheet" data-rtl="/pxt-holidays/rtlsemantic.css" href="/pxt-holidays/semantic.css" type="text/css">
+    <link id="blocklycss" rel="stylesheet" data-rtl="/pxt-holidays/rtlblockly.css" href="/pxt-holidays/blockly.css" type="text/css">
+</head>
+
+<body id="docs">
+    <style type="text/css">
+        @import "/pxt-holidays/highlight.js/styles/vs.css";
+        @import "/pxt-holidays/icons.css";
+    </style>
+    <div id='loading' class="ui active inverted dimmer">
+        <div class="ui large loader"></div>
+    </div>
+    <div id="content" class="ui container">
+        <i class="spinner loading icon"></i>
+    </div>
+
+    <script>   
+        // This line gets patched up by the cloud
+        var pxtConfig = {
+    "relprefix": "/pxt-holidays/",
+    "workerjs": "/pxt-holidays/worker.js",
+    "tdworkerjs": "/pxt-holidays/tdworker.js",
+    "monacoworkerjs": "/pxt-holidays/monacoworker.js",
+    "pxtVersion": "2.3.24",
+    "pxtRelId": "",
+    "pxtCdnUrl": "/pxt-holidays/",
+    "commitCdnUrl": "/pxt-holidays/",
+    "blobCdnUrl": "/pxt-holidays/",
+    "cdnUrl": "/pxt-holidays/",
+    "targetVersion": "0.0.0",
+    "targetRelId": "",
+    "targetUrl": "",
+    "targetId": "holidays",
+    "simUrl": "/pxt-holidays/simulator.html",
+    "partsUrl": "/pxt-holidays/siminstructions.html",
+    "runUrl": "/pxt-holidays/run.html",
+    "docsUrl": "/pxt-holidays/docs.html",
+    "isStatic": true
+};
+    </script>
+    <!-- @include apptracking.html -->
+    <script type="text/javascript" src="/pxt-holidays/jquery.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/embed.js"></script>
+    <script type="text/javascript">
+        (function () {    
+        var loading = document.getElementById('loading');
+        var content = document.getElementById('content');        
+        ksRunnerReady(function() {
+            pxt.BrowserUtils.initTheme();
+            pxt.docs.requireMarked = function() { return marked; }
+            var projectid = /projectid=([^&?]+)/i.exec(window.location.href); 
+            var code = /code=([^&?]+)/i.exec(window.location.href);
+            var md = /md=([^&?]+)/i.exec(window.location.href);
+            var markdown = code ? "```blocks\n" + decodeURIComponent(code[1]) + "```" : md ? decodeURIComponent(md[1]) : undefined;
+            var embed = /render=1/i.exec(window.location.href);
+            if (markdown) {
+                console.log('rendering code:')
+                console.log(markdown);
+                pxt.runner.renderMarkdownAsync(content, markdown).done(function() {
+                    $(loading).hide();
+                    $(content).show();
+                });
+            } else if (projectid) {                
+                pxt.runner.renderProjectAsync(content, projectid[1]).done(function() {
+                    $(loading).hide();
+                    $(content).show();
+                });
+            }
+            else if (embed)
+                pxt.runner.startRenderServer();
+            else
+                pxt.runner.startDocsServer(loading, content);
+        });
+        })();
+    </script>
+</body>
+
+</html>

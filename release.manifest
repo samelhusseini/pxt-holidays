@@ -1,0 +1,64 @@
+CACHE MANIFEST
+
+CACHE:
+/pxt-holidays/semantic.js
+/pxt-holidays/main.js
+/pxt-holidays/typescript.js
+/pxt-holidays/marked/marked.min.js
+/pxt-holidays/highlight.js/highlight.pack.js
+/pxt-holidays/lzma/lzma_worker-min.js
+/pxt-holidays/fuse.min.js
+/pxt-holidays/jquery.js
+/pxt-holidays/pxtlib.js
+/pxt-holidays/pxtcompiler.js
+/pxt-holidays/pxtblocks.js
+/pxt-holidays/pxtwinrt.js
+/pxt-holidays/pxteditor.js
+/pxt-holidays/pxtsim.js
+/pxt-holidays/blockly.css
+/pxt-holidays/semantic.css
+/pxt-holidays/rtlsemantic.css
+/pxt-holidays/custom.css
+/pxt-holidays/icons.css
+
+
+/pxt-holidays/editor.js
+
+# blockly
+/pxt-holidays/blockly/blockly_compressed.js
+/pxt-holidays/blockly/blocks_compressed.js
+/pxt-holidays/blockly/msg/js/en.js
+/pxt-holidays/blockly/media/sprites.png
+/pxt-holidays/blockly/media/click.mp3
+/pxt-holidays/blockly/media/disconnect.wav
+/pxt-holidays/blockly/media/delete.mp3
+
+# monaco; keep in sync with webapp/public/index.html
+/pxt-holidays/vs/loader.js
+/pxt-holidays/vs/base/worker/workerMain.js
+/pxt-holidays/vs/basic-languages/src/bat.js
+/pxt-holidays/vs/basic-languages/src/cpp.js
+/pxt-holidays/vs/editor/editor.main.css
+/pxt-holidays/vs/editor/editor.main.js
+/pxt-holidays/vs/editor/editor.main.nls.js
+/pxt-holidays/vs/language/json/jsonMode.js
+/pxt-holidays/vs/language/json/jsonWorker.js
+/pxt-holidays/vs/language/typescript/lib/typescriptServices.js
+/pxt-holidays/vs/language/typescript/src/mode.js
+/pxt-holidays/vs/language/typescript/src/worker.js
+
+# charts
+/pxt-holidays/smoothie/smoothie_compressed.js
+
+# ai
+https://az416426.vo.msecnd.net/scripts/a/ai.0.js
+
+/pxt-holidays/worker.js
+/pxt-holidays/monacoworker.js
+
+# ver Thu Nov 16 2017 14:49:45 GMT-0800 (PST)
+
+/pxt-holidays/target.js
+  
+NETWORK:
+*

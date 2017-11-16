@@ -1,0 +1,71 @@
+{
+  "id": "holidays",
+  "name": "MakeCode for the Holidays",
+  "title": "MakeCode Holidays",
+  "corepkg": "core",
+  "cloud": {
+    "workspace": false,
+    "packages": false
+  },
+  "runtime": {
+    "mathBlocks": true,
+    "loopsBlocks": false,
+    "logicBlocks": true,
+    "variablesBlocks": true,
+    "functionBlocks": true,
+    "onStartUnDeletable": true,
+    "onStartNamespace": "loops"
+  },
+  "simulator": {
+    "autoRun": false,
+    "stopOnChange": true,
+    "headless": true
+  },
+  "compile": {
+    "onStartText": true,
+    "emptyEventHandlerComments": true,
+    "floatingPoint": true
+  },
+  "blocksprj": {
+    "id": "blocksprj",
+    "config": {
+      "name": "{0}",
+      "dependencies": {
+        "core": "*"
+      },
+      "description": "",
+      "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md"
+      ]
+    },
+    "files": {
+      "README.md": " ",
+      "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n</xml>",
+      "main.ts": " "
+    }
+  },
+  "tsprj": {
+    "id": "tsprj",
+    "config": {
+      "name": "{0}",
+      "dependencies": {
+        "core": "*"
+      },
+      "description": "",
+      "files": [
+        "main.ts",
+        "README.md"
+      ]
+    },
+    "files": {
+      "README.md": " ",
+      "main.ts": " "
+    }
+  },
+  "versions": {
+    "target": "0.0.1",
+    "pxt": "2.3.24"
+  }
+}
