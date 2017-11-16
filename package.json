@@ -1,0 +1,38 @@
+{
+    "name": "pxt-holidays",
+    "version": "0.0.1",
+    "description": "MakeCode Target to celebrate the holiday season",
+    "keywords": [
+        "JavaScript",
+        "education",
+        "MakeCode"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/microsoftsam/pxt-holidays.git"
+    },
+    "author": "",
+    "license": "MIT",
+    "homepage": "https://github.com/microsoftsam/pxt-holidays#readme",
+    "files": [
+        "README.md",
+        "pxtarget.json",
+        "built/*.js",
+        "built/*.json",
+        "built/*.d.ts",
+        "sim/public",
+        "docs/**"
+    ],
+    "main": "built/pxtrequire.js",
+    "typings": "built/pxtrequire.d.ts",
+    "devDependencies": {
+        "typescript": "^1.8.7",
+        "less": "^2.6.0",
+        "semantic-ui-less": "^2.2.4",
+        "react": "^0.14.8",
+        "react-dom": "^0.14.8"
+    },
+    "dependencies": {
+        "pxt-core": "2.2.4"
+    }
+}

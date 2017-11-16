@@ -1,0 +1,84 @@
+{
+    "id": "holidays",
+    "name": "MakeCode for the Holidays",
+    "title": "MakeCode Holidays",
+    "corepkg": "core",
+    "cloud": {
+        "workspace": false,
+        "packages": false
+    },
+    "bundleddirs": [
+        "libs/core"
+    ],
+    "runtime": {
+      "mathBlocks": true,
+      "loopsBlocks": false,
+      "logicBlocks": true,
+      "variablesBlocks": true,
+      "functionBlocks": true,
+      "onStartUnDeletable": true,
+      "onStartNamespace": "loops"
+    },
+    "simulator": {
+        "autoRun": false,
+        "stopOnChange": true,
+        "headless": true
+    },
+    "appTheme": {
+        "logoUrl": "https://holidays.pxt.io/",
+        "homeUrl": "https://holidays.pxt.io/",
+        "embedUrl": "https://holidays.pxt.io/",
+        "privacyUrl": "https://go.microsoft.com/fwlink/?LinkId=521839",
+        "termsOfUseUrl": "https://go.microsoft.com/fwlink/?LinkID=206977",
+        "docMenu": [
+            {
+                "name": "About",
+                "path": "/about"
+            },
+            {
+                "name": "Docs",
+                "path": "/docs"
+            }
+        ],
+        "coloredToolbox": true,
+        "monacoToolbox": true,
+        "invertedMenu": true,
+        "invertedMonaco": true,
+        "blocklyOptions": { 
+            "grid": {
+                "spacing": 45,
+                "length": 7,
+                "colour": "rgba(189, 195, 199, 0.30)",
+                "snap": true
+            },
+            "zoom": {
+                "startScale": 1.0
+            }
+        },
+        "blockColors": {
+            "loops": "#27ae60",
+            "logic": "#2980b9",
+            "math": "#8e44ad",
+            "variables": "#e74c3c",
+            "functions": "#2c3e50"
+        },
+        "blocklyColors": {
+            "insertionMarker": "#FFFFFF",
+            "insertionMarkerOpacity": 0.5
+        },
+        "simAnimationEnter": "rotate in",
+        "simAnimationExit": "rotate out",
+        "allowParentController": true,
+        "hideCookieNotice": true,
+        "hideMenuBar": true,
+        "hideEditorToolbar": true,
+        "hideFlyoutHeadings": false,
+        "extendEditor": true,
+        "disableBlockIcons": true,
+        "noReloadOnUpdate": true
+    },
+    "compile" : {
+        "onStartText": true,
+        "emptyEventHandlerComments": true
+    }
+}
