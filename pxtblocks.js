@@ -6031,6 +6031,11 @@ var pxtblockly;
             // scrollContainer is part of the scrollable area and will not be correctly shown at the top and bottom
             // when scrolling
             var paddingContainer = new goog.ui.Control();
+            // Record windowSize and scrollOffset before adding menu.
+            var windowSize = goog.dom.getViewportSize();
+            var scrollOffset = goog.style.getViewportPageOffset(document);
+            var xy = this.getAbsoluteXY_();
+            var borderBBox = this.getScaledBBox_();
             var div = Blockly.WidgetDiv.DIV;
             scrollContainer.addChild(tableContainer, true);
             paddingContainer.addChild(scrollContainer, true);
@@ -6093,7 +6098,6 @@ var pxtblockly;
             paddingContainerDom.className = 'blocklyGridPickerPadder';
             this.createTooltips(options, tableContainer);
             // Resize the grid picker if width > screen width
-            var windowSize = goog.dom.getViewportSize();
             if (this.width_ > windowSize.width) {
                 this.width_ = windowSize.width;
             }
@@ -6135,12 +6139,32 @@ var pxtblockly;
                     this.highlightAndScrollSelected(tableContainer, scrollContainerDom);
                 }
             }
-            // Record viewport dimensions before adding the dropdown.
-            var viewportBBox = Blockly.utils.getViewportBBox();
-            var anchorBBox = this.getAnchorDimensions_();
             // Position the menu.
-            Blockly.WidgetDiv.positionWithAnchor(viewportBBox, anchorBBox, paddingContainerSize, this.sourceBlock_.RTL);
-            goog.style.setHeight(div, "auto");
+            // Flip menu vertically if off the bottom.
+            var borderBBoxHeight = borderBBox.bottom - xy.y;
+            var borderBBoxWidth = borderBBox.right - xy.x;
+            if (xy.y + paddingContainerSize.height + borderBBoxHeight >=
+                windowSize.height + scrollOffset.y) {
+                xy.y -= paddingContainerSize.height + 2;
+            }
+            else {
+                xy.y += borderBBoxHeight;
+            }
+            if (this.sourceBlock_.RTL) {
+                xy.x -= paddingContainerSize.width / 2;
+                // Don't go offscreen left.
+                if (xy.x < scrollOffset.x) {
+                    xy.x = scrollOffset.x;
+                }
+            }
+            else {
+                xy.x += borderBBoxWidth / 2 - paddingContainerSize.width / 2;
+                // Don't go offscreen right.
+                if (xy.x > windowSize.width + scrollOffset.x - paddingContainerSize.width) {
+                    xy.x = windowSize.width + scrollOffset.x - paddingContainerSize.width;
+                }
+            }
+            Blockly.WidgetDiv.position(xy.x, xy.y, windowSize, scrollOffset, this.sourceBlock_.RTL);
             tableContainerDom.focus();
         };
         FieldGridPicker.prototype.createRow = function (row, options) {
