@@ -15,19 +15,18 @@
     }
   ],
   "coloredToolbox": true,
+  "invertedToolbox": true,
   "monacoToolbox": true,
   "invertedMenu": true,
   "invertedMonaco": true,
   "blocklyOptions": {
-    "grid": {
-      "spacing": 45,
-      "length": 7,
-      "colour": "rgba(189, 195, 199, 0.30)",
-      "snap": true
-    },
+    "grid": {},
     "zoom": {
-      "startScale": 1
-    }
+      "startScale": 0.8
+    },
+    "trashcan": true,
+    "horizontalLayout": true,
+    "toolboxPosition": "end"
   },
   "blockColors": {
     "loops": "#27ae60",
@@ -37,7 +36,7 @@
     "functions": "#2c3e50"
   },
   "blocklyColors": {
-    "insertionMarker": "#FFFFFF",
+    "insertionMarker": "#9A6F62",
     "insertionMarkerOpacity": 0.5
   },
   "simAnimationEnter": "rotate in",
@@ -46,10 +45,11 @@
   "hideCookieNotice": true,
   "hideMenuBar": true,
   "hideEditorToolbar": true,
-  "hideFlyoutHeadings": false,
+  "hideFlyoutHeadings": true,
   "extendEditor": true,
   "disableBlockIcons": true,
   "noReloadOnUpdate": true,
+  "defaultBlockGap": 5,
   "TOC": [
     {
       "name": "Blocks",

@@ -135,6 +135,11 @@ var pxt;
                                 p = p.then(function () { return projectView.toggleTrace(togglemsg_1.intervalSpeed); });
                                 break;
                             }
+                            case "setscale": {
+                                var zoommsg_1 = data;
+                                p = p.then(function () { return projectView.editor.setScale(zoommsg_1.scale); });
+                                break;
+                            }
                         }
                     }
                     p.done(function () { return sendResponse(data, resp_1, true, undefined); }, function (err) { return sendResponse(data, resp_1, false, err); });

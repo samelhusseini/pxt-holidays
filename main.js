@@ -2240,6 +2240,7 @@ $(document).ready(function () {
         .then(function () { return workspace.importLegacyScriptsAsync(); })
         .done(function () {
         $("#loading").remove();
+        return workspace.loadedAsync();
     });
     document.addEventListener("visibilitychange", function (ev) {
         if (theEditor)
@@ -2435,9 +2436,9 @@ var Editor = (function (_super) {
                 var toolbox = _this.getDefaultToolbox(_this.showToolboxCategories);
                 // Search needs a toolbox with ALL blocks
                 var tbAll;
-                if (_this.showToolboxCategories !== CategoryMode.All) {
-                    tbAll = pxt.blocks.initBlocks(_this.blockInfo, toolbox, CategoryMode.All, _this.filters, _this.extensions);
-                }
+                // if (this.showToolboxCategories !== CategoryMode.All) {
+                //     tbAll = pxt.blocks.initBlocks(this.blockInfo, toolbox, CategoryMode.All, this.filters, this.extensions);
+                // }
                 var tb = pxt.blocks.initBlocks(_this.blockInfo, toolbox, _this.showToolboxCategories, _this.filters, _this.extensions);
                 _this.updateToolbox(tb, _this.showToolboxCategories);
                 if (_this.showToolboxCategories !== CategoryMode.None && showSearch) {
@@ -2733,12 +2734,9 @@ var Editor = (function (_super) {
     };
     Editor.prototype.prepareBlockly = function (showCategories) {
         var _this = this;
-        if (showCategories === void 0) { showCategories = this.showToolboxCategories; }
         var blocklyDiv = document.getElementById('blocksEditor');
         blocklyDiv.innerHTML = '';
-        var blocklyOptions = this.getBlocklyOptions(showCategories);
-        Util.jsonMergeFrom(blocklyOptions, pxt.appTarget.appTheme.blocklyOptions || {});
-        this.editor = Blockly.inject(blocklyDiv, blocklyOptions);
+        this.editor = Blockly.inject(blocklyDiv, this.getBlocklyOptions(showCategories));
         // set Blockly Colors
         var blocklyColors = Blockly.Colours;
         Util.jsonMergeFrom(blocklyColors, pxt.appTarget.appTheme.blocklyColors || {});
@@ -2836,8 +2834,10 @@ var Editor = (function (_super) {
         if (!blocklyToolbox)
             return;
         this.parent.updateEditorLogo(blocklyToolbox.clientWidth);
+        var blocklyOptions = this.getBlocklyOptions(this.showToolboxCategories);
         var toolboxHeight = blocklyDiv.offsetHeight;
-        blocklyToolbox.style.height = toolboxHeight + "px";
+        if (!blocklyOptions.horizontalLayout)
+            blocklyToolbox.style.height = toolboxHeight + "px";
     };
     Editor.prototype.hasUndo = function () {
         return this.editor ? this.editor.undoStack_.length != 0 : false;
@@ -2866,6 +2866,11 @@ var Editor = (function (_super) {
         if (!this.editor)
             return;
         this.editor.zoomCenter(-2);
+    };
+    Editor.prototype.setScale = function (scale) {
+        if (!this.editor)
+            return;
+        this.editor.setScale(scale);
     };
     Editor.prototype.closeFlyout = function () {
         if (!this.editor)
@@ -2925,6 +2930,12 @@ var Editor = (function (_super) {
         }
         else {
             this.showSearch = true;
+        }
+        if (this.parent.state.editorState && this.parent.state.editorState.categories != undefined) {
+            this.showToolboxCategories = this.parent.state.editorState.categories ? CategoryMode.Basic : CategoryMode.None;
+        }
+        else {
+            this.showToolboxCategories = CategoryMode.Basic;
         }
         this.currFile = file;
         // Clear the search field if a value exists
@@ -2990,13 +3001,19 @@ var Editor = (function (_super) {
         blocks.filter(function (b) { return b.isShadow_; }).forEach(function (b) { return b.dispose(false); });
     };
     Editor.prototype.getBlocklyOptions = function (showCategories) {
-        if (showCategories === void 0) { showCategories = this.showToolboxCategories; }
-        var readOnly = pxt.shell.isReadOnly();
-        var toolbox = showCategories !== CategoryMode.None ?
+        var blocklyOptions = this.getDefaultOptions();
+        Util.jsonMergeFrom(blocklyOptions, pxt.appTarget.appTheme.blocklyOptions || {});
+        var hasCategories = showCategories ? showCategories !== CategoryMode.None :
+            (blocklyOptions.hasCategories != undefined ? blocklyOptions.hasCategories : this.showToolboxCategories);
+        var toolbox = hasCategories ?
             document.getElementById('blocklyToolboxDefinitionCategory')
             : document.getElementById('blocklyToolboxDefinitionFlyout');
+        blocklyOptions['toolbox'] = blocklyOptions.readOnly ? undefined : toolbox;
+        return blocklyOptions;
+    };
+    Editor.prototype.getDefaultOptions = function () {
+        var readOnly = pxt.shell.isReadOnly();
         var blocklyOptions = {
-            toolbox: readOnly ? undefined : toolbox,
             scrollbars: true,
             media: pxt.webConfig.commitCdnUrl + "blockly/media/",
             sound: true,
@@ -3026,7 +3043,7 @@ var Editor = (function (_super) {
         if (showCategories === void 0) { showCategories = this.showToolboxCategories; }
         return showCategories !== CategoryMode.None ?
             baseToolbox.getBaseToolboxDom().documentElement
-            : new DOMParser().parseFromString("<xml id=\"blocklyToolboxDefinition\" style=\"display: none\"></xml>", "text/xml").documentElement;
+            : baseToolbox.getBaseNoCategoryToolboxDom().documentElement;
     };
     Editor.prototype.filterToolbox = function (filters, showCategories) {
         if (showCategories === void 0) { showCategories = this.showToolboxCategories; }
@@ -3711,6 +3728,9 @@ function resetAsync() {
         data.clearCache();
     });
 }
+function loadedAsync() {
+    return Promise.resolve();
+}
 function importLegacyScriptsAsync() {
     var key = 'legacyScriptsImported';
     var legacyDomain = pxt.appTarget.appTheme.legacyDomain;
@@ -3788,7 +3808,8 @@ exports.provider = {
     saveToCloudAsync: saveToCloudAsync,
     syncAsync: syncAsync,
     resetAsync: resetAsync,
-    importLegacyScriptsAsync: importLegacyScriptsAsync
+    importLegacyScriptsAsync: importLegacyScriptsAsync,
+    loadedAsync: loadedAsync
 };
 
 },{"./core":13,"./data":14,"./db":15,"./package":31,"./workspace":47}],9:[function(require,module,exports){
@@ -5310,7 +5331,8 @@ function wrapWorkspace(ws) {
         }); },
         saveToCloudAsync: ws.saveToCloudAsync,
         saveScreenshotAsync: ws.saveScreenshotAsync,
-        installAsync: ws.installAsync
+        installAsync: ws.installAsync,
+        loadedAsync: ws.loadedAsync
     };
 }
 exports.wrapWorkspace = wrapWorkspace;
@@ -6647,6 +6669,9 @@ function resetAsync() {
         data.clearCache();
     });
 }
+function loadedAsync() {
+    return Promise.resolve();
+}
 exports.provider = {
     getHeaders: getHeaders,
     getHeader: getHeader,
@@ -6657,7 +6682,8 @@ exports.provider = {
     saveToCloudAsync: saveToCloudAsync,
     syncAsync: syncAsync,
     resetAsync: resetAsync,
-    saveScreenshotAsync: saveScreenshotAsync
+    saveScreenshotAsync: saveScreenshotAsync,
+    loadedAsync: loadedAsync
 };
 
 },{"./core":13,"./data":14,"./db":15}],23:[function(require,module,exports){
@@ -6944,6 +6970,14 @@ function resetAsync() {
         response: true
     }); }).then(function () { });
 }
+function loadedAsync() {
+    return mem.provider.resetAsync()
+        .then(function () { return pxt.editor.postHostMessageAsync({
+        type: "pxthost",
+        action: "workspaceloaded",
+        response: true
+    }); }).then(function () { });
+}
 exports.provider = {
     getHeaders: getHeaders,
     getHeader: getHeader,
@@ -6953,7 +6987,8 @@ exports.provider = {
     installAsync: installAsync,
     saveToCloudAsync: saveToCloudAsync,
     syncAsync: syncAsync,
-    resetAsync: resetAsync
+    resetAsync: resetAsync,
+    loadedAsync: loadedAsync
 };
 
 },{"./data":14,"./memoryworkspace":28}],26:[function(require,module,exports){
@@ -7184,6 +7219,9 @@ function resetAsync() {
     target = "";
     return Promise.resolve();
 }
+function loadedAsync() {
+    return Promise.resolve();
+}
 exports.provider = {
     getHeaders: getHeaders,
     getHeader: getHeader,
@@ -7193,7 +7231,8 @@ exports.provider = {
     installAsync: installAsync,
     saveToCloudAsync: saveToCloudAsync,
     syncAsync: syncAsync,
-    resetAsync: resetAsync
+    resetAsync: resetAsync,
+    loadedAsync: loadedAsync
 };
 
 },{}],29:[function(require,module,exports){
@@ -11552,6 +11591,7 @@ var Editor = (function () {
     Editor.prototype.redo = function () { };
     Editor.prototype.zoomIn = function () { };
     Editor.prototype.zoomOut = function () { };
+    Editor.prototype.setScale = function (scale) { };
     Editor.prototype.closeFlyout = function () { };
     /*******************************
      loadFile
@@ -12337,6 +12377,7 @@ exports.td2tsAsync = td2tsAsync;
 },{"./compiler":11,"./package":31}],45:[function(require,module,exports){
 "use strict";
 var defaultToolboxString = "<xml id=\"blocklyToolboxDefinition\" style=\"display: none\">\n    <category name=\"Loops\" nameid=\"loops\" colour=\"#107c10\" category=\"50\" web-icon=\"\uF01E\" iconclass=\"blocklyTreeIconloops\" expandedclass=\"blocklyTreeIconloops\">    \n        <block type=\"controls_repeat_ext\">\n            <value name=\"TIMES\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"device_while\">\n            <value name=\"COND\">\n                <shadow type=\"logic_boolean\"></shadow>\n            </value>\n        </block>\n        <block type=\"controls_simple_for\">\n            <value name=\"TO\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">4</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"controls_for_of\">\n            <value name=\"LIST\">\n                <shadow type=\"variables_get\">\n                    <field name=\"VAR\">list</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Logic\" nameid=\"logic\" colour=\"#006970\" category=\"49\" web-icon=\"\uF074\" iconclass=\"blocklyTreeIconlogic\" expandedclass=\"blocklyTreeIconlogic\">    \n        <label text=\"Conditionals\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"controls_if\" gap=\"8\">\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"controls_if\" gap=\"8\">\n            <mutation else=\"1\"></mutation>\n            <value name=\"IF0\">\n                <shadow type=\"logic_boolean\">\n                    <field name=\"BOOL\">TRUE</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Comparison\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_compare\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"logic_compare\">\n            <field name=\"OP\">LT</field>\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <label text=\"Boolean\" web-class=\"blocklyFlyoutGroup\" web-line=\"1.5\"/>\n        <block type=\"logic_operation\" gap=\"8\"></block>\n        <block type=\"logic_operation\" gap=\"8\">\n            <field name=\"OP\">OR</field>\n        </block>\n        <block type=\"logic_negate\"></block>\n        <block type=\"logic_boolean\" gap=\"8\"></block>\n        <block type=\"logic_boolean\">\n            <field name=\"BOOL\">FALSE</field>\n        </block>\n    </category>\n    <category name=\"Variables\" nameid=\"variables\" colour=\"#A80000\" custom=\"VARIABLE\" category=\"48\" iconclass=\"blocklyTreeIconvariables\" expandedclass=\"blocklyTreeIconvariables\">\n    </category>\n    <category name=\"Math\" nameid=\"math\" colour=\"#712672\" category=\"47\" web-icon=\"\uF1EC\" iconclass=\"blocklyTreeIconmath\" expandedclass=\"blocklyTreeIconmath\">    \n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MINUS</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">MULTIPLY</field>\n        </block>\n        <block type=\"math_arithmetic\" gap=\"8\">\n            <value name=\"A\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"B\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"OP\">DIVIDE</field>\n        </block>\n        <block type=\"math_number\" gap=\"8\">\n            <field name=\"NUM\">0</field>\n        </block>\n        <block type=\"math_modulo\">\n            <value name=\"DIVIDEND\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"DIVISOR\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">1</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"math_op2\" gap=\"8\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <value name=\"y\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n            <field name=\"op\">max</field>\n        </block>\n        <block type=\"math_op3\">\n            <value name=\"x\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category name=\"Functions\" nameid=\"functions\" colour=\"#005a9e\" custom=\"PROCEDURE\" category=\"46\" iconclass=\"blocklyTreeIconfunctions\" expandedclass=\"blocklyTreeIconfunctions\" advanced=\"true\">\n    </category>\n    <category colour=\"#66672C\" name=\"Arrays\" nameid=\"arrays\" category=\"45\" web-icon=\"\uF0CB\" iconclass=\"blocklyTreeIconarrays\" expandedclass=\"blocklyTreeIconarrays\" advanced=\"true\">\n        <block type=\"lists_create_with\">\n            <mutation items=\"1\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_create_with\">\n            <mutation items=\"2\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\"></field>\n                </shadow>\n            </value>\n            <value name=\"ADD1\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\"></field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_length\"></block>\n        <block type=\"lists_index_get\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"lists_index_set\">\n            <value name=\"LIST\">\n                <block type=\"variables_get\">\n                    <field name=\"VAR\">" + lf("{id:var}list") + "</field>\n                </block>\n            </value>\n            <value name=\"INDEX\">\n                <shadow type=\"math_number\">\n                    <field name=\"NUM\">0</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n    <category colour=\"#996600\" name=\"Text\" nameid=\"text\" category=\"46\" web-icon=\"\uF035\" iconclass=\"blocklyTreeIcontext\" expandedclass=\"blocklyTreeIcontext\" advanced=\"true\">\n        <block type=\"text\"></block>\n        <block type=\"text_length\">\n            <value name=\"VALUE\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n        </block>\n        <block type=\"text_join\">\n            <mutation items=\"2\"></mutation>\n            <value name=\"ADD0\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("Hello") + "</field>\n                </shadow>\n            </value>\n            <value name=\"ADD1\">\n                <shadow type=\"text\">\n                    <field name=\"TEXT\">" + lf("World") + "</field>\n                </shadow>\n            </value>\n        </block>\n    </category>\n</xml>";
+var defaultNoCategoryToolboxString = "<xml id=\"blocklyToolboxDefinition\" style=\"display: none\"></xml>";
 var cachedToolboxDom;
 function getBaseToolboxDom() {
     if (!cachedToolboxDom) {
@@ -12345,6 +12386,13 @@ function getBaseToolboxDom() {
     return cachedToolboxDom;
 }
 exports.getBaseToolboxDom = getBaseToolboxDom;
+function getBaseNoCategoryToolboxDom() {
+    if (!cachedToolboxDom) {
+        overrideBaseToolbox(defaultNoCategoryToolboxString);
+    }
+    return cachedToolboxDom;
+}
+exports.getBaseNoCategoryToolboxDom = getBaseNoCategoryToolboxDom;
 function overrideBaseToolbox(xml) {
     cachedToolboxDom = new DOMParser().parseFromString(xml, 'text/xml');
 }
@@ -12768,6 +12816,10 @@ function resetAsync() {
     return impl.resetAsync();
 }
 exports.resetAsync = resetAsync;
+function loadedAsync() {
+    return impl.loadedAsync();
+}
+exports.loadedAsync = loadedAsync;
 /*
     header:<guid>   - one header
     header:*        - all headers

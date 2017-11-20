@@ -2511,6 +2511,11 @@ var pxsim;
     var floatingPoint = false;
     var cfgKey = {};
     var cfg = {};
+    function noRefCounting() {
+        if (pxsim.runtime)
+            pxsim.runtime.refCounting = false;
+    }
+    pxsim.noRefCounting = noRefCounting;
     function getConfig(id) {
         if (cfg.hasOwnProperty(id + ""))
             return cfg[id + ""];

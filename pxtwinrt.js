@@ -648,6 +648,9 @@ var pxt;
                     pxt.storage.clearLocal();
                 }));
             }
+            function loadedAsync() {
+                return Promise.resolve();
+            }
             workspace.provider = {
                 getHeaders: getHeaders,
                 getHeader: getHeader,
@@ -657,7 +660,8 @@ var pxt;
                 installAsync: installAsync,
                 saveToCloudAsync: saveToCloudAsync,
                 syncAsync: syncAsync,
-                resetAsync: resetAsync
+                resetAsync: resetAsync,
+                loadedAsync: loadedAsync
             };
         })(workspace = winrt.workspace || (winrt.workspace = {}));
     })(winrt = pxt.winrt || (pxt.winrt = {}));

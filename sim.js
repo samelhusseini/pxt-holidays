@@ -6,35 +6,41 @@ var __extends = (this && this.__extends) || function (d, b) {
 /// <reference path="../libs/core/enums.d.ts"/>
 var pxsim;
 (function (pxsim) {
-    var turtle;
-    (function (turtle) {
+    var main;
+    (function (main) {
         /**
-         * Moves the sprite forward
-         * @param steps number of steps to move, eg: 1
+         * Write text on the card
+         * @param text text to write on the card, eg: "Happy Holidays!"
          */
         //% weight=90
-        //% block
-        function forwardAsync(steps) {
-            return pxsim.board().sprite.forwardAsync(steps);
+        //% blockId="say" block="say %text"
+        function say(text) {
+            pxsim.board().sendMessage('text', text);
         }
-        turtle.forwardAsync = forwardAsync;
+        main.say = say;
         /**
-         * Moves the sprite forward
-         * @param direction the direction to turn, eg: Direction.Left
-         * @param angle degrees to turn, eg:90
+         * Set the card background
          */
-        //% weight=85
-        //% blockId=sampleTurn block="turn %direction|by %angle degrees"
-        function turnAsync(direction, angle) {
-            var b = pxsim.board();
-            if (direction == 0 /* Left */)
-                b.sprite.angle -= angle;
-            else
-                b.sprite.angle += angle;
-            return Promise.delay(400);
+        //% weight=89
+        //% blockId="setBackground" block="set background %color=colorNumberPicker"
+        function setBackground(color) {
+            pxsim.board().sendMessage('background', color.toString(16));
         }
-        turtle.turnAsync = turnAsync;
-    })(turtle = pxsim.turtle || (pxsim.turtle = {}));
+        main.setBackground = setBackground;
+        //% weight=89
+        //% blockId="setIcon" block="set icon %icon=main_iconPicker"
+        function setIcon(icon) {
+            pxsim.board().sendMessage('icon', icon.toString());
+        }
+        main.setIcon = setIcon;
+        //% blockId="main_iconPicker" block="%input" shim=TD_ID
+        //% blockHidden=true
+        //% input.fieldEditor="imagedropdown" input.fieldOptions.columns=4
+        function _iconPicker(input) {
+            return input;
+        }
+        main._iconPicker = _iconPicker;
+    })(main = pxsim.main || (pxsim.main = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
@@ -44,23 +50,55 @@ var pxsim;
          * Repeats the code forever in the background. On each iteration, allows other code to run.
          * @param body the code to repeat
          */
-        //% help=functions/forever weight=55 blockGap=8
-        //% blockId=device_forever block="forever" 
+        //% help=functions/forever weight=99 blockGap=8
+        //% blockId=device_forever block="repeat forever" blockAllowMultiple=true
         function forever(body) {
             pxsim.thread.forever(body);
         }
         loops.forever = forever;
         /**
          * Pause for the specified time in milliseconds
-         * @param ms how long to pause for, eg: 100, 200, 500, 1000, 2000
+         * @param ms how long to pause for, eg: 1, 2, 5
          */
-        //% help=functions/pause weight=54
-        //% block="pause (ms) %pause" blockId=device_pause
-        function pauseAsync(ms) {
-            return Promise.delay(ms);
+        //% help=functions/pause weight=98
+        //% block="wait %pause|second(s)" blockId=device_pause
+        //% s.defl="1"
+        function pauseAsync(s) {
+            return Promise.delay(s * 1000);
         }
         loops.pauseAsync = pauseAsync;
     })(loops = pxsim.loops || (pxsim.loops = {}));
+})(pxsim || (pxsim = {}));
+var pxsim;
+(function (pxsim) {
+    var lights;
+    (function (lights) {
+        /**
+         * Set the lights background
+         */
+        //% weight=89
+        //% blockId="setLightColor" block="set lights %color=colorNumberPicker"
+        function setLightColor(color) {
+            pxsim.board().sendMessage('light.color', color.toString());
+        }
+        lights.setLightColor = setLightColor;
+        /**
+         * Set the animation on the lights
+         */
+        //% blockId="setLightAnimation" block="show %animation=light_animation_picker"
+        //% weight=89
+        function setLightAnimation(animation) {
+            pxsim.board().sendMessage('light.animation', animation.toString());
+            pxsim.loops.pauseAsync(0.1);
+        }
+        lights.setLightAnimation = setLightAnimation;
+        //% blockId="light_animation_picker" block="%animation" shim=TD_ID
+        //% blockHidden=true
+        function _animationPicker(animation) {
+            return animation;
+        }
+        lights._animationPicker = _animationPicker;
+    })(lights = pxsim.lights || (pxsim.lights = {}));
 })(pxsim || (pxsim = {}));
 function logMsg(m) { console.log(m); }
 var pxsim;
@@ -79,56 +117,6 @@ var pxsim;
         console.log = log;
     })(console = pxsim.console || (pxsim.console = {}));
 })(pxsim || (pxsim = {}));
-var pxsim;
-(function (pxsim) {
-    /**
-     * A ghost on the screen.
-     */
-    //%
-    var Sprite = (function () {
-        function Sprite() {
-            /**
-             * The X-coordiante
-             */
-            //%
-            this.x = 100;
-            /**
-            * The Y-coordiante
-            */
-            //%
-            this.y = 100;
-            this.angle = 90;
-        }
-        Sprite.prototype.foobar = function () { };
-        /**
-         * Move the thing forward
-         */
-        //%
-        Sprite.prototype.forwardAsync = function (steps) {
-            var deg = this.angle / 180 * Math.PI;
-            this.x += Math.cos(deg) * steps * 10;
-            this.y += Math.sin(deg) * steps * 10;
-            pxsim.board().updateView();
-            return Promise.delay(400);
-        };
-        return Sprite;
-    }());
-    pxsim.Sprite = Sprite;
-})(pxsim || (pxsim = {}));
-var pxsim;
-(function (pxsim) {
-    var sprites;
-    (function (sprites) {
-        /**
-         * Creates a new sprite
-         */
-        //% block
-        function createSprite() {
-            return new pxsim.Sprite();
-        }
-        sprites.createSprite = createSprite;
-    })(sprites = pxsim.sprites || (pxsim.sprites = {}));
-})(pxsim || (pxsim = {}));
 /// <reference path="../node_modules/pxt-core/typings/globals/bluebird/index.d.ts"/>
 /// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
 var pxsim;
@@ -146,6 +134,13 @@ var pxsim;
         return pxsim.runtime.board;
     }
     pxsim.board = board;
+    var postContainerMessage = function (message) {
+        pxsim.Runtime.postMessage({
+            type: "custom",
+            __proxy: "parent",
+            content: message
+        });
+    };
     /**
      * Represents the entire state of the executing program.
      * Do not store state anywhere else!
@@ -154,18 +149,20 @@ var pxsim;
         __extends(Board, _super);
         function Board() {
             _super.call(this);
-            this.element = document.getElementById('svgcanvas');
-            this.spriteElement = this.element.getElementById('svgsprite');
-            this.sprite = new pxsim.Sprite();
         }
         Board.prototype.initAsync = function (msg) {
             document.body.innerHTML = ''; // clear children
-            document.body.appendChild(this.element);
             return Promise.resolve();
         };
         Board.prototype.updateView = function () {
-            this.spriteElement.cx.baseVal.value = this.sprite.x;
-            this.spriteElement.cy.baseVal.value = this.sprite.y;
+            pxsim.console.log("Update view");
+        };
+        Board.prototype.sendMessage = function (key, data) {
+            postContainerMessage({
+                type: "simulator.message",
+                key: key,
+                data: data
+            });
         };
         return Board;
     }(pxsim.BaseBoard));

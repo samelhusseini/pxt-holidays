@@ -8,17 +8,16 @@
     "packages": false
   },
   "runtime": {
-    "mathBlocks": true,
-    "loopsBlocks": false,
-    "logicBlocks": true,
-    "variablesBlocks": true,
-    "functionBlocks": true,
-    "onStartUnDeletable": true,
+    "mathBlocks": false,
+    "loopsBlocks": true,
+    "logicBlocks": false,
+    "variablesBlocks": false,
+    "functionBlocks": false,
+    "onStartWeight": 100,
     "onStartNamespace": "loops"
   },
   "simulator": {
-    "autoRun": false,
-    "stopOnChange": true,
+    "autoRun": true,
     "headless": true
   },
   "compile": {

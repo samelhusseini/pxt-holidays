@@ -1602,6 +1602,7 @@ var pxt;
             registerFieldEditor('toggleonoff', pxtblockly.FieldToggleOnOff);
             registerFieldEditor('toggleyesno', pxtblockly.FieldToggleYesNo);
             registerFieldEditor('colornumber', pxtblockly.FieldColorNumber);
+            registerFieldEditor('colorpicker', pxtblockly.FieldColorPicker);
         }
         blocks.initFieldEditors = initFieldEditors;
         function registerFieldEditor(selector, field, validator) {
@@ -3570,11 +3571,6 @@ var pxt;
             goog.provide('Blockly.Blocks.device');
             goog.require('Blockly.Blocks');
             if (window.PointerEvent) {
-                Blockly.bindEvent_.TOUCH_MAP = {
-                    mousedown: 'pointerdown',
-                    mousemove: 'pointermove',
-                    mouseup: 'pointerup'
-                };
                 document.body.style.touchAction = 'none';
             }
             Blockly.FieldCheckbox.CHECK_CHAR = '■';
@@ -3822,7 +3818,7 @@ var pxt;
                 var blocklyToolboxDiv = document.getElementsByClassName('blocklyToolboxDiv')[0];
                 var blocklyTreeRoot = document.getElementsByClassName('blocklyTreeRoot')[0];
                 var trashIcon = document.getElementById("blocklyTrashIcon");
-                if (trashIcon) {
+                if (trashIcon && blocklyTreeRoot) {
                     trashIcon.style.display = 'none';
                     blocklyTreeRoot.style.opacity = '1';
                     blocklyToolboxDiv.classList.remove('blocklyToolboxDeleting');
@@ -5828,6 +5824,22 @@ var pxtblockly;
         return FieldColorNumber;
     }(Blockly.FieldColour));
     pxtblockly.FieldColorNumber = FieldColorNumber;
+})(pxtblockly || (pxtblockly = {}));
+/// <reference path="../../localtypings/blockly.d.ts" />
+var pxtblockly;
+(function (pxtblockly) {
+    var FieldColorPicker = (function (_super) {
+        __extends(FieldColorPicker, _super);
+        function FieldColorPicker(text, params, opt_validator) {
+            _super.call(this, text, opt_validator);
+            this.isFieldCustom_ = true;
+        }
+        FieldColorPicker.prototype.getValue = function () {
+            return "\"" + this.colour_ + "\"";
+        };
+        return FieldColorPicker;
+    }(Blockly.FieldColourSlider));
+    pxtblockly.FieldColorPicker = FieldColorPicker;
 })(pxtblockly || (pxtblockly = {}));
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
