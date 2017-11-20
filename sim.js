@@ -98,7 +98,7 @@ var pxsim;
          * Set the animation on the lights
          */
         //% blockId="setLightAnimation" block="show %animation=light_animation_picker"
-        //% weight=89
+        //% weight=89 blockHidden=1
         function setLightAnimation(animation) {
             pxsim.board().sendMessage('light.animation', animation.toString());
             pxsim.loops.pauseAsync(0.1);
