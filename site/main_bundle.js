@@ -19603,9 +19603,8 @@ var MainApp = /** @class */ (function (_super) {
             scale: scale
         });
         // Scale the game
-        var innerCard = document.getElementById('inner-card');
         if (this.game)
-            this.game.scale.setGameSize(innerCard.offsetWidth, innerCard.offsetHeight);
+            this.resizeGame();
     };
     MainApp.prototype.sendMessage = function (action, args) {
         var editor = this.editorFrame.contentWindow;
@@ -19710,32 +19709,34 @@ var MainApp = /** @class */ (function (_super) {
         this.game = new Phaser.Game(innerCard.offsetWidth, innerCard.offsetHeight, Phaser.AUTO, 'inner-card', { preload: this.preload, create: this.create.bind(this), update: this.update });
     };
     MainApp.prototype.preload = function () {
-        this.game.load.image('balloons', './docs/static/sprites/balloons.png');
-        this.game.load.image('barbecue', './docs/static/sprites/barbecue-1.png');
-        this.game.load.image('bauble', './docs/static/sprites/bauble.png');
-        this.game.load.image('baubles', './docs/static/sprites/baubles.png');
-        this.game.load.image('bell', './docs/static/sprites/bell.png');
-        this.game.load.image('candies', './docs/static/sprites/candies.png');
-        this.game.load.image('candy-cane', './docs/static/sprites/candy-cane.png');
-        this.game.load.image('christmas-sock', './docs/static/sprites/christmas-sock.png');
-        this.game.load.image('christmas-tree', './docs/static/sprites/christmas-tree.png');
-        this.game.load.image('church', './docs/static/sprites/church.png');
-        this.game.load.image('firecracker', './docs/static/sprites/firecracker-1.png');
-        this.game.load.image('fireworks-1', './docs/static/sprites/fireworks-1.png');
-        this.game.load.image('fireworks-2', './docs/static/sprites/fireworks-2.png');
-        this.game.load.image('fireworks', './docs/static/sprites/fireworks.png');
-        this.game.load.image('gift', './docs/static/sprites/gift.png');
-        this.game.load.image('mistletoe', './docs/static/sprites/mistletoe.png');
-        this.game.load.image('mittens', './docs/static/sprites/mittens.png');
-        this.game.load.image('rainbow', './docs/static/sprites/rainbow.png');
-        this.game.load.image('reindeer', './docs/static/sprites/reindeer.png');
-        this.game.load.image('ribbon', './docs/static/sprites/ribbon.png');
-        this.game.load.image('santa', './docs/static/sprites/santa-claus.png');
-        this.game.load.image('sledge', './docs/static/sprites/sledge.png');
-        this.game.load.image('snowflake-1', './docs/static/sprites/snowflake-1.png');
-        this.game.load.image('snowflake-2', './docs/static/sprites/snowflake-2.png');
-        this.game.load.image('snowflake', './docs/static/sprites/snowflake.png');
-        this.game.load.image('snowman', './docs/static/sprites/snowman.png');
+        var isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1):\d+\//.test(window.location.href);
+        var staticPath = isLocalhost ? './static' : './docs/static';
+        this.game.load.image('balloons', staticPath + "/sprites/balloons.png");
+        this.game.load.image('barbecue', staticPath + "/sprites/barbecue-1.png");
+        this.game.load.image('bauble', staticPath + "/sprites/bauble.png");
+        this.game.load.image('baubles', staticPath + "/sprites/baubles.png");
+        this.game.load.image('bell', staticPath + "/sprites/bell.png");
+        this.game.load.image('candies', staticPath + "/sprites/candies.png");
+        this.game.load.image('candy-cane', staticPath + "/sprites/candy-cane.png");
+        this.game.load.image('christmas-sock', staticPath + "/sprites/christmas-sock.png");
+        this.game.load.image('christmas-tree', staticPath + "/sprites/christmas-tree.png");
+        this.game.load.image('church', staticPath + "/sprites/church.png");
+        this.game.load.image('firecracker', staticPath + "/sprites/firecracker-1.png");
+        this.game.load.image('fireworks-1', staticPath + "/sprites/fireworks-1.png");
+        this.game.load.image('fireworks-2', staticPath + "/sprites/fireworks-2.png");
+        this.game.load.image('fireworks', staticPath + "/sprites/fireworks.png");
+        this.game.load.image('gift', staticPath + "/sprites/gift.png");
+        this.game.load.image('mistletoe', staticPath + "/sprites/mistletoe.png");
+        this.game.load.image('mittens', staticPath + "/sprites/mittens.png");
+        this.game.load.image('rainbow', staticPath + "/sprites/rainbow.png");
+        this.game.load.image('reindeer', staticPath + "/sprites/reindeer.png");
+        this.game.load.image('ribbon', staticPath + "/sprites/ribbon.png");
+        this.game.load.image('santa', staticPath + "/sprites/santa-claus.png");
+        this.game.load.image('sledge', staticPath + "/sprites/sledge.png");
+        this.game.load.image('snowflake-1', staticPath + "/sprites/snowflake-1.png");
+        this.game.load.image('snowflake-2', staticPath + "/sprites/snowflake-2.png");
+        this.game.load.image('snowflake', staticPath + "/sprites/snowflake.png");
+        this.game.load.image('snowman', staticPath + "/sprites/snowman.png");
     };
     MainApp.prototype.lookupIcon = function (icon) {
         switch (icon) {
@@ -19815,6 +19816,15 @@ var MainApp = /** @class */ (function (_super) {
         this.iconElement = this.game.add.sprite(220, height / 5, iconName);
         this.iconElement.scale.setTo(0.5, 0.5);
     };
+    MainApp.prototype.resizeGame = function () {
+        var innerCard = document.getElementById('inner-card');
+        this.game.scale.setGameSize(innerCard.offsetWidth, innerCard.offsetHeight);
+        if (this.iconElement)
+            this.iconElement.scale.setTo(0.5, 0.5);
+        this.destroyLights();
+        if (this.showLights)
+            this.drawLights();
+    };
     MainApp.prototype.setBackground = function () {
         this.game.stage.backgroundColor = "0x" + this.background;
     };
@@ -19826,6 +19836,18 @@ var MainApp = /** @class */ (function (_super) {
         }
         this.textElement = this.game.add.text(120, this.game.world.centerY, this.text, style);
         this.textElement.anchor.set(0.5);
+    };
+    MainApp.prototype.destroyLights = function () {
+        if (this.lightArc)
+            this.lightArc.destroy();
+        if (this.game.bmd)
+            this.game.bmd.clear();
+        for (var i = 0; i < this.lightGraphics.length; i++) {
+            this.lightGraphics[i].destroy();
+            this.lightGraphics[i] = null;
+        }
+        this.lightGraphics = [];
+        this.lightArc = null;
     };
     MainApp.prototype.drawLights = function () {
         if (!this.lightGraphics || this.lightGraphics.length == 0) {
@@ -19841,11 +19863,11 @@ var MainApp = /** @class */ (function (_super) {
             var circleCenter = this.calcCircleCenter(pointA, pointB, pointC);
             var circleRadius = Math.sqrt(Math.pow(circleCenter.x - width, 2) + Math.pow(circleCenter.y - 0, 2));
             var circleRadius2 = Math.pow(circleRadius, 2);
-            var graphics = this.game.add.graphics(circleCenter.x, circleCenter.y);
+            this.lightArc = this.game.add.graphics(circleCenter.x, circleCenter.y);
             //  Our first arc will be a line only
-            graphics.lineStyle(6, 0x656d78);
+            this.lightArc.lineStyle(6, 0x656d78);
             // graphics.arc(0, 0, 135, game.math.degToRad(0), game.math.degToRad(90), false);
-            graphics.arc(0, 0, circleRadius, 0, this.game.math.degToRad(180), false);
+            this.lightArc.arc(0, 0, circleRadius, 0, this.game.math.degToRad(180), false);
             // draw lights on the arc
             this.game.bmd = this.game.add.bitmapData(this.game.width, this.game.height);
             this.game.bmd.addToWorld();
@@ -19855,13 +19877,13 @@ var MainApp = /** @class */ (function (_super) {
                 var x = 10 + p * lightWidth;
                 var y = Math.sqrt(circleRadius2 - Math.pow((x - circleCenter.x), 2)) + circleCenter.y;
                 this.game.bmd.rect(x - 3, y + 2, 6, 10, '#656d78');
-                var graphics_1 = this.game.add.graphics(x, y + 18);
+                var graphics = this.game.add.graphics(x, y + 18);
                 //  Our first arc will be a line only
                 var color = this.lightBuffer[i];
-                graphics_1.lineStyle(2, color);
-                graphics_1.beginFill(color, 1);
-                graphics_1.drawEllipse(0, 0, 6, 10);
-                this.lightGraphics.push(graphics_1);
+                graphics.lineStyle(2, color);
+                graphics.beginFill(color, 1);
+                graphics.drawEllipse(0, 0, 6, 10);
+                this.lightGraphics.push(graphics);
                 i++;
                 if (i >= this.lightBuffer.length)
                     i = 0;
