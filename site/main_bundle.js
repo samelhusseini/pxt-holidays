@@ -19829,7 +19829,7 @@ var MainApp = /** @class */ (function (_super) {
         this.game.stage.backgroundColor = "0x" + this.background;
     };
     MainApp.prototype.setText = function () {
-        var style = { font: 'bold 30pt Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 100 };
+        var style = { font: 'bold 30pt ', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 100 };
         if (this.textElement) {
             this.textElement.destroy();
             this.textElement = null;
@@ -20042,7 +20042,9 @@ var MainApp = /** @class */ (function (_super) {
                             React.createElement("p", null,
                                 "A Blocks / JavaScript code editor for the holidays powered by ",
                                 React.createElement("a", { href: "www.makecode.com", target: "_blank" }, "Microsoft MakeCode.")),
-                            React.createElement("p", null, "microsoftsam.github.io/pxt-holidays version: 0.0.1"),
+                            React.createElement("p", null,
+                                React.createElement("a", { href: "https://github.com/microsoftsam/pxt-holidays", target: "_blank" }, "microsoftsam.github.io/pxt-holidays"),
+                                " version: 0.0.1"),
                             React.createElement("p", null, "Microsoft MakeCode version: 2.2.4"),
                             React.createElement("b", null, " Built with:"),
                             React.createElement(semantic_ui_react_1.List, { bulleted: true },
