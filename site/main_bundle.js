@@ -20001,7 +20001,7 @@ var MainApp = /** @class */ (function (_super) {
                     "About")),
             React.createElement(semantic_ui_react_1.Sidebar.Pusher, { dimmed: sidebarVisible },
                 isLoading ? React.createElement(semantic_ui_react_1.Dimmer, { active: true },
-                    React.createElement(semantic_ui_react_1.Loader, null)) : undefined,
+                    React.createElement(semantic_ui_react_1.Loader, { size: "large" })) : undefined,
                 React.createElement(semantic_ui_react_1.Menu, { fixed: "top", borderless: true, size: "mini" },
                     React.createElement(semantic_ui_react_1.Menu.Item, { onClick: this.toggleSidebar.bind(this) },
                         React.createElement(semantic_ui_react_1.Icon, { name: "sidebar", size: "large", style: { color: '#F6252D' } })),
