@@ -19697,6 +19697,7 @@ var MainApp = /** @class */ (function (_super) {
             filters: this.filters,
             response: true
         });
+        this.setState({ isSharing: false });
     };
     MainApp.prototype.handleFacebook = function () {
         console.log("sharing with facebook");
