@@ -19689,6 +19689,8 @@ var MainApp = /** @class */ (function (_super) {
         }
     };
     MainApp.prototype.startOver = function () {
+        if (this.state.isSharing)
+            this.toggleSharing();
         this.initDefaultProject();
         this.clear();
         this.create();
@@ -19697,7 +19699,6 @@ var MainApp = /** @class */ (function (_super) {
             filters: this.filters,
             response: true
         });
-        this.setState({ isSharing: false });
     };
     MainApp.prototype.handleFacebook = function () {
         console.log("sharing with facebook");
