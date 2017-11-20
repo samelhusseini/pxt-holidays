@@ -299,7 +299,7 @@ var ProjectView = (function (_super) {
                 pxt.debug('workspace changed, reloading...');
                 var id_1 = this.state.header ? this.state.header.id : '';
                 workspace.initAsync()
-                    .done(function () { return !_this.state.home && id_1 ? _this.loadHeaderAsync(workspace.getHeader(id_1)) : Promise.resolve(); });
+                    .done(function () { return !_this.state.home && id_1 ? _this.loadHeaderAsync(workspace.getHeader(id_1), _this.state.editorState) : Promise.resolve(); });
             }
             else if (this.state.resumeOnVisibility && !this.state.running) {
                 this.setState({ resumeOnVisibility: false });
