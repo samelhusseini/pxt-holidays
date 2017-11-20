@@ -19690,6 +19690,8 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.startOver = function () {
         this.initDefaultProject();
+        this.clear();
+        this.create();
         this.sendMessage('importproject', {
             project: JSON.parse(JSON.stringify(this.projects[0])),
             filters: this.filters,
@@ -19791,6 +19793,10 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.clear = function () {
         this.game.world.removeAll();
+        this.text = "";
+        this.background = "FF0000";
+        this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
+        this.showLights = false;
     };
     MainApp.prototype.create = function () {
         this.setBackground();
