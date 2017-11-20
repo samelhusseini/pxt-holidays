@@ -19829,7 +19829,7 @@ var MainApp = /** @class */ (function (_super) {
         this.game.stage.backgroundColor = "0x" + this.background;
     };
     MainApp.prototype.setText = function () {
-        var style = { font: 'bold 30pt ', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 100 };
+        var style = { font: 'bold 30pt Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 100 };
         if (this.textElement) {
             this.textElement.destroy();
             this.textElement = null;
