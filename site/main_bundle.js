@@ -19512,7 +19512,7 @@ var MainApp = /** @class */ (function (_super) {
     function MainApp(props) {
         var _this = _super.call(this, props) || this;
         _this.text = "";
-        _this.background = "B5001E";
+        _this.background = "FE6666";
         _this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
         _this.showLights = false;
         _this.lightGraphics = [];
