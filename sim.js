@@ -6,8 +6,8 @@ var __extends = (this && this.__extends) || function (d, b) {
 /// <reference path="../libs/core/enums.d.ts"/>
 var pxsim;
 (function (pxsim) {
-    var main;
-    (function (main) {
+    var card;
+    (function (card) {
         /**
          * Write text on the card
          * @param text text to write on the card, eg: "Happy Holidays!"
@@ -17,7 +17,7 @@ var pxsim;
         function say(text) {
             pxsim.board().sendMessage('text', text);
         }
-        main.say = say;
+        card.say = say;
         /**
          * Set the card background
          */
@@ -26,21 +26,33 @@ var pxsim;
         function setBackground(color) {
             pxsim.board().sendMessage('background', color.toString(16));
         }
-        main.setBackground = setBackground;
+        card.setBackground = setBackground;
         //% weight=89
         //% blockId="setIcon" block="set icon %icon=main_iconPicker"
         function setIcon(icon) {
             pxsim.board().sendMessage('icon', icon.toString());
         }
-        main.setIcon = setIcon;
+        card.setIcon = setIcon;
         //% blockId="main_iconPicker" block="%input" shim=TD_ID
         //% blockHidden=true
         //% input.fieldEditor="imagedropdown" input.fieldOptions.columns=4
         function _iconPicker(input) {
             return input;
         }
-        main._iconPicker = _iconPicker;
-    })(main = pxsim.main || (pxsim.main = {}));
+        card._iconPicker = _iconPicker;
+        /**
+         * Set the animation on the lights
+         */
+        //% blockId="randomColor" block="random color"
+        //% weight=89
+        function randomColor() {
+            var red = Math.floor(Math.random() * 255);
+            var green = Math.floor(Math.random() * 255);
+            var blue = Math.floor(Math.random() * 255);
+            return ((red & 0xFF) << 16) | ((green & 0xFF) << 8) | (blue & 0xFF);
+        }
+        card.randomColor = randomColor;
+    })(card = pxsim.card || (pxsim.card = {}));
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {

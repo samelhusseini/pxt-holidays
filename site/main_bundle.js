@@ -19543,7 +19543,8 @@ var MainApp = /** @class */ (function (_super) {
                 "string_compare": 0,
                 "string_substr": 0,
                 "string_parseint": 0,
-                "stringFromCharCode": 0
+                "stringFromCharCode": 0,
+                "device_random": 0
             },
             "fns": {}
         };
@@ -19628,7 +19629,7 @@ var MainApp = /** @class */ (function (_super) {
                     msg.editor = {
                         "filters": JSON.parse(JSON.stringify(this.filters)),
                         "searchBar": false,
-                        "categories": true
+                        "categories": false
                     };
                 editor.postMessage(msg, "*");
                 return;

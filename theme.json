@@ -26,7 +26,8 @@
     },
     "trashcan": true,
     "horizontalLayout": true,
-    "toolboxPosition": "end"
+    "toolboxPosition": "end",
+    "hasCategories": false
   },
   "blockColors": {
     "loops": "#27ae60",
@@ -49,7 +50,7 @@
   "extendEditor": true,
   "disableBlockIcons": true,
   "noReloadOnUpdate": true,
-  "defaultBlockGap": 5,
+  "defaultBlockGap": 8,
   "TOC": [
     {
       "name": "Blocks",
