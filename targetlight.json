@@ -17,8 +17,7 @@
     "onStartNamespace": "loops"
   },
   "simulator": {
-    "autoRun": true,
-    "headless": true
+    "autoRun": true
   },
   "compile": {
     "onStartText": true,

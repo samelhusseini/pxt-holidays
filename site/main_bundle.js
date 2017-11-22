@@ -19515,9 +19515,6 @@ var MainApp = /** @class */ (function (_super) {
         _this.background = "FE6666";
         _this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
         _this.showLights = false;
-        _this.lightGraphics = [];
-        _this.rainbowIndex = 0;
-        _this.rainbowColors = [''];
         _this.state = {
             isLoading: true,
             isSharing: false
@@ -19554,7 +19551,7 @@ var MainApp = /** @class */ (function (_super) {
         this.projects = [
             {
                 "text": {
-                    "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n  <block type=\"device_forever\" x=\"90\" y=\"45\">\n    <statement name=\"HANDLER\">\n      <block type=\"say\">\n        <value name=\"text\">\n          <shadow type=\"text\">\n            <field name=\"TEXT\">Happy Holidays!</field>\n          </shadow>\n        </value>\n      </block>\n    </statement>\n  </block>\n</xml>",
+                    "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n  <block type=\"device_forever\" x=\"90\" y=\"45\">\n    <statement name=\"HANDLER\">\n     <block type=\"setBackground\" >\n        <value name=\"color\">\n          <shadow type=\"colorNumberPicker\" id=\"8_h3;_~,~OWpTQeX=Ea`\">\n            <field name=\"value\">0xff0000</field>\n          </shadow>\n        </value>\n        <next>\n  <block type=\"say\">\n        <value name=\"text\">\n          <shadow type=\"text\">\n            <field name=\"TEXT\">Happy Holidays!</field>\n          </shadow>\n        </value>\n      </block>\n    </statement>\n  </block>\n</xml>",
                     "main.ts": "\n",
                     "README.md": " ",
                     "pxt.json": "{\n    \"name\": \"Untitled\",\n    \"dependencies\": {\n        \"core\": \"*\"\n    },\n    \"description\": \"\",\n    \"files\": [\n        \"main.blocks\",\n        \"main.ts\",\n        \"README.md\"\n    ]\n}"
@@ -19569,7 +19566,7 @@ var MainApp = /** @class */ (function (_super) {
             snowFall.snow(document.body, { round: true, shadow: true, maxSpeed: 5, flakeCount: 10, minSize: 3, maxSize: 8 });
         }, 3000);
         this.resize();
-        this.initPhaser();
+        //this.initPhaser();
     };
     MainApp.prototype.resize = function (setHeight) {
         var fullHeight = window.innerHeight;
@@ -19593,18 +19590,21 @@ var MainApp = /** @class */ (function (_super) {
         contentFrame.style.height = newHeight + "px";
         contentFrame.style.width = newWidth + "px";
         contentFrame.style.left = left + "px";
-        if (!hasTop)
-            contentFrame.style.top = top + additionalTopPadding / 2 + "px";
-        else
-            contentFrame.style.top = defaultPadding + additionalTopPadding + "px";
+        var newTop = hasTop ? top + additionalTopPadding / 2 : defaultPadding + additionalTopPadding;
+        contentFrame.style.top = newTop + "px";
         // Resize the editor workspace
         var scale = 0.3 + (fullWidth / 1000 * 0.3);
         this.sendMessage("setscale", {
             scale: scale
         });
-        // Scale the game
-        if (this.game)
-            this.resizeGame();
+        var innerCard = document.getElementById('inner-card');
+        this.sendMessage("proxytosim", {
+            type: "resize",
+            top: newTop + innerCard.offsetTop + 15,
+            left: left + innerCard.offsetLeft + 15,
+            width: innerCard.offsetWidth + 20,
+            height: innerCard.offsetHeight + 20
+        });
     };
     MainApp.prototype.sendMessage = function (action, args) {
         var editor = this.editorFrame.contentWindow;
@@ -19643,6 +19643,14 @@ var MainApp = /** @class */ (function (_super) {
                 this.setState({ isLoading: false });
                 this.resize();
             }
+            else if (msg.action == "simevent") {
+                if (msg.subtype == "started") {
+                    // remove frame background
+                    var frame = document.getElementsByClassName('frame')[0];
+                    frame.style.backgroundColor = 'transparent';
+                    this.resize();
+                }
+            }
         }
         if (msg.type == "pxteditor") {
             //var req = pendingMsgs[msg.id];
@@ -19653,47 +19661,12 @@ var MainApp = /** @class */ (function (_super) {
             // }
         }
         if (msg.type == "custom") {
-            if (msg.content) {
-                var innerMessage = msg.content;
-                switch (innerMessage.type) {
-                    case "simulator.message":
-                        var key = innerMessage.key;
-                        var data = innerMessage.data;
-                        switch (key) {
-                            case "text":
-                                this.text = innerMessage.data;
-                                this.setText();
-                                break;
-                            case "background":
-                                this.background = innerMessage.data;
-                                this.setBackground();
-                                break;
-                            case "light.color":
-                                this.lightBuffer = [innerMessage.data];
-                                this.showLights = true;
-                                this.drawLights();
-                                break;
-                            case "light.animation":
-                                this.lightAnimation = parseInt(innerMessage.data);
-                                this.showLights = true;
-                                break;
-                            case "icon":
-                                this.showIcon(innerMessage.data);
-                                break;
-                            default:
-                        }
-                        break;
-                    default:
-                }
-            }
         }
     };
     MainApp.prototype.startOver = function () {
         if (this.state.isSharing)
             this.toggleSharing();
         this.initDefaultProject();
-        this.clear();
-        this.create();
         this.sendMessage('importproject', {
             project: JSON.parse(JSON.stringify(this.projects[0])),
             filters: this.filters,
@@ -19705,249 +19678,6 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.handleTwitter = function () {
         console.log("sharing with twitter");
-    };
-    MainApp.prototype.initPhaser = function () {
-        var innerCard = document.getElementById('inner-card');
-        this.game = new Phaser.Game(innerCard.offsetWidth, innerCard.offsetHeight, Phaser.AUTO, 'inner-card', { preload: this.preload, create: this.create.bind(this), update: this.update });
-    };
-    MainApp.prototype.preload = function () {
-        var isLocalhost = /^http:\/\/(localhost|127\.0\.0\.1):\d+\//.test(window.location.href);
-        var staticPath = isLocalhost ? './static' : './docs/static';
-        this.game.load.image('balloons', staticPath + "/sprites/balloons.png");
-        this.game.load.image('barbecue', staticPath + "/sprites/barbecue-1.png");
-        this.game.load.image('bauble', staticPath + "/sprites/bauble.png");
-        this.game.load.image('baubles', staticPath + "/sprites/baubles.png");
-        this.game.load.image('bell', staticPath + "/sprites/bell.png");
-        this.game.load.image('candies', staticPath + "/sprites/candies.png");
-        this.game.load.image('candy-cane', staticPath + "/sprites/candy-cane.png");
-        this.game.load.image('christmas-sock', staticPath + "/sprites/christmas-sock.png");
-        this.game.load.image('christmas-tree', staticPath + "/sprites/christmas-tree.png");
-        this.game.load.image('church', staticPath + "/sprites/church.png");
-        this.game.load.image('firecracker', staticPath + "/sprites/firecracker-1.png");
-        this.game.load.image('fireworks-1', staticPath + "/sprites/fireworks-1.png");
-        this.game.load.image('fireworks-2', staticPath + "/sprites/fireworks-2.png");
-        this.game.load.image('fireworks', staticPath + "/sprites/fireworks.png");
-        this.game.load.image('gift', staticPath + "/sprites/gift.png");
-        this.game.load.image('mistletoe', staticPath + "/sprites/mistletoe.png");
-        this.game.load.image('mittens', staticPath + "/sprites/mittens.png");
-        this.game.load.image('rainbow', staticPath + "/sprites/rainbow.png");
-        this.game.load.image('reindeer', staticPath + "/sprites/reindeer.png");
-        this.game.load.image('ribbon', staticPath + "/sprites/ribbon.png");
-        this.game.load.image('santa', staticPath + "/sprites/santa-claus.png");
-        this.game.load.image('sledge', staticPath + "/sprites/sledge.png");
-        this.game.load.image('snowflake-1', staticPath + "/sprites/snowflake-1.png");
-        this.game.load.image('snowflake-2', staticPath + "/sprites/snowflake-2.png");
-        this.game.load.image('snowflake', staticPath + "/sprites/snowflake.png");
-        this.game.load.image('snowman', staticPath + "/sprites/snowman.png");
-    };
-    MainApp.prototype.lookupIcon = function (icon) {
-        switch (icon) {
-            case "1":
-                return "santa";
-            case "2":
-                return "snowman";
-            case "3":
-                return "snowflake";
-            case "4":
-                return "snowflake-1";
-            case "5":
-                return "snowflake-2";
-            case "6":
-                return "ribbon";
-            case "7":
-                return "sledge";
-            case "8":
-                return "reindeer";
-            case "9":
-                return "mittens";
-            case "10":
-                return "mistletoe";
-            case "11":
-                return "gift";
-            case "12":
-                return "fireworks";
-            case "13":
-                return "fireworks-1";
-            case "14":
-                return "fireworks-2";
-            case "15":
-                return "firecracker";
-            case "16":
-                return "church";
-            case "17":
-                return "christmas-tree";
-            case "18":
-                return "christmas-sock";
-            case "19":
-                return "candycane";
-            case "20":
-                return "candies";
-            case "21":
-                return "bell";
-            case "22":
-                return "bauble";
-            case "23":
-                return "baubles";
-            case "24":
-                return "barbecue";
-            case "25":
-                return "balloons";
-        }
-        return "";
-    };
-    MainApp.prototype.clear = function () {
-        this.game.world.removeAll();
-        this.text = "";
-        this.background = "FF0000";
-        this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
-        this.showLights = false;
-    };
-    MainApp.prototype.create = function () {
-        this.setBackground();
-        this.setText();
-        if (this.showLights)
-            this.drawLights();
-    };
-    MainApp.prototype.showIcon = function (icon) {
-        var iconName = this.lookupIcon(icon);
-        if (this.iconElement) {
-            this.iconElement.destroy();
-            this.iconElement = null;
-        }
-        var height = this.game.world.height;
-        this.iconElement = this.game.add.sprite(220, height / 5, iconName);
-        this.iconElement.scale.setTo(0.5, 0.5);
-    };
-    MainApp.prototype.resizeGame = function () {
-        var innerCard = document.getElementById('inner-card');
-        this.game.scale.setGameSize(innerCard.offsetWidth, innerCard.offsetHeight);
-        if (this.iconElement)
-            this.iconElement.scale.setTo(0.5, 0.5);
-        this.destroyLights();
-        if (this.showLights)
-            this.drawLights();
-    };
-    MainApp.prototype.setBackground = function () {
-        this.game.stage.backgroundColor = "0x" + this.background;
-    };
-    MainApp.prototype.setText = function () {
-        var style = { font: 'bold 30pt Arial', fill: 'white', align: 'left', wordWrap: true, wordWrapWidth: 100 };
-        if (this.textElement) {
-            this.textElement.destroy();
-            this.textElement = null;
-        }
-        this.textElement = this.game.add.text(120, this.game.world.centerY, this.text, style);
-        this.textElement.anchor.set(0.5);
-    };
-    MainApp.prototype.destroyLights = function () {
-        if (this.lightArc)
-            this.lightArc.destroy();
-        if (this.game.bmd)
-            this.game.bmd.clear();
-        for (var i = 0; i < this.lightGraphics.length; i++) {
-            this.lightGraphics[i].destroy();
-            this.lightGraphics[i] = null;
-        }
-        this.lightGraphics = [];
-        this.lightArc = null;
-    };
-    MainApp.prototype.drawLights = function () {
-        if (!this.lightGraphics || this.lightGraphics.length == 0) {
-            // setup lights
-            var width = this.game.world.width;
-            var height = this.game.world.height;
-            var lightWidth = this.game.world.width / 10;
-            var numOfLights = width / lightWidth;
-            var curveHeight = height / 10;
-            var pointA = { x: 0, y: 0 };
-            var pointB = { x: width / 2, y: curveHeight };
-            var pointC = { x: width, y: 0 };
-            var circleCenter = this.calcCircleCenter(pointA, pointB, pointC);
-            var circleRadius = Math.sqrt(Math.pow(circleCenter.x - width, 2) + Math.pow(circleCenter.y - 0, 2));
-            var circleRadius2 = Math.pow(circleRadius, 2);
-            this.lightArc = this.game.add.graphics(circleCenter.x, circleCenter.y);
-            //  Our first arc will be a line only
-            this.lightArc.lineStyle(6, 0x656d78);
-            // graphics.arc(0, 0, 135, game.math.degToRad(0), game.math.degToRad(90), false);
-            this.lightArc.arc(0, 0, circleRadius, 0, this.game.math.degToRad(180), false);
-            // draw lights on the arc
-            this.game.bmd = this.game.add.bitmapData(this.game.width, this.game.height);
-            this.game.bmd.addToWorld();
-            this.game.bmd.clear();
-            var i = 0;
-            for (var p = 0; p < numOfLights; p++) {
-                var x = 10 + p * lightWidth;
-                var y = Math.sqrt(circleRadius2 - Math.pow((x - circleCenter.x), 2)) + circleCenter.y;
-                this.game.bmd.rect(x - 3, y + 2, 6, 10, '#656d78');
-                var graphics = this.game.add.graphics(x, y + 18);
-                //  Our first arc will be a line only
-                var color = this.lightBuffer[i];
-                graphics.lineStyle(2, color);
-                graphics.beginFill(color, 1);
-                graphics.drawEllipse(0, 0, 6, 10);
-                this.lightGraphics.push(graphics);
-                i++;
-                if (i >= this.lightBuffer.length)
-                    i = 0;
-            }
-        }
-        else {
-            var j = 0;
-            for (var i = 0; i < this.lightGraphics.length; i++) {
-                var color = this.lightBuffer[j];
-                var graphics = this.lightGraphics[i];
-                var x = graphics.position.x;
-                var y = graphics.position.y;
-                graphics.destroy();
-                graphics = null;
-                var newgraphics = this.game.add.graphics(x, y);
-                newgraphics.lineStyle(2, color);
-                newgraphics.beginFill(color, 1);
-                newgraphics.drawEllipse(0, 0, 6, 10);
-                this.lightGraphics[i] = newgraphics;
-                j++;
-                if (j >= this.lightBuffer.length)
-                    j = 0;
-            }
-        }
-    };
-    MainApp.prototype.calcCircleCenter = function (A, B, C) {
-        var yDelta_a = B.y - A.y;
-        var xDelta_a = B.x - A.x;
-        var yDelta_b = C.y - B.y;
-        var xDelta_b = C.x - B.x;
-        var center = {};
-        var aSlope = yDelta_a / xDelta_a;
-        var bSlope = yDelta_b / xDelta_b;
-        center.x = (aSlope * bSlope * (A.y - C.y) + bSlope * (A.x + B.x) - aSlope * (B.x + C.x)) / (2 * (bSlope - aSlope));
-        center.y = -1 * (center.x - (A.x + B.x) / 2) / aSlope + (A.y + B.y) / 2;
-        return center;
-    };
-    MainApp.prototype.update = function () {
-        // // Animation frame
-        // if (this.lightAnimation) {
-        //     switch (this.lightAnimation) {
-        //         case 1:  // Rainbow Animation
-        //             this.showRainbowAnimation();
-        //             break;
-        //         default:
-        //     }
-        // }
-    };
-    MainApp.prototype.showRainbowAnimation = function () {
-        for (var i = 0; i < this.lightGraphics.length; i++) {
-            var color = this.calcRainbowColor(0, 9, i + this.rainbowIndex % this.lightGraphics.length);
-            var graphics = this.lightGraphics[i];
-            graphics.lineStyle(2, color);
-            graphics.beginFill(color, 1);
-            graphics.drawEllipse(0, 0, 6, 10);
-        }
-    };
-    MainApp.prototype.calcRainbowColor = function (min, max, val) {
-        var minHue = 240, maxHue = 0;
-        var curPercent = (val - min) / (max - min);
-        var colString = "hsl(" + ((curPercent * (maxHue - minHue)) + minHue) + ",100%,50%)";
-        return colString;
     };
     MainApp.prototype.componentWillUpdate = function (nextProps, nextState) {
         // when the menu becomes visible, setup some handlers so we can close the menu easily
@@ -19976,12 +19706,38 @@ var MainApp = /** @class */ (function (_super) {
     MainApp.prototype.toggleSharing = function () {
         var _this = this;
         this.setState({ isSharing: !this.state.isSharing });
+        if (this.state.isSharing) {
+            // Create a gist
+            this.publishGist();
+        }
         setTimeout(function () {
             _this.resize();
             setTimeout(function () {
                 _this.resize();
             }, 1500);
         }, 300);
+    };
+    MainApp.prototype.publishGist = function () {
+        var data = {
+            "description": 'my-project',
+            "public": false,
+            "files": this.projects[0].text
+        };
+        var headers = {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-GitHub-OTP, X-Requested-With',
+            'Access-Control-Allow-Methods': 'GET, POST, PATCH, PUT, DELETE',
+            'Access-Control-Expose-Headers': 'ETag, Link, X-GitHub-OTP, X-RateLimit-Limit, X-RateLimit-Remaining, X-RateLimit-Reset, X-OAuth-Scopes, X-Accepted-OAuth-Scopes, X-Poll-Interval',
+            'Access-Control-Max-Age': 86400
+        };
+        var url = "https://api.github.com/gists";
+        fetch(url, {
+            method: 'POST',
+            headers: headers,
+            body: data
+        }).then(function (response) {
+            console.log(response);
+        });
     };
     MainApp.prototype.render = function () {
         var _this = this;
@@ -20064,7 +19820,10 @@ var MainApp = /** @class */ (function (_super) {
                                     "Icons made by ",
                                     React.createElement("a", { href: "https://www.freepik.com/", target: "_blank" }, "Freepik"),
                                     " from ",
-                                    React.createElement("a", { href: "www.flaticon.com", target: "_blank" }, "www.flaticon.com"))))))));
+                                    React.createElement("a", { href: "www.flaticon.com", target: "_blank" }, "www.flaticon.com")),
+                                React.createElement(semantic_ui_react_1.List.Item, null,
+                                    "Kwanzaa icons from: ",
+                                    React.createElement("a", { rel: "nofollow", href: "https://www.Vecteezy.com/" }, "Vector Art by www.vecteezy.com"))))))));
     };
     return MainApp;
 }(React.Component));
