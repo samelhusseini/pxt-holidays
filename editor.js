@@ -12,12 +12,14 @@ pxt.editor.initExtensionsAsync = function (opts) {
                 // Resize sim-frame
                 console.log("Receive resize message");
                 var simframe = document.getElementsByClassName('simframe')[0];
-                simframe.style.position = 'fixed';
-                simframe.style.height = height + "px";
-                simframe.style.width = width + "px";
-                simframe.style.top = top_1 + "px";
-                simframe.style.left = left + "px";
-                simframe.style.paddingBottom = "0px";
+                if (simframe) {
+                    simframe.style.position = 'fixed';
+                    simframe.style.height = height + "px";
+                    simframe.style.width = width + "px";
+                    simframe.style.top = top_1 + "px";
+                    simframe.style.left = left + "px";
+                    simframe.style.paddingBottom = "0px";
+                }
                 break;
             default:
         }

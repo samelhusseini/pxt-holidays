@@ -19719,10 +19719,23 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.publishGist = function () {
         var data = {
-            "description": 'my-project',
-            "public": false,
-            "files": this.projects[0].text
+            "description": "the description for this gist",
+            "public": true,
+            "files": {
+                "file1.txt": {
+                    "content": "String file contents"
+                }
+            }
         };
+        // const data = {
+        //     "description": 'my-project',
+        //     "public": false,
+        //     "files": {
+        //         "main.ts": {
+        //             "content": JSON.stringify(this.projects[0].text['main.ts'])
+        //         }
+        //     }
+        // };
         var headers = {};
         var url = "https://api.github.com/gists";
         fetch(url, {
@@ -19730,7 +19743,9 @@ var MainApp = /** @class */ (function (_super) {
             headers: headers,
             body: data
         }).then(function (response) {
-            console.log(response);
+            return response.json();
+        }).then(function (json) {
+            console.log(json);
         });
     };
     MainApp.prototype.render = function () {
@@ -19823,6 +19838,10 @@ var MainApp = /** @class */ (function (_super) {
 }(React.Component));
 exports.MainApp = MainApp;
 ReactDOM.render(React.createElement(MainApp, null), document.getElementById("root"));
+function newGist(data) {
+    console.log('new gist');
+    console.log(data);
+}
 
 
 /***/ }),

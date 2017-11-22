@@ -27,7 +27,8 @@
         }
 
         .pushable>.pusher {
-            background: #46D3EF; /*#55D7F3;*/
+            background: #46D3EF;
+            /*#55D7F3;*/
         }
 
         #iframe {
@@ -126,6 +127,14 @@
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/JQuery-Snowfall/1.7.4/snowfall.min.js"></script>
+    <script>
+        function foo(response) {
+            var meta = response.meta;
+            var data = response.data;
+            console.log(meta);
+            console.log(data);
+        }
+        </script>
 </head>
 
 <body>
