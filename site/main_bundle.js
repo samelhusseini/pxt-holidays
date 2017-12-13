@@ -19819,7 +19819,7 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.beginSharing = function () {
         // Begin music
-        this.player = new Tone.Player("/sounds/Jingle_Bells_Instrumental.mp3").toMaster();
+        this.player = new Tone.Player("./sounds/Jingle_Bells_Instrumental.mp3").toMaster();
         this.player.autostart = true;
         // Begin snowing
         setTimeout(function () {
