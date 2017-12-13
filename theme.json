@@ -22,11 +22,10 @@
   "blocklyOptions": {
     "grid": {},
     "zoom": {
-      "startScale": 0.8
+      "startScale": 0.8,
+      "maxScale": 1.1
     },
     "trashcan": true,
-    "horizontalLayout": true,
-    "toolboxPosition": "end",
     "hasCategories": false
   },
   "blockColors": {
@@ -40,8 +39,8 @@
     "insertionMarker": "#9A6F62",
     "insertionMarkerOpacity": 0.5
   },
-  "simAnimationEnter": "rotate in",
-  "simAnimationExit": "rotate out",
+  "simAnimationEnter": "fly in right",
+  "simAnimationExit": "fly out right",
   "allowParentController": true,
   "hideCookieNotice": true,
   "hideMenuBar": true,

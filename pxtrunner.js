@@ -19,7 +19,7 @@ var pxt;
          * interface. Also talks to the server for anything to do with
          * the filesystem (like reading code)
          */
-        var DebugRunner = (function () {
+        var DebugRunner = /** @class */ (function () {
             function DebugRunner(container) {
                 this.container = container;
                 this.pkgLoaded = false;
@@ -724,7 +724,7 @@ var pxt;
 (function (pxt) {
     var runner;
     (function (runner) {
-        var EditorPackage = (function () {
+        var EditorPackage = /** @class */ (function () {
             function EditorPackage(ksPkg, topPkg) {
                 this.ksPkg = ksPkg;
                 this.topPkg = topPkg;
@@ -747,7 +747,7 @@ var pxt;
             };
             return EditorPackage;
         }());
-        var Host = (function () {
+        var Host = /** @class */ (function () {
             function Host() {
                 this.githubPackageCache = {};
             }
@@ -971,11 +971,11 @@ var pxt;
             });
         }
         runner.simulateAsync = simulateAsync;
+        var LanguageMode;
         (function (LanguageMode) {
             LanguageMode[LanguageMode["Blocks"] = 0] = "Blocks";
             LanguageMode[LanguageMode["TypeScript"] = 1] = "TypeScript";
-        })(runner.LanguageMode || (runner.LanguageMode = {}));
-        var LanguageMode = runner.LanguageMode;
+        })(LanguageMode = runner.LanguageMode || (runner.LanguageMode = {}));
         runner.languageMode = LanguageMode.Blocks;
         runner.editorLocale = "en";
         function setEditorContextAsync(mode, locale) {

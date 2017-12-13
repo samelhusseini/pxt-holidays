@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 // Helpers designed to help to make a simulator accessible.
 var pxsim;
 (function (pxsim) {
@@ -166,16 +171,16 @@ var pxsim;
     function isConnectedToBB(pin) {
         return pin.orientation === "-Z" && pin.style === "male";
     }
-    var Allocator = (function () {
+    var Allocator = /** @class */ (function () {
         function Allocator(opts) {
             this.availablePowerPins = {
                 top: {
-                    threeVolt: pxsim.mkRange(26, 51).map(function (n) { return { type: "breadboard", row: "+", col: "" + n }; }),
-                    ground: pxsim.mkRange(26, 51).map(function (n) { return { type: "breadboard", row: "-", col: "" + n }; }),
+                    threeVolt: pxsim.mkRange(26, 51).map(function (n) { return ({ type: "breadboard", row: "+", col: "" + n }); }),
+                    ground: pxsim.mkRange(26, 51).map(function (n) { return ({ type: "breadboard", row: "-", col: "" + n }); }),
                 },
                 bottom: {
-                    threeVolt: pxsim.mkRange(1, 26).map(function (n) { return { type: "breadboard", row: "+", col: "" + n }; }),
-                    ground: pxsim.mkRange(1, 26).map(function (n) { return { type: "breadboard", row: "-", col: "" + n }; }),
+                    threeVolt: pxsim.mkRange(1, 26).map(function (n) { return ({ type: "breadboard", row: "+", col: "" + n }); }),
+                    ground: pxsim.mkRange(1, 26).map(function (n) { return ({ type: "breadboard", row: "-", col: "" + n }); }),
                 },
             };
             this.opts = opts;
@@ -300,6 +305,7 @@ var pxsim;
             var extraSpace = totalColumnsCount - totalSpaceNeeded;
             if (extraSpace <= 0) {
                 console.log("Not enough breadboard space!");
+                //TODO
             }
             var padding = Math.floor(extraSpace / (partsCount - 1 + 2));
             var partSpacing = padding; //Math.floor(extraSpace/(partsCount-1));
@@ -423,6 +429,7 @@ var pxsim;
                 });
                 if (!firstTopAndBot[0] || !firstTopAndBot[1]) {
                     console.debug("No more available \"" + location + "\" locations!");
+                    //TODO
                 }
                 var nearTop = pxsim.visuals.findClosestCoordIdx(nearestCoord, firstTopAndBot) == 0;
                 var barPins = void 0;
@@ -485,6 +492,7 @@ var pxsim;
             var boardGround = this.opts.boardDef.groundPins[0] || null;
             if (!boardGround) {
                 console.log("No available ground pin on board!");
+                //TODO
             }
             return boardGround;
         };
@@ -492,6 +500,7 @@ var pxsim;
             var threeVoltPin = this.opts.boardDef.threeVoltPins[0] || null;
             if (!threeVoltPin) {
                 console.log("No available 3.3V pin on board!");
+                //TODO
             }
             return threeVoltPin;
         };
@@ -692,7 +701,7 @@ var pxsim;
 (function (pxsim) {
     var protocol;
     (function (protocol) {
-        var Message = (function () {
+        var Message = /** @class */ (function () {
             function Message(type) {
                 this.seq = 0;
                 this.type = type;
@@ -700,36 +709,38 @@ var pxsim;
             return Message;
         }());
         protocol.Message = Message;
-        var Response = (function (_super) {
+        var Response = /** @class */ (function (_super) {
             __extends(Response, _super);
             function Response(request, message) {
-                _super.call(this, 'response');
-                this.request_seq = request.seq;
-                this.command = request.command;
+                var _this = _super.call(this, 'response') || this;
+                _this.request_seq = request.seq;
+                _this.command = request.command;
                 if (message) {
-                    this.success = false;
-                    this.message = message;
+                    _this.success = false;
+                    _this.message = message;
                 }
                 else {
-                    this.success = true;
+                    _this.success = true;
                 }
+                return _this;
             }
             return Response;
         }(Message));
         protocol.Response = Response;
-        var Event = (function (_super) {
+        var Event = /** @class */ (function (_super) {
             __extends(Event, _super);
             function Event(event, body) {
-                _super.call(this, 'event');
-                this.event = event;
+                var _this = _super.call(this, 'event') || this;
+                _this.event = event;
                 if (body) {
-                    this.body = body;
+                    _this.body = body;
                 }
+                return _this;
             }
             return Event;
         }(Message));
         protocol.Event = Event;
-        var Source = (function () {
+        var Source = /** @class */ (function () {
             function Source(name, path, id, origin, data) {
                 if (id === void 0) { id = 0; }
                 this.name = name;
@@ -745,7 +756,7 @@ var pxsim;
             return Source;
         }());
         protocol.Source = Source;
-        var Scope = (function () {
+        var Scope = /** @class */ (function () {
             function Scope(name, reference, expensive) {
                 if (expensive === void 0) { expensive = false; }
                 this.name = name;
@@ -755,7 +766,7 @@ var pxsim;
             return Scope;
         }());
         protocol.Scope = Scope;
-        var StackFrame = (function () {
+        var StackFrame = /** @class */ (function () {
             function StackFrame(i, nm, src, ln, col) {
                 if (ln === void 0) { ln = 0; }
                 if (col === void 0) { col = 0; }
@@ -768,7 +779,7 @@ var pxsim;
             return StackFrame;
         }());
         protocol.StackFrame = StackFrame;
-        var Thread = (function () {
+        var Thread = /** @class */ (function () {
             function Thread(id, name) {
                 this.id = id;
                 if (name) {
@@ -781,7 +792,7 @@ var pxsim;
             return Thread;
         }());
         protocol.Thread = Thread;
-        var Variable = (function () {
+        var Variable = /** @class */ (function () {
             function Variable(name, value, ref, indexedVariables, namedVariables) {
                 if (ref === void 0) { ref = 0; }
                 this.name = name;
@@ -797,7 +808,7 @@ var pxsim;
             return Variable;
         }());
         protocol.Variable = Variable;
-        var Breakpoint = (function () {
+        var Breakpoint = /** @class */ (function () {
             function Breakpoint(verified, line, column, source) {
                 this.verified = verified;
                 var e = this;
@@ -814,7 +825,7 @@ var pxsim;
             return Breakpoint;
         }());
         protocol.Breakpoint = Breakpoint;
-        var Module = (function () {
+        var Module = /** @class */ (function () {
             function Module(id, name) {
                 this.id = id;
                 this.name = name;
@@ -822,7 +833,7 @@ var pxsim;
             return Module;
         }());
         protocol.Module = Module;
-        var CompletionItem = (function () {
+        var CompletionItem = /** @class */ (function () {
             function CompletionItem(label, start, length) {
                 if (length === void 0) { length = 0; }
                 this.label = label;
@@ -832,112 +843,119 @@ var pxsim;
             return CompletionItem;
         }());
         protocol.CompletionItem = CompletionItem;
-        var StoppedEvent = (function (_super) {
+        var StoppedEvent = /** @class */ (function (_super) {
             __extends(StoppedEvent, _super);
             function StoppedEvent(reason, threadId, exception_text) {
                 if (exception_text === void 0) { exception_text = null; }
-                _super.call(this, 'stopped');
-                this.body = {
+                var _this = _super.call(this, 'stopped') || this;
+                _this.body = {
                     reason: reason,
                     threadId: threadId
                 };
                 if (exception_text) {
-                    var e = this;
+                    var e = _this;
                     e.body.text = exception_text;
                 }
+                return _this;
             }
             return StoppedEvent;
         }(Event));
         protocol.StoppedEvent = StoppedEvent;
-        var ContinuedEvent = (function (_super) {
+        var ContinuedEvent = /** @class */ (function (_super) {
             __extends(ContinuedEvent, _super);
             function ContinuedEvent(threadId, allThreadsContinued) {
-                _super.call(this, 'continued');
-                this.body = {
+                var _this = _super.call(this, 'continued') || this;
+                _this.body = {
                     threadId: threadId
                 };
                 if (typeof allThreadsContinued === 'boolean') {
-                    this.body.allThreadsContinued = allThreadsContinued;
+                    _this.body.allThreadsContinued = allThreadsContinued;
                 }
+                return _this;
             }
             return ContinuedEvent;
         }(Event));
         protocol.ContinuedEvent = ContinuedEvent;
-        var InitializedEvent = (function (_super) {
+        var InitializedEvent = /** @class */ (function (_super) {
             __extends(InitializedEvent, _super);
             function InitializedEvent() {
-                _super.call(this, 'initialized');
+                return _super.call(this, 'initialized') || this;
             }
             return InitializedEvent;
         }(Event));
         protocol.InitializedEvent = InitializedEvent;
-        var TerminatedEvent = (function (_super) {
+        var TerminatedEvent = /** @class */ (function (_super) {
             __extends(TerminatedEvent, _super);
             function TerminatedEvent(restart) {
-                _super.call(this, 'terminated');
+                var _this = _super.call(this, 'terminated') || this;
                 if (typeof restart === 'boolean') {
-                    var e = this;
+                    var e = _this;
                     e.body = {
                         restart: restart
                     };
                 }
+                return _this;
             }
             return TerminatedEvent;
         }(Event));
         protocol.TerminatedEvent = TerminatedEvent;
-        var OutputEvent = (function (_super) {
+        var OutputEvent = /** @class */ (function (_super) {
             __extends(OutputEvent, _super);
             function OutputEvent(output, category, data) {
                 if (category === void 0) { category = 'console'; }
-                _super.call(this, 'output');
-                this.body = {
+                var _this = _super.call(this, 'output') || this;
+                _this.body = {
                     category: category,
                     output: output
                 };
                 if (data !== undefined) {
-                    this.body.data = data;
+                    _this.body.data = data;
                 }
+                return _this;
             }
             return OutputEvent;
         }(Event));
         protocol.OutputEvent = OutputEvent;
-        var ThreadEvent = (function (_super) {
+        var ThreadEvent = /** @class */ (function (_super) {
             __extends(ThreadEvent, _super);
             function ThreadEvent(reason, threadId) {
-                _super.call(this, 'thread');
-                this.body = {
+                var _this = _super.call(this, 'thread') || this;
+                _this.body = {
                     reason: reason,
                     threadId: threadId
                 };
+                return _this;
             }
             return ThreadEvent;
         }(Event));
         protocol.ThreadEvent = ThreadEvent;
-        var BreakpointEvent = (function (_super) {
+        var BreakpointEvent = /** @class */ (function (_super) {
             __extends(BreakpointEvent, _super);
             function BreakpointEvent(reason, breakpoint) {
-                _super.call(this, 'breakpoint');
-                this.body = {
+                var _this = _super.call(this, 'breakpoint') || this;
+                _this.body = {
                     reason: reason,
                     breakpoint: breakpoint
                 };
+                return _this;
             }
             return BreakpointEvent;
         }(Event));
         protocol.BreakpointEvent = BreakpointEvent;
-        var ModuleEvent = (function (_super) {
+        var ModuleEvent = /** @class */ (function (_super) {
             __extends(ModuleEvent, _super);
             function ModuleEvent(reason, module) {
-                _super.call(this, 'module');
-                this.body = {
+                var _this = _super.call(this, 'module') || this;
+                _this.body = {
                     reason: reason,
                     module: module
                 };
+                return _this;
             }
             return ModuleEvent;
         }(Event));
         protocol.ModuleEvent = ModuleEvent;
-        var ProtocolServer = (function () {
+        var ProtocolServer = /** @class */ (function () {
             function ProtocolServer() {
                 this._pendingRequests = {};
             }
@@ -1010,14 +1028,15 @@ var pxsim;
             return ProtocolServer;
         }());
         protocol.ProtocolServer = ProtocolServer;
-        var DebugSession = (function (_super) {
+        var DebugSession = /** @class */ (function (_super) {
             __extends(DebugSession, _super);
             function DebugSession() {
-                _super.apply(this, arguments);
-                this._debuggerLinesStartAt1 = false;
-                this._debuggerColumnsStartAt1 = false;
-                this._clientLinesStartAt1 = true;
-                this._clientColumnsStartAt1 = true;
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this._debuggerLinesStartAt1 = false;
+                _this._debuggerColumnsStartAt1 = false;
+                _this._clientLinesStartAt1 = true;
+                _this._clientColumnsStartAt1 = true;
+                return _this;
             }
             DebugSession.prototype.shutdown = function () {
             };
@@ -1385,7 +1404,7 @@ var pxsim;
             }
         }
         util.injectPolyphils = injectPolyphils;
-        var Lazy = (function () {
+        var Lazy = /** @class */ (function () {
             function Lazy(_func) {
                 this._func = _func;
                 this._evaluated = false;
@@ -1443,7 +1462,7 @@ var pxsim;
         function pathJoin() {
             var paths = [];
             for (var _i = 0; _i < arguments.length; _i++) {
-                paths[_i - 0] = arguments[_i];
+                paths[_i] = arguments[_i];
             }
             var result = "";
             paths.forEach(function (path) {
@@ -1477,7 +1496,7 @@ var pxsim;
         return r;
     }
     pxsim.getWarningMessage = getWarningMessage;
-    var BreakpointMap = (function () {
+    var BreakpointMap = /** @class */ (function () {
         function BreakpointMap(breakpoints) {
             var _this = this;
             this.fileMap = {};
@@ -1587,18 +1606,18 @@ var pxsim;
         return r;
     }
     pxsim.getBreakpointMsg = getBreakpointMsg;
-    var SimDebugSession = (function (_super) {
+    var SimDebugSession = /** @class */ (function (_super) {
         __extends(SimDebugSession, _super);
         function SimDebugSession(container) {
-            var _this = this;
-            _super.call(this);
+            var _this = _super.call(this) || this;
             var options = {
                 onDebuggerBreakpoint: function (b) { return _this.onDebuggerBreakpoint(b); },
                 onDebuggerWarning: function (w) { return _this.onDebuggerWarning(w); },
                 onDebuggerResume: function () { return _this.onDebuggerResume(); },
                 onStateChanged: function (s) { return _this.onStateChanged(s); }
             };
-            this.driver = new pxsim.SimulatorDriver(container, options);
+            _this.driver = new pxsim.SimulatorDriver(container, options);
+            return _this;
         }
         SimDebugSession.prototype.runCode = function (js, parts, fnArgs, breakpoints, board) {
             this.breakpoints = breakpoints;
@@ -1759,7 +1778,7 @@ var pxsim;
      * expects requests to be made in the order:
      *      Frames -> Scopes -> Variables
      */
-    var StoppedState = (function () {
+    var StoppedState = /** @class */ (function () {
         function StoppedState(_message, _map, _dir) {
             this._message = _message;
             this._map = _map;
@@ -1988,14 +2007,13 @@ if (typeof window !== 'undefined') {
         pxsim.Embed.start();
     });
 }
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 var pxsim;
 (function (pxsim) {
     var instructions;
     (function (instructions) {
         var LOC_LBL_SIZE = 10;
         var QUANT_LBL_SIZE = 30;
-        var QUANT_LBL = function (q) { return (q + "x"); };
+        var QUANT_LBL = function (q) { return q + "x"; };
         var WIRE_QUANT_LBL_SIZE = 20;
         var LBL_VERT_PAD = 3;
         var LBL_RIGHT_PAD = 5;
@@ -2280,7 +2298,7 @@ var pxsim;
             if (step > 0) {
                 pxsim.svg.addClass(view, "grayed");
             }
-            var _loop_1 = function(i) {
+            var _loop_1 = function (i) {
                 var cmps = props.stepToCmps[i];
                 if (cmps) {
                     cmps.forEach(function (partInst) {
@@ -2459,9 +2477,13 @@ var pxsim;
             return panel;
         }
         function renderParts(options) {
+            if (options.configData)
+                pxsim.setConfigData(options.configData.cfg, options.configData.cfgKey);
             var msg = {
                 type: "run",
                 code: "",
+                boardDefinition: options.boardDef,
+                partDefinitions: options.partDefinitions
             };
             pxsim.runtime = new pxsim.Runtime(msg);
             pxsim.runtime.board = null;
@@ -2541,11 +2563,15 @@ var pxsim;
         cfgKey = cfgKey_;
     }
     pxsim.setConfigData = setConfigData;
+    function getConfigData() {
+        return { cfg: cfg, cfgKey: cfgKey };
+    }
+    pxsim.getConfigData = getConfigData;
     function enableFloatingPoint() {
         floatingPoint = true;
     }
     pxsim.enableFloatingPoint = enableFloatingPoint;
-    var RefObject = (function () {
+    var RefObject = /** @class */ (function () {
         function RefObject() {
             this.refcnt = 1;
             if (pxsim.runtime)
@@ -2561,7 +2587,7 @@ var pxsim;
         return RefObject;
     }());
     pxsim.RefObject = RefObject;
-    var FnWrapper = (function () {
+    var FnWrapper = /** @class */ (function () {
         function FnWrapper(func, caps, a0, a1, a2, cb) {
             this.func = func;
             this.caps = caps;
@@ -2573,11 +2599,12 @@ var pxsim;
         return FnWrapper;
     }());
     pxsim.FnWrapper = FnWrapper;
-    var RefRecord = (function (_super) {
+    var RefRecord = /** @class */ (function (_super) {
         __extends(RefRecord, _super);
         function RefRecord() {
-            _super.apply(this, arguments);
-            this.fields = [];
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.fields = [];
+            return _this;
         }
         RefRecord.prototype.destroy = function () {
             var refmask = this.vtable.refmask;
@@ -2598,11 +2625,12 @@ var pxsim;
         return RefRecord;
     }(RefObject));
     pxsim.RefRecord = RefRecord;
-    var RefAction = (function (_super) {
+    var RefAction = /** @class */ (function (_super) {
         __extends(RefAction, _super);
         function RefAction() {
-            _super.apply(this, arguments);
-            this.fields = [];
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.fields = [];
+            return _this;
         }
         RefAction.prototype.isRef = function (idx) {
             check(0 <= idx && idx < this.fields.length);
@@ -2664,11 +2692,12 @@ var pxsim;
         }
         pxtcore.runAction0 = runAction0;
     })(pxtcore = pxsim.pxtcore || (pxsim.pxtcore = {}));
-    var RefLocal = (function (_super) {
+    var RefLocal = /** @class */ (function (_super) {
         __extends(RefLocal, _super);
         function RefLocal() {
-            _super.apply(this, arguments);
-            this.v = 0;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.v = 0;
+            return _this;
         }
         RefLocal.prototype.print = function () {
             //console.log(`RefLocal id:${this.id} refs:${this.refcnt} v:${this.v}`)
@@ -2676,11 +2705,12 @@ var pxsim;
         return RefLocal;
     }(RefObject));
     pxsim.RefLocal = RefLocal;
-    var RefRefLocal = (function (_super) {
+    var RefRefLocal = /** @class */ (function (_super) {
         __extends(RefRefLocal, _super);
         function RefRefLocal() {
-            _super.apply(this, arguments);
-            this.v = null;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.v = null;
+            return _this;
         }
         RefRefLocal.prototype.destroy = function () {
             decr(this.v);
@@ -2692,12 +2722,13 @@ var pxsim;
         return RefRefLocal;
     }(RefObject));
     pxsim.RefRefLocal = RefRefLocal;
-    var RefMap = (function (_super) {
+    var RefMap = /** @class */ (function (_super) {
         __extends(RefMap, _super);
         function RefMap() {
-            _super.apply(this, arguments);
-            this.vtable = 42;
-            this.data = [];
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.vtable = 42;
+            _this.data = [];
+            return _this;
         }
         RefMap.prototype.findIdx = function (key) {
             for (var i = 0; i < this.data.length; ++i) {
@@ -2788,14 +2819,17 @@ var pxsim;
     })(numops = pxsim.numops || (pxsim.numops = {}));
     var langsupp;
     (function (langsupp) {
-        function toInt(v) { return (v | 0); }
-        langsupp.toInt = toInt; // TODO
+        function toInt(v) { return (v | 0); } // TODO
+        langsupp.toInt = toInt;
         function toFloat(v) { return v; }
         langsupp.toFloat = toFloat;
         function ignore(v) { return v; }
         langsupp.ignore = ignore;
+        function ptreqDecr(a, b) {
+            return pxsim.Number_.eqDecr(a, b);
+        }
+        langsupp.ptreqDecr = ptreqDecr;
     })(langsupp = pxsim.langsupp || (pxsim.langsupp = {}));
-    var pxtcore;
     (function (pxtcore) {
         pxtcore.incr = pxsim.incr;
         pxtcore.decr = pxsim.decr;
@@ -3050,7 +3084,6 @@ var pxsim;
         }
         pxtrt.mapSetRef = mapSetRef;
     })(pxtrt = pxsim.pxtrt || (pxsim.pxtrt = {}));
-    var pxtcore;
     (function (pxtcore) {
         function mkClassInstance(vtable) {
             check(!!vtable.methods);
@@ -3102,14 +3135,15 @@ var pxsim;
 (function (pxsim) {
     // A ref-counted collection of either primitive or ref-counted objects (String, Image,
     // user-defined record, another collection)
-    var RefCollection = (function (_super) {
+    var RefCollection = /** @class */ (function (_super) {
         __extends(RefCollection, _super);
         //undefiend or null values need to be handled specially to support default values
         //default values of boolean, string, number & object arrays are respectively, false, null, 0, null
         //All of the default values are implemented by mapping undefined\null to zero.
         function RefCollection() {
-            _super.call(this);
-            this.data = [];
+            var _this = _super.call(this) || this;
+            _this.data = [];
+            return _this;
         }
         RefCollection.prototype.destroy = function () {
             var data = this.data;
@@ -3328,7 +3362,7 @@ var pxsim;
         var bh = (b >>> 16) & 0xffff;
         var bl = b & 0xffff;
         // the shift by 0 fixes the sign on the high part
-        // the final |0 converts the unsigned value into a signed value 
+        // the final |0 converts the unsigned value into a signed value
         return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
     }
     var Number_;
@@ -3341,6 +3375,16 @@ var pxsim;
         Number_.neq = neq;
         function eq(x, y) { return pxsim.pxtrt.nullFix(x) == pxsim.pxtrt.nullFix(y); }
         Number_.eq = eq;
+        function eqDecr(x, y) {
+            if (pxsim.pxtrt.nullFix(x) == pxsim.pxtrt.nullFix(y)) {
+                pxsim.decr(y);
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        Number_.eqDecr = eqDecr;
         function gt(x, y) { return x > y; }
         Number_.gt = gt;
         function ge(x, y) { return x >= y; }
@@ -3441,6 +3485,16 @@ var pxsim;
             return 1;
         }
         String_.compare = compare;
+        function compareDecr(s1, s2) {
+            if (s1 == s2) {
+                pxsim.decr(s2);
+                return 0;
+            }
+            if (s1 < s2)
+                return -1;
+            return 1;
+        }
+        String_.compareDecr = compareDecr;
         function length(s) {
             return s.length;
         }
@@ -3478,14 +3532,15 @@ var pxsim;
         }
         Boolean_.bang = bang;
     })(Boolean_ = pxsim.Boolean_ || (pxsim.Boolean_ = {}));
-    var RefBuffer = (function (_super) {
+    var RefBuffer = /** @class */ (function (_super) {
         __extends(RefBuffer, _super);
         function RefBuffer(data) {
-            _super.call(this);
-            this.data = data;
+            var _this = _super.call(this) || this;
+            _this.data = data;
+            return _this;
         }
         RefBuffer.prototype.print = function () {
-            console.log("RefBuffer id:" + this.id + " refs:" + this.refcnt + " len:" + this.data.length + " d0:" + this.data[0]);
+            // console.log(`RefBuffer id:${this.id} refs:${this.refcnt} len:${this.data.length} d0:${this.data[0]}`)
         };
         return RefBuffer;
     }(pxsim.RefObject));
@@ -3493,6 +3548,7 @@ var pxsim;
     var BufferMethods;
     (function (BufferMethods) {
         // keep in sync with C++!
+        var NumberFormat;
         (function (NumberFormat) {
             NumberFormat[NumberFormat["Int8LE"] = 1] = "Int8LE";
             NumberFormat[NumberFormat["UInt8LE"] = 2] = "UInt8LE";
@@ -3510,8 +3566,7 @@ var pxsim;
             NumberFormat[NumberFormat["Float64LE"] = 14] = "Float64LE";
             NumberFormat[NumberFormat["Float32BE"] = 15] = "Float32BE";
             NumberFormat[NumberFormat["Float64BE"] = 16] = "Float64BE";
-        })(BufferMethods.NumberFormat || (BufferMethods.NumberFormat = {}));
-        var NumberFormat = BufferMethods.NumberFormat;
+        })(NumberFormat = BufferMethods.NumberFormat || (BufferMethods.NumberFormat = {}));
         ;
         function fmtInfoCore(fmt) {
             switch (fmt) {
@@ -3656,10 +3711,10 @@ var pxsim;
         BufferMethods.slice = slice;
         function toHex(buf) {
             var hex = "0123456789abcdef";
-            var res;
+            var res = "";
             for (var i = 0; i < buf.data.length; ++i) {
-                res[i << 1] = hex[buf.data[i] >> 4];
-                res[(i << 1) + 1] = hex[buf.data[i] & 0xf];
+                res += hex[buf.data[i] >> 4];
+                res += hex[buf.data[i] & 0xf];
             }
             return res;
         }
@@ -3758,7 +3813,6 @@ var pxsim;
         localization.lf = lf;
     })(localization = pxsim.localization || (pxsim.localization = {}));
 })(pxsim || (pxsim = {}));
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 /// <reference path="../localtypings/pxtparts.d.ts"/>
 var pxsim;
 (function (pxsim) {
@@ -3812,7 +3866,7 @@ var pxsim;
     function getResume() { return pxsim.runtime.getResume(); }
     pxsim.getResume = getResume;
     var SERIAL_BUFFER_LENGTH = 16;
-    var BaseBoard = (function () {
+    var BaseBoard = /** @class */ (function () {
         function BaseBoard() {
             this.serialOutBuffer = '';
         }
@@ -3840,21 +3894,21 @@ var pxsim;
         return BaseBoard;
     }());
     pxsim.BaseBoard = BaseBoard;
-    var CoreBoard = (function (_super) {
+    var CoreBoard = /** @class */ (function (_super) {
         __extends(CoreBoard, _super);
         function CoreBoard() {
-            var _this = this;
-            _super.call(this);
-            this.id = "b" + Math.round(Math.random() * 2147483647);
-            this.bus = new pxsim.EventBus(pxsim.runtime);
+            var _this = _super.call(this) || this;
+            _this.id = "b" + Math.round(Math.random() * 2147483647);
+            _this.bus = new pxsim.EventBus(pxsim.runtime);
             // updates
-            this.updateSubscribers = [];
-            this.updateView = function () {
+            _this.updateSubscribers = [];
+            _this.updateView = function () {
                 _this.updateSubscribers.forEach(function (sub) { return sub(); });
             };
-            this.builtinParts = {};
-            this.builtinVisuals = {};
-            this.builtinPartVisuals = {};
+            _this.builtinParts = {};
+            _this.builtinVisuals = {};
+            _this.builtinPartVisuals = {};
+            return _this;
         }
         CoreBoard.prototype.kill = function () {
             _super.prototype.kill.call(this);
@@ -3863,10 +3917,10 @@ var pxsim;
         return CoreBoard;
     }(BaseBoard));
     pxsim.CoreBoard = CoreBoard;
-    var BareBoard = (function (_super) {
+    var BareBoard = /** @class */ (function (_super) {
         __extends(BareBoard, _super);
         function BareBoard() {
-            _super.apply(this, arguments);
+            return _super !== null && _super.apply(this, arguments) || this;
         }
         return BareBoard;
     }(BaseBoard));
@@ -3892,7 +3946,7 @@ var pxsim;
         };
     }
     pxsim.initBareRuntime = initBareRuntime;
-    var EventQueue = (function () {
+    var EventQueue = /** @class */ (function () {
         function EventQueue(runtime) {
             this.runtime = runtime;
             this.max = 5;
@@ -3959,7 +4013,7 @@ var pxsim;
     // overriden at loadtime by specific implementation
     pxsim.initCurrentRuntime = undefined;
     pxsim.handleCustomMessage = undefined;
-    var Runtime = (function () {
+    var Runtime = /** @class */ (function () {
         function Runtime(msg) {
             var _this = this;
             this.numGlobals = 1000;
@@ -4328,22 +4382,22 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    var SimulatorState;
     (function (SimulatorState) {
         SimulatorState[SimulatorState["Unloaded"] = 0] = "Unloaded";
         SimulatorState[SimulatorState["Stopped"] = 1] = "Stopped";
         SimulatorState[SimulatorState["Running"] = 2] = "Running";
         SimulatorState[SimulatorState["Paused"] = 3] = "Paused";
-    })(pxsim.SimulatorState || (pxsim.SimulatorState = {}));
-    var SimulatorState = pxsim.SimulatorState;
+    })(SimulatorState = pxsim.SimulatorState || (pxsim.SimulatorState = {}));
+    var SimulatorDebuggerCommand;
     (function (SimulatorDebuggerCommand) {
         SimulatorDebuggerCommand[SimulatorDebuggerCommand["StepInto"] = 0] = "StepInto";
         SimulatorDebuggerCommand[SimulatorDebuggerCommand["StepOver"] = 1] = "StepOver";
         SimulatorDebuggerCommand[SimulatorDebuggerCommand["StepOut"] = 2] = "StepOut";
         SimulatorDebuggerCommand[SimulatorDebuggerCommand["Resume"] = 3] = "Resume";
         SimulatorDebuggerCommand[SimulatorDebuggerCommand["Pause"] = 4] = "Pause";
-    })(pxsim.SimulatorDebuggerCommand || (pxsim.SimulatorDebuggerCommand = {}));
-    var SimulatorDebuggerCommand = pxsim.SimulatorDebuggerCommand;
-    var SimulatorDriver = (function () {
+    })(SimulatorDebuggerCommand = pxsim.SimulatorDebuggerCommand || (pxsim.SimulatorDebuggerCommand = {}));
+    var SimulatorDriver = /** @class */ (function () {
         function SimulatorDriver(container, options) {
             if (options === void 0) { options = {}; }
             this.container = container;
@@ -4698,7 +4752,6 @@ var pxsim;
     }());
     pxsim.SimulatorDriver = SimulatorDriver;
 })(pxsim || (pxsim = {}));
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 var pxsim;
 (function (pxsim) {
     ;
@@ -4716,7 +4769,7 @@ var pxsim;
         return getQsVal;
     }
     pxsim.parseQueryString = parseQueryString;
-    var EventBus = (function () {
+    var EventBus = /** @class */ (function () {
         function EventBus(runtime) {
             this.runtime = runtime;
             this.queues = {};
@@ -4755,7 +4808,7 @@ var pxsim;
         return EventBus;
     }());
     pxsim.EventBus = EventBus;
-    var AnimationQueue = (function () {
+    var AnimationQueue = /** @class */ (function () {
         function AnimationQueue(runtime) {
             var _this = this;
             this.runtime = runtime;
@@ -4926,7 +4979,6 @@ var pxsim;
             leave: "mouseleave"
         };
 })(pxsim || (pxsim = {}));
-var pxsim;
 (function (pxsim) {
     var visuals;
     (function (visuals) {
@@ -5324,14 +5376,14 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var Button = (function () {
+    var Button = /** @class */ (function () {
         function Button(id) {
             this.id = id;
         }
         return Button;
     }());
     pxsim.Button = Button;
-    var ButtonPairState = (function () {
+    var ButtonPairState = /** @class */ (function () {
         function ButtonPairState(props) {
             this.props = props;
             this.usesButtonAB = false;
@@ -5346,7 +5398,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var CompassState = (function () {
+    var CompassState = /** @class */ (function () {
         function CompassState() {
             this.usesHeading = false;
             this.heading = 90;
@@ -5357,6 +5409,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    var PinFlags;
     (function (PinFlags) {
         PinFlags[PinFlags["Unused"] = 0] = "Unused";
         PinFlags[PinFlags["Digital"] = 1] = "Digital";
@@ -5364,9 +5417,8 @@ var pxsim;
         PinFlags[PinFlags["Input"] = 4] = "Input";
         PinFlags[PinFlags["Output"] = 8] = "Output";
         PinFlags[PinFlags["Touch"] = 16] = "Touch";
-    })(pxsim.PinFlags || (pxsim.PinFlags = {}));
-    var PinFlags = pxsim.PinFlags;
-    var Pin = (function () {
+    })(PinFlags = pxsim.PinFlags || (pxsim.PinFlags = {}));
+    var Pin = /** @class */ (function () {
         function Pin(id) {
             this.id = id;
             this.touched = false;
@@ -5418,7 +5470,7 @@ var pxsim;
         return Pin;
     }());
     pxsim.Pin = Pin;
-    var EdgeConnectorState = (function () {
+    var EdgeConnectorState = /** @class */ (function () {
         function EdgeConnectorState(props) {
             this.props = props;
             this.pins = props.pins.map(function (id) { return id != undefined ? new Pin(id) : null; });
@@ -5432,7 +5484,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var FileSystemState = (function () {
+    var FileSystemState = /** @class */ (function () {
         function FileSystemState() {
             this.files = {};
         }
@@ -5448,7 +5500,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var LightSensorState = (function () {
+    var LightSensorState = /** @class */ (function () {
         function LightSensorState() {
             this.usesLightLevel = false;
             this.lightLevel = 128;
@@ -5459,13 +5511,13 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
+    var NeoPixelMode;
     (function (NeoPixelMode) {
         NeoPixelMode[NeoPixelMode["RGB"] = 0] = "RGB";
         NeoPixelMode[NeoPixelMode["RGBW"] = 1] = "RGBW";
-    })(pxsim.NeoPixelMode || (pxsim.NeoPixelMode = {}));
-    var NeoPixelMode = pxsim.NeoPixelMode;
+    })(NeoPixelMode = pxsim.NeoPixelMode || (pxsim.NeoPixelMode = {}));
     ;
-    var NeoPixelState = (function () {
+    var NeoPixelState = /** @class */ (function () {
         function NeoPixelState() {
             this.buffers = {};
             this.colors = {};
@@ -5505,7 +5557,7 @@ var pxsim;
 })(pxsim || (pxsim = {}));
 var pxsim;
 (function (pxsim) {
-    var ToggleState = (function () {
+    var ToggleState = /** @class */ (function () {
         function ToggleState(pin) {
             this.pin = pin;
             this.on = false;
@@ -5534,7 +5586,7 @@ var pxsim;
                 wireframe: opts.wireframe,
             });
         };
-        var BoardHost = (function () {
+        var BoardHost = /** @class */ (function () {
             function BoardHost(view, opts) {
                 var _this = this;
                 this.parts = [];
@@ -5678,7 +5730,7 @@ var pxsim;
                 };
                 var coord = this.getBBCoord(rowCol);
                 part.moveToCoord(coord);
-                var getCmpClass = function (type) { return ("sim-" + type + "-cmp"); };
+                var getCmpClass = function (type) { return "sim-" + type + "-cmp"; };
                 var cls = getCmpClass(partInst.name);
                 pxsim.svg.addClass(part.element, cls);
                 pxsim.svg.addClass(part.element, "sim-cmp");
@@ -5790,12 +5842,12 @@ var pxsim;
             };
             var rowGaps = 0;
             var rowIdxsWithGap = copyArr(opts.rowIdxsWithGap);
-            var _loop_2 = function(i) {
+            var _loop_2 = function (i) {
                 var colGaps = 0;
                 var colIdxsWithGap = copyArr(opts.colIdxsWithGap);
                 var cy = yOff + i * opts.pinDist + rowGaps * opts.pinDist;
                 var rowIdx = i + rowIdxOffset;
-                var _loop_3 = function(j) {
+                var _loop_3 = function (j) {
                     var cx = xOff + j * opts.pinDist + colGaps * opts.pinDist;
                     var colIdx = j + colIdxOffset;
                     var addEl = function (pin) {
@@ -5867,7 +5919,7 @@ var pxsim;
             return lbl;
         }
         ;
-        var Breadboard = (function () {
+        var Breadboard = /** @class */ (function () {
             function Breadboard(opts) {
                 //truth
                 this.allPins = [];
@@ -6118,7 +6170,8 @@ var pxsim;
                         x: x,
                         y: y - lnThickness / 2.0,
                         width: lnLen,
-                        height: lnThickness });
+                        height: lnThickness
+                    });
                     var bar = { el: ln, group: group };
                     return bar;
                 };
@@ -6209,7 +6262,6 @@ var pxsim;
         visuals.Breadboard = Breadboard;
     })(visuals = pxsim.visuals || (pxsim.visuals = {}));
 })(pxsim || (pxsim = {}));
-/// <reference path="../../typings/globals/bluebird/index.d.ts"/>
 var pxsim;
 (function (pxsim) {
     var visuals;
@@ -6257,7 +6309,7 @@ var pxsim;
         }
         visuals.mkBtnSvg = mkBtnSvg;
         visuals.BUTTON_PAIR_STYLE = "\n            .sim-button {\n                pointer-events: none;\n                fill: #000;\n            }\n            .sim-button-outer:active ~ .sim-button,\n            .sim-button-virtual:active {\n                fill: #FFA500;\n            }\n            .sim-button-outer {\n                cursor: pointer;\n                fill: #979797;\n            }\n            .sim-button-outer:hover {\n                stroke:gray;\n                stroke-width: " + visuals.PIN_DIST / 5 + "px;\n            }\n            .sim-button-nut {\n                fill:#000;\n                pointer-events:none;\n            }\n            .sim-button-nut:hover {\n                stroke:" + visuals.PIN_DIST / 15 + "px solid #704A4A;\n            }\n            .sim-button-tab {\n                fill:#FFF;\n                pointer-events:none;\n            }\n            .sim-button-virtual {\n                cursor: pointer;\n                fill: rgba(255, 255, 255, 0.6);\n                stroke: rgba(255, 255, 255, 1);\n                stroke-width: " + visuals.PIN_DIST / 5 + "px;\n            }\n            .sim-button-virtual:hover {\n                stroke: rgba(128, 128, 128, 1);\n            }\n            .sim-text-virtual {\n                fill: #000;\n                pointer-events:none;\n            }\n            ";
-        var ButtonPairView = (function () {
+        var ButtonPairView = /** @class */ (function () {
             function ButtonPairView() {
                 this.style = visuals.BUTTON_PAIR_STYLE;
             }
@@ -6353,7 +6405,6 @@ var pxsim;
         visuals.ButtonPairView = ButtonPairView;
     })(visuals = pxsim.visuals || (pxsim.visuals = {}));
 })(pxsim || (pxsim = {}));
-/// <reference path="../../typings/globals/bluebird/index.d.ts"/>
 var pxsim;
 (function (pxsim) {
     var visuals;
@@ -6364,7 +6415,7 @@ var pxsim;
         var SQUARE_PIN_WIDTH = visuals.PIN_DIST * 0.66666;
         var SQUARE_PIN_HOVER_WIDTH = visuals.PIN_DIST * 0.66666 + visuals.PIN_DIST / 3.0;
         var nextBoardId = 0;
-        var GenericBoardSvg = (function () {
+        var GenericBoardSvg = /** @class */ (function () {
             function GenericBoardSvg(props) {
                 var _this = this;
                 this.props = props;
@@ -6438,7 +6489,7 @@ var pxsim;
                     var rowCount = 1;
                     var colCount = pinBlock.labels.length;
                     var getColName = function (colIdx) { return pinBlock.labels[colIdx]; };
-                    var getRowName = function () { return ("" + (blockIdx + 1)); };
+                    var getRowName = function () { return "" + (blockIdx + 1); };
                     var getGroupName = function () { return pinBlock.labels.join(" "); };
                     var gridRes = visuals.mkGrid({
                         xOffset: xOffset,
@@ -6565,7 +6616,7 @@ var pxsim;
             return imgAndSize;
         }
         visuals.mkGenericPartSVG = mkGenericPartSVG;
-        var GenericPart = (function () {
+        var GenericPart = /** @class */ (function () {
             function GenericPart(partVisual) {
                 this.style = "";
                 this.defs = [];
@@ -6590,13 +6641,15 @@ var pxsim;
 (function (pxsim) {
     var visuals;
     (function (visuals) {
+        function createMicroServoElement() {
+            return pxsim.svg.parseString("\n        <svg xmlns=\"http://www.w3.org/2000/svg\" id=\"svg2\" width=\"112.188\" height=\"299.674\">\n          <g id=\"layer1\" stroke-linecap=\"round\" stroke-linejoin=\"round\" transform=\"scale(0.8)\">\n            <path id=\"path8212\" fill=\"#0061ff\" stroke-width=\"6.6\" d=\"M.378 44.61v255.064h112.188V44.61H.378z\"/>\n            <path id=\"crankbase\" fill=\"#00f\" stroke-width=\"6.6\" d=\"M56.57 88.047C25.328 88.047 0 113.373 0 144.615c.02 22.352 11.807 42.596 32.238 51.66.03 3.318.095 5.24.088 7.938 0 13.947 11.307 25.254 25.254 25.254 13.947 0 25.254-11.307 25.254-25.254-.006-2.986-.415-5.442-.32-8.746 19.487-9.45 30.606-29.195 30.625-50.852 0-31.24-25.33-56.568-56.57-56.568z\"/>\n            <path id=\"lowertip\" fill=\"#00a2ff\" stroke-width=\"2\" d=\"M.476 260.78v38.894h53.82v-10.486a6.82 6.566 0 0 1-4.545-6.182 6.82 6.566 0 0 1 6.82-6.566 6.82 6.566 0 0 1 6.82 6.566 6.82 6.566 0 0 1-4.545 6.182v10.486h53.82V260.78H.475z\"/>\n            <path id=\"uppertip\" fill=\"#00a2ff\" stroke-width=\"2\" d=\"M112.566 83.503V44.61h-53.82v10.487a6.82 6.566 0 0 1 4.544 6.18 6.82 6.566 0 0 1-6.818 6.568 6.82 6.566 0 0 1-6.82-6.567 6.82 6.566 0 0 1 4.546-6.18V44.61H.378v38.893h112.188z\"/>\n            <path id=\"VCC\" fill=\"red\" stroke-width=\"2\" d=\"M53.72 21.93h5.504v22.627H53.72z\"/>\n            <path id=\"LOGIC\" fill=\"#fc0\" stroke-width=\"2\" d=\"M47.3 21.93h5.503v22.627H47.3z\"/>\n            <path id=\"GND\" fill=\"#a02c2c\" stroke-width=\"2\" d=\"M60.14 21.93h5.505v22.627H60.14z\"/>\n            <path id=\"connector\" stroke-width=\"2\" d=\"M45.064 0a1.488 1.488 0 0 0-1.488 1.488v24.5a1.488 1.488 0 0 0 1.488 1.487h22.71a1.488 1.488 0 0 0 1.49-1.488v-24.5A1.488 1.488 0 0 0 67.774 0h-22.71z\"/>\n            <g id=\"crank\" transform=\"translate(0 -752.688)\">\n              <path id=\"arm\" fill=\"#ececec\" stroke=\"#000\" stroke-width=\"1.372\" d=\"M47.767 880.88c-4.447 1.162-8.412 8.278-8.412 18.492s3.77 18.312 8.412 18.494c8.024.314 78.496 5.06 78.51-16.952.012-22.013-74.377-21.117-78.51-20.035z\"/>\n              <circle id=\"path8216\" cx=\"56.661\" cy=\"899.475\" r=\"8.972\" fill=\"gray\" stroke-width=\"2\"/>\n            </g>\n          </g>\n        </svg>\n                    ").firstElementChild;
+        }
         function mkMicroServoPart(xy) {
             if (xy === void 0) { xy = [0, 0]; }
-            // TODO
-            return { el: null, y: 0, x: 0, w: 0, h: 0 };
+            return { el: createMicroServoElement(), x: xy[0], y: xy[1], w: 112.188, h: 299.674 };
         }
         visuals.mkMicroServoPart = mkMicroServoPart;
-        var MicroServoView = (function () {
+        var MicroServoView = /** @class */ (function () {
             function MicroServoView() {
                 this.style = "";
                 this.overElement = undefined;
@@ -6614,7 +6667,7 @@ var pxsim;
                 this.updateState();
             };
             MicroServoView.prototype.initDom = function () {
-                this.element = pxsim.svg.parseString("\n<svg xmlns=\"http://www.w3.org/2000/svg\" id=\"svg2\" width=\"112.188\" height=\"299.674\">\n  <g id=\"layer1\" stroke-linecap=\"round\" stroke-linejoin=\"round\" transform=\"scale(0.8)\">\n    <path id=\"path8212\" fill=\"#0061ff\" stroke-width=\"6.6\" d=\"M.378 44.61v255.064h112.188V44.61H.378z\"/>\n    <path id=\"crankbase\" fill=\"#00f\" stroke-width=\"6.6\" d=\"M56.57 88.047C25.328 88.047 0 113.373 0 144.615c.02 22.352 11.807 42.596 32.238 51.66.03 3.318.095 5.24.088 7.938 0 13.947 11.307 25.254 25.254 25.254 13.947 0 25.254-11.307 25.254-25.254-.006-2.986-.415-5.442-.32-8.746 19.487-9.45 30.606-29.195 30.625-50.852 0-31.24-25.33-56.568-56.57-56.568z\"/>\n    <path id=\"lowertip\" fill=\"#00a2ff\" stroke-width=\"2\" d=\"M.476 260.78v38.894h53.82v-10.486a6.82 6.566 0 0 1-4.545-6.182 6.82 6.566 0 0 1 6.82-6.566 6.82 6.566 0 0 1 6.82 6.566 6.82 6.566 0 0 1-4.545 6.182v10.486h53.82V260.78H.475z\"/>\n    <path id=\"uppertip\" fill=\"#00a2ff\" stroke-width=\"2\" d=\"M112.566 83.503V44.61h-53.82v10.487a6.82 6.566 0 0 1 4.544 6.18 6.82 6.566 0 0 1-6.818 6.568 6.82 6.566 0 0 1-6.82-6.567 6.82 6.566 0 0 1 4.546-6.18V44.61H.378v38.893h112.188z\"/>\n    <path id=\"VCC\" fill=\"red\" stroke-width=\"2\" d=\"M53.72 21.93h5.504v22.627H53.72z\"/>\n    <path id=\"LOGIC\" fill=\"#fc0\" stroke-width=\"2\" d=\"M47.3 21.93h5.503v22.627H47.3z\"/>\n    <path id=\"GND\" fill=\"#a02c2c\" stroke-width=\"2\" d=\"M60.14 21.93h5.505v22.627H60.14z\"/>\n    <path id=\"connector\" stroke-width=\"2\" d=\"M45.064 0a1.488 1.488 0 0 0-1.488 1.488v24.5a1.488 1.488 0 0 0 1.488 1.487h22.71a1.488 1.488 0 0 0 1.49-1.488v-24.5A1.488 1.488 0 0 0 67.774 0h-22.71z\"/>\n    <g id=\"crank\" transform=\"translate(0 -752.688)\">\n      <path id=\"arm\" fill=\"#ececec\" stroke=\"#000\" stroke-width=\"1.372\" d=\"M47.767 880.88c-4.447 1.162-8.412 8.278-8.412 18.492s3.77 18.312 8.412 18.494c8.024.314 78.496 5.06 78.51-16.952.012-22.013-74.377-21.117-78.51-20.035z\"/>\n      <circle id=\"path8216\" cx=\"56.661\" cy=\"899.475\" r=\"8.972\" fill=\"gray\" stroke-width=\"2\"/>\n    </g>\n  </g>\n</svg>\n            ").firstElementChild;
+                this.element = createMicroServoElement();
                 this.crankEl = this.element.querySelector("#crank");
                 this.crankTransform = this.crankEl.getAttribute("transform");
             };
@@ -6623,7 +6676,7 @@ var pxsim;
                 visuals.translateEl(this.element, [x, y]);
             };
             MicroServoView.prototype.updateState = function () {
-                this.targetAngle = this.state.getPin(this.pin).servoAngle;
+                this.targetAngle = 180.0 - this.state.getPin(this.pin).servoAngle;
                 if (this.targetAngle != this.currentAngle) {
                     var now = pxsim.U.now();
                     var cx = 56.661;
@@ -6665,12 +6718,12 @@ var pxsim;
                 .replace(/\./g, "-")
                 .replace(/\s/g, "");
         }
+        var WireEndStyle;
         (function (WireEndStyle) {
             WireEndStyle[WireEndStyle["BBJumper"] = 0] = "BBJumper";
             WireEndStyle[WireEndStyle["OpenJumper"] = 1] = "OpenJumper";
             WireEndStyle[WireEndStyle["Croc"] = 2] = "Croc";
-        })(visuals.WireEndStyle || (visuals.WireEndStyle = {}));
-        var WireEndStyle = visuals.WireEndStyle;
+        })(WireEndStyle = visuals.WireEndStyle || (visuals.WireEndStyle = {}));
         function mkWirePart(cp, clr, croc) {
             if (croc === void 0) { croc = false; }
             var g = pxsim.svg.elt("g");
@@ -6816,11 +6869,11 @@ var pxsim;
             var w1 = plasticWidth;
             var x1 = cx - w1 / 2;
             var y1 = cy - (h1 / 2);
-            var mkPnt = function (xy) { return (xy[0] + "," + xy[1]); };
+            var mkPnt = function (xy) { return xy[0] + "," + xy[1]; };
             var mkPnts = function () {
                 var xys = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
-                    xys[_i - 0] = arguments[_i];
+                    xys[_i] = arguments[_i];
                 }
                 return xys.map(function (xy) { return mkPnt(xy); }).join(" ");
             };
@@ -6849,7 +6902,7 @@ var pxsim;
             return { el: g, x: x1 - strokeWidth, y: Math.min(y1, y2), w: w1 + strokeWidth * 2, h: h1 + h2 };
         }
         //TODO: make this stupid class obsolete
-        var WireFactory = (function () {
+        var WireFactory = /** @class */ (function () {
             function WireFactory(underboard, overboard, boardEdges, styleEl, getLocCoord) {
                 this.nextWireId = 0;
                 this.styleEl = styleEl;

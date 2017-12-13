@@ -1,5 +1,5 @@
 "use strict";
-/// <reference path="../node_modules/pxt-core/typings/globals/node/index.d.ts"/>
+Object.defineProperty(exports, "__esModule", { value: true });
 /// <reference path="../node_modules/pxt-core/built/pxtlib.d.ts" />
 var path = require("path");
 exports.pxtCore = require("pxt-core");

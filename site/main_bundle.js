@@ -19515,9 +19515,12 @@ var MainApp = /** @class */ (function (_super) {
         _this.background = "FE6666";
         _this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
         _this.showLights = false;
+        var shareURL = window.location.hash ? window.location.hash.substring(3) : undefined;
         _this.state = {
             isLoading: true,
-            isSharing: false
+            loadShareURL: shareURL,
+            shareURL: undefined,
+            isSharing: !!shareURL
         };
         _this.initDefaultProject();
         _this.filters = {
@@ -19551,7 +19554,7 @@ var MainApp = /** @class */ (function (_super) {
         this.projects = [
             {
                 "text": {
-                    "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n  <block type=\"device_forever\" x=\"90\" y=\"45\">\n    <statement name=\"HANDLER\">\n     <block type=\"setBackground\" >\n        <value name=\"color\">\n          <shadow type=\"colorNumberPicker\" id=\"8_h3;_~,~OWpTQeX=Ea`\">\n            <field name=\"value\">0xff0000</field>\n          </shadow>\n        </value>\n        <next>\n  <block type=\"say\">\n        <value name=\"text\">\n          <shadow type=\"text\">\n            <field name=\"TEXT\">Happy Holidays!</field>\n          </shadow>\n        </value>\n      </block>\n    </statement>\n  </block>\n</xml>",
+                    "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\">\n  <block type=\"device_forever\" x=\"0\" y=\"0\">\n    <statement name=\"HANDLER\">\n     <block type=\"setBackground\" >\n        <value name=\"color\">\n          <shadow type=\"colorNumberPicker\">\n            <field name=\"value\">0xff0000</field>\n          </shadow>\n        </value>\n        <next>\n  <block type=\"say\">\n        <value name=\"text\">\n          <shadow type=\"text\">\n            <field name=\"TEXT\">Happy Holidays!</field>\n          </shadow>\n        </value>\n      </block>\n    </statement>\n  </block>\n</xml>",
                     "main.ts": "\n",
                     "README.md": " ",
                     "pxt.json": "{\n    \"name\": \"Untitled\",\n    \"dependencies\": {\n        \"core\": \"*\"\n    },\n    \"description\": \"\",\n    \"files\": [\n        \"main.blocks\",\n        \"main.ts\",\n        \"README.md\"\n    ]\n}"
@@ -19562,29 +19565,67 @@ var MainApp = /** @class */ (function (_super) {
     MainApp.prototype.componentDidMount = function () {
         window.addEventListener("message", this.receiveMessage.bind(this), false);
         window.addEventListener("resize", this.resize.bind(this), false);
-        setTimeout(function () {
-            snowFall.snow(document.body, { round: true, shadow: true, maxSpeed: 5, flakeCount: 10, minSize: 3, maxSize: 8 });
-        }, 3000);
         this.resize();
-        //this.initPhaser();
+    };
+    // resize(setHeight?: number) {
+    //     const fullHeight = window.innerHeight;
+    //     const fullWidth = window.innerWidth;
+    //     const additionalTopPadding = 40;
+    //     const defaultPadding = 15;
+    //     const maxHeight = fullHeight / (this.state.isSharing ? 1.5 : 2) - (defaultPadding * 2) - (additionalTopPadding);
+    //     let ratio = 0.4;
+    //     let hasTop = false;
+    //     let newWidth = fullWidth / 2;
+    //     let newHeight = newWidth / 4 * 3;
+    //     if (newHeight > maxHeight) {
+    //         newHeight = maxHeight;
+    //         newWidth = (newHeight / 3 * 4);
+    //         hasTop = true;
+    //     }
+    //     // Center the frame
+    //     const left = (fullWidth / 2) - (newWidth / 2);
+    //     const top = (fullHeight / 4) - (newHeight / 2);
+    //     const contentFrame = document.getElementById('contentFrame');
+    //     contentFrame.style.height = `${newHeight}px`;
+    //     contentFrame.style.width = `${newWidth}px`;
+    //     contentFrame.style.left = `${left}px`;
+    //     const newTop = hasTop ? top + additionalTopPadding / 2 : defaultPadding + additionalTopPadding;
+    //     contentFrame.style.top = `${newTop}px`;
+    //     // Resize the editor workspace
+    //     const scale = 0.3 + (fullWidth / 1000 * 0.3);
+    //     this.sendMessage("setscale", {
+    //         scale: scale
+    //     });
+    //     const innerCard = document.getElementById('inner-card');
+    //     this.sendMessage("proxytosim", {
+    //         type: "resize",
+    //         top: newTop + innerCard.offsetTop + 15,
+    //         left: left + innerCard.offsetLeft + 15,
+    //         width: innerCard.offsetWidth + 20,
+    //         height: innerCard.offsetHeight + 20
+    //     });
+    // }
+    MainApp.prototype.isSharing = function () {
+        return this.state.isSharing;
     };
     MainApp.prototype.resize = function (setHeight) {
         var fullHeight = window.innerHeight;
         var fullWidth = window.innerWidth;
         var additionalTopPadding = 40;
         var defaultPadding = 15;
-        var maxHeight = fullHeight / (this.state.isSharing ? 1.5 : 2) - (defaultPadding * 2) - (additionalTopPadding);
+        var maxHeight = fullHeight / (this.isSharing() ? 1.5 : 2) - (defaultPadding * 2) - (additionalTopPadding);
         var ratio = 0.4;
         var hasTop = false;
-        var newWidth = fullWidth / 2;
+        var newWidth = fullWidth / 2 - fullWidth / 8;
         var newHeight = newWidth / 4 * 3;
+        /*
         if (newHeight > maxHeight) {
             newHeight = maxHeight;
             newWidth = (newHeight / 3 * 4);
             hasTop = true;
-        }
+        }*/
         // Center the frame
-        var left = (fullWidth / 2) - (newWidth / 2);
+        var left = !this.isSharing() ? (fullWidth / 2) + (newWidth / 6) : (fullWidth / 2) - newWidth / 2;
         var top = (fullHeight / 4) - (newHeight / 2);
         var contentFrame = document.getElementById('contentFrame');
         contentFrame.style.height = newHeight + "px";
@@ -19606,50 +19647,102 @@ var MainApp = /** @class */ (function (_super) {
             height: innerCard.offsetHeight + 20
         });
     };
+    MainApp.prototype.toggleTrace = function () {
+        this.sendMessage("toggletrace", {});
+    };
     MainApp.prototype.sendMessage = function (action, args) {
         var editor = this.editorFrame.contentWindow;
         var msg = __assign({ type: "pxteditor", id: Math.random().toString(), action: action }, args);
         editor.postMessage(msg, "*");
     };
     MainApp.prototype.receiveMessage = function (ev) {
+        var _this = this;
         var editor = this.editorFrame.contentWindow;
         var msg = ev.data;
         // console.log('received...')
         // console.log(msg)
         if (msg.type == "pxthost") {
-            if (msg.action == "workspacesync") {
-                // no project
-                msg.projects = this.projects;
-                var currentProject = localStorage.getItem('currentProject');
-                if (currentProject) {
-                    msg.projects = [JSON.parse(currentProject)];
-                }
-                if (this.filters)
+            switch (msg.action) {
+                case "workspacesync":
+                    // no project
+                    msg.response = true;
+                    msg.projects = this.projects;
                     msg.editor = {
                         "filters": JSON.parse(JSON.stringify(this.filters)),
                         "searchBar": false,
                         "categories": false
                     };
-                editor.postMessage(msg, "*");
-                return;
-            }
-            else if (msg.action == "workspacesave") {
-                console.log(JSON.stringify(msg.project, null, 2));
-                //lastSaved = msg.project;
-                this.currentProject = msg.project;
-                localStorage.setItem('currentProject', JSON.stringify(this.currentProject));
-            }
-            else if (msg.action == "workspaceloaded") {
-                this.setState({ isLoading: false });
-                this.resize();
-            }
-            else if (msg.action == "simevent") {
-                if (msg.subtype == "started") {
-                    // remove frame background
-                    var frame = document.getElementsByClassName('frame')[0];
-                    frame.style.backgroundColor = 'transparent';
+                    if (this.state.loadShareURL) {
+                        this.lookupGist(this.state.loadShareURL)
+                            .then(function (content) {
+                            _this.currentProject = {
+                                'text': {
+                                    "main.blocks": JSON.parse(content["main.blocks"]['content']),
+                                    "main.ts": JSON.parse(content["main.ts"]['content']),
+                                    "README.md": " ",
+                                    "pxt.json": "{\n    \"name\": \"Untitled\",\n    \"dependencies\": {\n        \"core\": \"*\"\n    },\n    \"description\": \"\",\n    \"files\": [\n        \"main.blocks\",\n        \"main.ts\",\n        \"README.md\"\n    ]\n}"
+                                }
+                            };
+                        }).then(function () {
+                            localStorage.setItem('currentProject', JSON.stringify(_this.currentProject));
+                            msg.projects = [_this.currentProject];
+                            // console.log("workspacesync")
+                            // console.log(JSON.stringify(this.currentProject, null, 2))
+                            editor.postMessage(msg, "*");
+                            _this.loaded = true;
+                            if (!_this.state.loadShareURL)
+                                _this.setState({ isLoading: false });
+                        });
+                    }
+                    else {
+                        var currentProject = localStorage.getItem('currentProject');
+                        if (currentProject) {
+                            this.currentProject = JSON.parse(currentProject);
+                            msg.projects = [this.currentProject];
+                            // console.log("workspacesync")
+                            // console.log(JSON.stringify(this.currentProject, null, 2))
+                        }
+                        editor.postMessage(msg, "*");
+                        this.loaded = true;
+                    }
+                    return;
+                case "workspacesave":
+                    // console.log("workspacesave")
+                    // console.log(JSON.stringify(msg.project, null, 2))
+                    //lastSaved = msg.project;
+                    if (this.loaded) {
+                        this.currentProject = msg.project;
+                        localStorage.setItem('currentProject', JSON.stringify(this.currentProject));
+                    }
+                    else {
+                        this.setState({ isLoading: true });
+                    }
+                    return;
+                case "workspaceloaded":
+                    if (!this.state.loadShareURL)
+                        this.setState({ isLoading: false });
                     this.resize();
-                }
+                    return;
+                case "simevent":
+                    if (msg.subtype == "started") {
+                        // remove frame background
+                        var frame = document.getElementsByClassName('frame')[0];
+                        frame.style.backgroundColor = 'transparent';
+                        this.resize();
+                        //this.toggleTrace();
+                        if (this.state.loadShareURL) {
+                            this.sendMessage("proxytosim", {
+                                type: "hidemaineditor"
+                            });
+                            if (this.state.isLoading) {
+                                this.setState({ isLoading: false });
+                                this.beginSharing();
+                            }
+                        }
+                    }
+                    else if (msg.subtype == "stopped") {
+                    }
+                    return;
             }
         }
         if (msg.type == "pxteditor") {
@@ -19661,10 +19754,19 @@ var MainApp = /** @class */ (function (_super) {
             // }
         }
         if (msg.type == "custom") {
+            var content = msg.content;
+            if (content) {
+                switch (content.key) {
+                    case "init":
+                        // Simulator initialized
+                        console.log("Simulator init");
+                        return;
+                }
+            }
         }
     };
     MainApp.prototype.startOver = function () {
-        if (this.state.isSharing)
+        if (this.isSharing())
             this.toggleSharing();
         this.initDefaultProject();
         this.sendMessage('importproject', {
@@ -19672,12 +19774,24 @@ var MainApp = /** @class */ (function (_super) {
             filters: this.filters,
             response: true
         });
+        this.toggleTrace();
     };
     MainApp.prototype.handleFacebook = function () {
         console.log("sharing with facebook");
+        ga('send', 'event', 'Sharing', 'facebook', 'Shared');
+        var url = window.location.href;
+        var fbUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url);
+        this.popupWindow(fbUrl, "Share on Facebook", 600, 600);
     };
     MainApp.prototype.handleTwitter = function () {
         console.log("sharing with twitter");
+        ga('send', 'event', 'Sharing', 'twitter', 'Shared');
+        var url = window.location.href;
+        var twitterText = "Check out what I made with @MSMakeCode (experimental)!";
+        var twitterUrl = "https://twitter.com/intent/tweet?url=" + encodeURIComponent(url) +
+            ("&text=" + encodeURIComponent(twitterText)) +
+            ("&hashtags=" + encodeURIComponent('MakeCode'));
+        this.popupWindow(twitterUrl, "Share on Facebook", 600, 600);
     };
     MainApp.prototype.componentWillUpdate = function (nextProps, nextState) {
         // when the menu becomes visible, setup some handlers so we can close the menu easily
@@ -19703,12 +19817,39 @@ var MainApp = /** @class */ (function (_super) {
     MainApp.prototype.toggleSidebar = function () {
         this.setState({ sidebarVisible: !this.state.sidebarVisible });
     };
+    MainApp.prototype.beginSharing = function () {
+        // Begin music
+        this.player = new Tone.Player("/sounds/Jingle_Bells_Instrumental.mp3").toMaster();
+        this.player.autostart = true;
+        // Begin snowing
+        setTimeout(function () {
+            snowFall.snow(document.body, { round: true, shadow: true, maxSpeed: 5, flakeCount: 10, minSize: 3, maxSize: 8 });
+        }, 1000);
+    };
+    MainApp.prototype.stopSharing = function () {
+        // Stop the music
+        this.player.stop();
+        // Clear the snow
+        snowFall.snow(document.body, "clear");
+    };
     MainApp.prototype.toggleSharing = function () {
         var _this = this;
         this.setState({ isSharing: !this.state.isSharing });
-        if (this.state.isSharing) {
+        if (!this.state.isSharing) {
             // Create a gist
             this.publishGist();
+            this.sendMessage("proxytosim", {
+                type: "hidemaineditor"
+            });
+            this.beginSharing();
+        }
+        else {
+            window.location.hash = '';
+            this.setState({ loadShareURL: undefined });
+            this.sendMessage("proxytosim", {
+                type: "showmaineditor"
+            });
+            this.stopSharing();
         }
         setTimeout(function () {
             _this.resize();
@@ -19717,41 +19858,71 @@ var MainApp = /** @class */ (function (_super) {
             }, 1500);
         }, 300);
     };
+    MainApp.prototype.play = function () {
+        this.sendMessage("startsimulator", {});
+    };
+    MainApp.prototype.copy = function () {
+        var copyForm = document.getElementById('share-url');
+        copyForm.focus();
+        copyForm.select();
+        try {
+            var successful = document.execCommand('copy');
+            var msg = successful ? 'successful' : 'unsuccessful';
+            console.log('Copying text command was ' + msg);
+        }
+        catch (err) {
+            console.log('Oops, unable to copy');
+        }
+    };
     MainApp.prototype.publishGist = function () {
+        var _this = this;
+        ga('send', 'event', 'Sharing', 'publish', 'Shared');
         var data = {
-            "description": "the description for this gist",
-            "public": true,
+            "description": 'My MakeCode Holiday project',
+            "public": false,
             "files": {
-                "file1.txt": {
-                    "content": "String file contents"
+                "main.blocks": {
+                    "content": JSON.stringify(this.currentProject.text['main.blocks'])
+                },
+                "main.ts": {
+                    "content": JSON.stringify(this.currentProject.text['main.ts'])
                 }
             }
         };
-        // const data = {
-        //     "description": 'my-project',
-        //     "public": false,
-        //     "files": {
-        //         "main.ts": {
-        //             "content": JSON.stringify(this.projects[0].text['main.ts'])
-        //         }
-        //     }
-        // };
         var headers = {};
         var url = "https://api.github.com/gists";
         fetch(url, {
             method: 'POST',
             headers: headers,
-            body: data
+            body: JSON.stringify(data)
         }).then(function (response) {
             return response.json();
         }).then(function (json) {
             console.log(json);
+            window.location.hash = "s:" + json['id'];
+            // Set form url to path
+            _this.setState({ shareURL: window.location.href });
         });
+    };
+    MainApp.prototype.lookupGist = function (guid) {
+        var url = "https://api.github.com/gists/" + guid;
+        //eg: https://api.github.com/gists/945d8adf90573feaa315d8e2074f2433
+        return fetch(url, {
+            method: 'GET'
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            console.log(json);
+            return json['files'];
+        });
+    };
+    MainApp.prototype.popupWindow = function (url, title, width, height) {
+        return window.open(url, title, "resizable=no, copyhistory=no, " +
+            ("width=" + width + ", height=" + height + ", top=" + ((screen.height / 2) - (height / 2)) + ", left=" + ((screen.width / 2) - (width / 2))));
     };
     MainApp.prototype.render = function () {
         var _this = this;
-        var _a = this.state, sidebarVisible = _a.sidebarVisible, isLoading = _a.isLoading, isSharing = _a.isSharing, isCreditsOpen = _a.isCreditsOpen;
-        var sharingVal = isSharing ? 'http:///' : '';
+        var _a = this.state, sidebarVisible = _a.sidebarVisible, isLoading = _a.isLoading, isSharing = _a.isSharing, shareURL = _a.shareURL, loadShareURL = _a.loadShareURL, isCreditsOpen = _a.isCreditsOpen;
         return React.createElement(semantic_ui_react_1.Sidebar.Pushable, null,
             React.createElement(semantic_ui_react_1.Sidebar, { as: semantic_ui_react_1.Menu, animation: 'scale down', width: 'thin', visible: sidebarVisible, icon: 'labeled', vertical: true, inverted: true },
                 React.createElement(semantic_ui_react_1.Menu.Item, { name: 'home', onClick: function () { return _this.setState({ sidebarVisible: false }); } },
@@ -19772,28 +19943,38 @@ var MainApp = /** @class */ (function (_super) {
                 React.createElement(semantic_ui_react_1.Menu, { fixed: "top", borderless: true, size: "mini" },
                     React.createElement(semantic_ui_react_1.Menu.Item, { onClick: this.toggleSidebar.bind(this) },
                         React.createElement(semantic_ui_react_1.Icon, { name: "sidebar", size: "large", style: { color: '#F6252D' } })),
-                    React.createElement(semantic_ui_react_1.Menu.Item, { onClick: this.startOver.bind(this) },
-                        React.createElement(semantic_ui_react_1.Button, { color: "red", content: "Start Over" })),
+                    !isSharing ? React.createElement(semantic_ui_react_1.Menu.Item, { onClick: this.startOver.bind(this) },
+                        React.createElement(semantic_ui_react_1.Button, { color: "red", content: "Start Over" })) : undefined,
                     React.createElement(semantic_ui_react_1.Menu.Menu, { position: 'right' },
-                        React.createElement(semantic_ui_react_1.Menu.Item, { name: 'twitter', onClick: this.handleTwitter },
+                        React.createElement(semantic_ui_react_1.Menu.Item, { name: 'twitter', onClick: this.handleTwitter.bind(this) },
                             React.createElement(semantic_ui_react_1.Icon, { name: 'twitter', size: "large", style: { color: '#00aced' } })),
-                        React.createElement(semantic_ui_react_1.Menu.Item, { name: 'facebook', onClick: this.handleFacebook },
+                        React.createElement(semantic_ui_react_1.Menu.Item, { name: 'facebook', onClick: this.handleFacebook.bind(this) },
                             React.createElement(semantic_ui_react_1.Icon, { name: 'facebook', size: "large", style: { color: '#3b5998' } })))),
+                React.createElement("iframe", { ref: function (e) { return _this.editorFrame = e; }, id: "iframe", src: "index.html?editorlayout=ide" }),
                 React.createElement("div", { className: "left-back" }),
-                React.createElement("iframe", { style: { display: isSharing ? 'none' : 'block' }, ref: function (e) { return _this.editorFrame = e; }, id: "iframe", src: "index.html?editorlayout=ide" }),
                 isSharing ? React.createElement("div", { className: "back-button" },
-                    React.createElement(semantic_ui_react_1.Button, { color: "purple", circular: true, size: "huge", icon: 'left arrow', labelPosition: 'left', content: 'Back', onClick: this.toggleSharing.bind(this) })) : undefined,
+                    React.createElement(semantic_ui_react_1.Button, { color: "purple", circular: true, size: "huge", icon: 'edit', labelPosition: 'left', content: 'Remix', onClick: this.toggleSharing.bind(this) })) : undefined,
                 React.createElement("div", { id: "contentFrame", className: "card-content", style: { transition: isSharing ? 'all 1s' : '' } },
                     React.createElement("div", { className: "shadow" }),
                     React.createElement("div", { className: "frame" },
                         React.createElement("div", { id: "inner-card", className: "inner-card" }))),
                 React.createElement("div", { className: "right-back" }),
-                !isSharing ? React.createElement("div", { className: "share-button" },
-                    React.createElement(semantic_ui_react_1.Button, { color: "red", circular: true, size: "huge", icon: 'right arrow', labelPosition: 'right', content: 'Share', onClick: this.toggleSharing.bind(this) })) : undefined,
-                isSharing ? React.createElement("div", { className: "sharing-dialog ui container text" },
+                !isSharing && !loadShareURL ? React.createElement("div", { className: "sim-buttons" },
+                    React.createElement(semantic_ui_react_1.Grid, { divided: true, inverted: true, stackable: true, centered: true },
+                        React.createElement(semantic_ui_react_1.Grid.Row, null,
+                            React.createElement(semantic_ui_react_1.Grid.Column, { width: 8, textAlign: "center" },
+                                React.createElement("div", { className: "play-button" },
+                                    React.createElement(semantic_ui_react_1.Button, { color: "green", circular: true, size: "massive", icon: 'play', onClick: this.play.bind(this) }))),
+                            React.createElement(semantic_ui_react_1.Grid.Column, { width: 8, textAlign: "center" },
+                                React.createElement("div", { className: "share-button" },
+                                    React.createElement(semantic_ui_react_1.Button, { color: "red", circular: true, size: "huge", icon: 'right arrow', labelPosition: 'right', content: 'Share', onClick: this.toggleSharing.bind(this) })))))) : undefined,
+                isSharing && shareURL ? React.createElement("div", { className: "sharing-dialog ui container text" },
                     React.createElement(semantic_ui_react_1.Form, { size: 'huge' },
                         React.createElement(semantic_ui_react_1.Form.Field, null,
-                            React.createElement(semantic_ui_react_1.Input, { label: React.createElement(semantic_ui_react_1.Button, { content: 'Copy', color: 'green' }), labelPosition: 'right', value: sharingVal })))) : undefined,
+                            React.createElement(semantic_ui_react_1.Input, { label: React.createElement(semantic_ui_react_1.Button, { content: 'Copy', color: 'green', onClick: this.copy.bind(this) }), labelPosition: 'right', id: "share-url", value: shareURL })))) : undefined,
+                isSharing ?
+                    React.createElement("div", null)
+                    : undefined,
                 isSharing ? React.createElement(semantic_ui_react_1.Segment, { className: "sharing-footer", inverted: true, vertical: true, style: { padding: '1em 0em' } },
                     React.createElement(semantic_ui_react_1.Container, null,
                         React.createElement(semantic_ui_react_1.Grid, { divided: true, inverted: true, stackable: true, centered: true },
@@ -19801,8 +19982,9 @@ var MainApp = /** @class */ (function (_super) {
                                 React.createElement(semantic_ui_react_1.Grid.Column, { width: 16, textAlign: "center" },
                                     React.createElement(semantic_ui_react_1.Header, { as: 'h4', inverted: true },
                                         "Powered by ",
-                                        React.createElement("a", { href: "https://www.makecode.com", style: { color: '#b4019E' } }, "Microsoft MakeCode"))))))) : undefined,
-                React.createElement(semantic_ui_react_1.Modal, { open: isCreditsOpen, closeIcon: true, onClose: function () { return _this.setState({ isCreditsOpen: false }); }, dimmer: 'blurring' },
+                                        React.createElement("a", { href: "https://www.makecode.com", target: "_blank", style: { color: '#b4019E' } }, "Microsoft MakeCode"))))))) : undefined,
+                isLoading ? React.createElement("div", { className: "loading-screen" }) : undefined,
+                React.createElement(semantic_ui_react_1.Modal, { open: isCreditsOpen, closeIcon: true, onClose: function () { return _this.setState({ isCreditsOpen: false }); }, dimmer: true },
                     React.createElement(semantic_ui_react_1.Modal.Header, null, "About"),
                     React.createElement(semantic_ui_react_1.Modal.Content, null,
                         React.createElement(semantic_ui_react_1.Modal.Description, null,
@@ -19838,10 +20020,6 @@ var MainApp = /** @class */ (function (_super) {
 }(React.Component));
 exports.MainApp = MainApp;
 ReactDOM.render(React.createElement(MainApp, null), document.getElementById("root"));
-function newGist(data) {
-    console.log('new gist');
-    console.log(data);
-}
 
 
 /***/ }),

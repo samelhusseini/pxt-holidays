@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 ///<reference path='../localtypings/pxtblockly.d.ts'/>
 /// <reference path="../built/pxtlib.d.ts" />
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,7 +67,7 @@ var pxt;
         // generation; when generating code for a variable dereference, if the expected
         // type doesn't match the inferred type, it's an error. If the type was
         // undetermined as of yet, the type of the variable becomes the expected type.
-        var Point = (function () {
+        var Point = /** @class */ (function () {
             function Point(link, type, parentType, childType) {
                 this.link = link;
                 this.type = type;
@@ -358,6 +363,9 @@ var pxt;
                                 handleGenericType(b, "LIST");
                                 unionParam(e, b, "INDEX", ground(pNumber.type));
                                 break;
+                            case pxtc.PAUSE_UNTIL_TYPE:
+                                unionParam(e, b, "PREDICATE", pBoolean);
+                                break;
                             default:
                                 if (b.type in e.stdCallTable) {
                                     var call_1 = e.stdCallTable[b.type];
@@ -381,6 +389,7 @@ var pxt;
                                                         break;
                                                     }
                                                     catch (e) {
+                                                        // Ignore type checking errors in the blocks...
                                                     }
                                                 }
                                             }
@@ -726,12 +735,12 @@ var pxt;
             return expr;
         }
         blocks.compileExpression = compileExpression;
+        var VarUsage;
         (function (VarUsage) {
             VarUsage[VarUsage["Unknown"] = 0] = "Unknown";
             VarUsage[VarUsage["Read"] = 1] = "Read";
             VarUsage[VarUsage["Assign"] = 2] = "Assign";
-        })(blocks.VarUsage || (blocks.VarUsage = {}));
-        var VarUsage = blocks.VarUsage;
+        })(VarUsage = blocks.VarUsage || (blocks.VarUsage = {}));
         function isCompiledAsLocalVariable(b) {
             return b.declaredInLocalScope && !b.mustBeGlobal;
         }
@@ -1021,8 +1030,10 @@ var pxt;
             }
             if (isExtension)
                 return blocks.mkStmt(blocks.H.extensionCall(f, args.concat([callback]), false));
-            else
+            else if (n)
                 return blocks.mkStmt(blocks.H.namespaceCall(n, f, args.concat([callback]), false));
+            else
+                return blocks.mkStmt(blocks.H.mkCall(f, args.concat([callback]), false));
         }
         function compileArg(e, b, arg, comments) {
             // b.getFieldValue may be string, numbers
@@ -1128,6 +1139,9 @@ var pxt;
                 case pxtc.TS_STATEMENT_TYPE:
                     r = compileTypescriptBlock(e, b);
                     break;
+                case pxtc.PAUSE_UNTIL_TYPE:
+                    r = compilePauseUntilBlock(e, b, comments);
+                    break;
                 default:
                     var call = e.stdCallTable[b.type];
                     if (call)
@@ -1197,6 +1211,20 @@ var pxt;
             var emptyStatement = blocks.mkStmt(blocks.mkText(";"));
             emptyStatement.glueToBlock = blocks.GlueMode.NoSpace;
             return blocks.mkGroup([emptyStatement, n]);
+        }
+        function compilePauseUntilBlock(e, b, comments) {
+            var options = pxt.appTarget.runtime && pxt.appTarget.runtime.pauseUntilBlock;
+            pxt.Util.assert(!!options, "target has block enabled");
+            var ns = options.namespace;
+            var name = options.callName || "pauseUntil";
+            var arg = compileArg(e, b, "PREDICATE", comments);
+            var lambda = [blocks.mkGroup([blocks.mkText("() => "), arg])];
+            if (ns) {
+                return [blocks.mkStmt(blocks.H.namespaceCall(ns, name, lambda, false))];
+            }
+            else {
+                return [blocks.mkStmt(blocks.H.mkCall(name, lambda, false, false))];
+            }
         }
         // This function creates an empty environment where type inference has NOT yet
         // been performed.
@@ -1436,6 +1464,7 @@ var pxt;
         }
         blocks.callKey = callKey;
         function updateDisabledBlocks(e, allBlocks, topBlocks) {
+            var disableOrphans = pxt.appTarget.appTheme.disableOrphans || true;
             // unset disabled
             allBlocks.forEach(function (b) { return b.setDisabled(false); });
             // update top blocks
@@ -1468,7 +1497,8 @@ var pxt;
                     // all non-events are disabled
                     var t = b;
                     while (t) {
-                        t.setDisabled(true);
+                        if (disableOrphans)
+                            t.setDisabled(true);
                         t = t.getNextBlock();
                     }
                 }
@@ -1772,7 +1802,9 @@ var pxt;
                 for (var i = 0; i < blocks_2.length; ++i)
                     patchBlock(info, enums, blocks_2[i]);
                 // patch floating blocks
-                patchFloatingBlocks(doc_1.documentElement, info);
+                var shouldPatchFloatingBlocks = pxt.appTarget.appTheme.patchFloatingBlocks || true;
+                if (shouldPatchFloatingBlocks)
+                    patchFloatingBlocks(doc_1.documentElement, info);
                 // serialize and return
                 return new XMLSerializer().serializeToString(doc_1);
             }
@@ -1799,6 +1831,11 @@ var pxt;
                         if (en)
                             field.textContent = en;
                     }
+                    /*
+    <block type="device_button_event" x="92" y="77">
+        <field name="NAME">Button.AB</field>
+      </block>
+                      */
                 }
             });
         }
@@ -1951,7 +1988,9 @@ var pxt;
                 sg.removeAttribute("width");
                 sg.removeAttribute("height");
                 sg.removeAttribute("transform");
-                var xsg = new DOMParser().parseFromString("<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"" + XLINK_NAMESPACE + "\" width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + x + " " + y + " " + width + " " + height + "\">\n            " + new XMLSerializer().serializeToString(sg) + "\n            </svg>", "image/svg+xml");
+                var xmlString = new XMLSerializer().serializeToString(sg);
+                xmlString = xmlString.replace('&nbsp;', '&#160;'); // Replace &nbsp; with &#160; as a workaround for having nbsp missing from SVG xml 
+                var xsg = new DOMParser().parseFromString("<svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"" + XLINK_NAMESPACE + "\" width=\"" + width + "\" height=\"" + height + "\" viewBox=\"" + x + " " + y + " " + width + " " + height + "\">\n            " + xmlString + "\n            </svg>", "image/svg+xml");
                 var cssLink = xsg.createElementNS("http://www.w3.org/1999/xhtml", "style");
                 var customCssHref = document.getElementById("blocklycss").href;
                 return pxt.BrowserUtils.loadAjaxAsync(customCssHref)
@@ -2060,12 +2099,12 @@ var pxt;
             arrays: '#A94400',
             advanced: '#3c3c3c'
         };
+        var CategoryMode;
         (function (CategoryMode) {
             CategoryMode[CategoryMode["All"] = 0] = "All";
             CategoryMode[CategoryMode["None"] = 1] = "None";
             CategoryMode[CategoryMode["Basic"] = 2] = "Basic";
-        })(blocks_6.CategoryMode || (blocks_6.CategoryMode = {}));
-        var CategoryMode = blocks_6.CategoryMode;
+        })(CategoryMode = blocks_6.CategoryMode || (blocks_6.CategoryMode = {}));
         var typeDefaults = {
             "string": {
                 field: "TEXT",
@@ -2550,7 +2589,21 @@ var pxt;
             return true;
         }
         function initField(i, ni, fn, ns, pre, right, type, nsinfo) {
-            if (pre)
+            if (pre && pre.indexOf('`') > -1) {
+                // parse and create icon fields for every inline icon
+                var regex = /([^`]+|(`([^`]+)`))/gi;
+                var match = void 0;
+                while (match = regex.exec(pre)) {
+                    var img = void 0;
+                    if (match[3] && (img = iconToFieldImage(match[3]))) {
+                        i.appendField(img);
+                    }
+                    else {
+                        i.appendField(match[1]);
+                    }
+                }
+            }
+            else if (pre)
                 i.appendField(pre);
             if (right)
                 i.setAlign(Blockly.ALIGN_LEFT);
@@ -2894,12 +2947,12 @@ var pxt;
                 }), "_HANDLER_ADD");
             }
         }
+        var FilterState;
         (function (FilterState) {
             FilterState[FilterState["Hidden"] = 0] = "Hidden";
             FilterState[FilterState["Visible"] = 1] = "Visible";
             FilterState[FilterState["Disabled"] = 2] = "Disabled";
-        })(blocks_6.FilterState || (blocks_6.FilterState = {}));
-        var FilterState = blocks_6.FilterState;
+        })(FilterState = blocks_6.FilterState || (blocks_6.FilterState = {}));
         function createToolbox(blockInfo, toolbox, showCategories, filters, extensions) {
             if (showCategories === void 0) { showCategories = CategoryMode.Basic; }
             init();
@@ -3051,6 +3104,11 @@ var pxt;
                     if (cat) {
                         cat.removeChild(blocks_6.getFirstChildWithAttr(cat, "block", "type", "controls_for_of"));
                     }
+                }
+                // Inject optional builtin blocks into categories
+                if (pxt.appTarget.runtime) {
+                    var rt = pxt.appTarget.runtime;
+                    maybeInsertBuiltinBlock(tb, mkPredicateBlock(pxtc.PAUSE_UNTIL_TYPE), rt.pauseUntilBlock);
                 }
                 // Load localized names for default categories
                 var cats = tb.getElementsByTagName('category');
@@ -3261,7 +3319,7 @@ var pxt;
             // Rearrange blocks in the flyout and add group labels
             if (tb) {
                 var categories = tb.getElementsByTagName("category");
-                var _loop_1 = function(ci) {
+                var _loop_1 = function (ci) {
                     var cat = categories.item(ci);
                     var catName = cat.getAttribute("nameid");
                     if (catName === "advanced")
@@ -3319,8 +3377,7 @@ var pxt;
                     }
                 };
                 for (var ci = 0; ci < categories.length; ++ci) {
-                    var state_1 = _loop_1(ci);
-                    if (state_1 === "continue") continue;
+                    _loop_1(ci);
                 }
             }
             return tb;
@@ -3349,10 +3406,20 @@ var pxt;
             }
         }
         blocks_6.createToolbox = createToolbox;
+        function maybeInsertBuiltinBlock(toolbox, block, options) {
+            if (!options || !options.category)
+                return;
+            var cat = categoryElement(toolbox, options.category || "Loops");
+            if (!cat)
+                return;
+            var weight = options.weight == null ? 0 : options.weight;
+            insertBlock(block, cat, weight, options.group);
+        }
         function initBlocks(blockInfo, toolbox, showCategories, filters, extensions) {
             if (showCategories === void 0) { showCategories = CategoryMode.Basic; }
             init();
             initTooltip(blockInfo);
+            initJresIcons(blockInfo);
             var tb = createToolbox(blockInfo, toolbox, showCategories, filters, extensions);
             // add trash icon to toolbox
             if (!document.getElementById("blocklyTrashIcon")) {
@@ -3706,6 +3773,10 @@ var pxt;
                                 "type": "field_variable",
                                 "name": "VAR",
                                 "variable": controlsSimpleForDef.block["variable"]
+                                // Please note that most multilingual characters
+                                // cannot be used as variable name at this point.
+                                // Translate or decide the default variable name
+                                // with care.
                             },
                             {
                                 "type": "input_value",
@@ -4131,6 +4202,30 @@ var pxt;
                     setHelpResources(that, pxtc.TS_OUTPUT_TYPE, lf("JavaScript expression"), lf("A JavaScript expression that could not be converted to blocks"), '/blocks/javascript-blocks', "#717171");
                 }
             };
+            if (pxt.appTarget.runtime && pxt.appTarget.runtime.pauseUntilBlock) {
+                var blockOptions_1 = pxt.appTarget.runtime.pauseUntilBlock;
+                var blockDef_1 = pxt.blocks.getBlockDefinition(ts.pxtc.PAUSE_UNTIL_TYPE);
+                Blockly.Blocks[pxtc.PAUSE_UNTIL_TYPE] = {
+                    init: function () {
+                        var color = blockOptions_1.color || getNamespaceColor('loops');
+                        this.jsonInit({
+                            "message0": blockDef_1.block["message0"],
+                            "args0": [
+                                {
+                                    "type": "input_value",
+                                    "name": "PREDICATE",
+                                    "check": "Boolean"
+                                }
+                            ],
+                            "inputsInline": true,
+                            "previousStatement": null,
+                            "nextStatement": null,
+                            "colour": color
+                        });
+                        setHelpResources(this, ts.pxtc.PAUSE_UNTIL_TYPE, blockDef_1.name, blockDef_1.tooltip, blockDef_1.url, color, undefined /*colourSecondary*/, undefined /*colourTertiary*/, false /*undeletable*/);
+                    }
+                };
+            }
             // controls_for_of
             var controlsForOfId = "controls_for_of";
             var controlsForOfDef = pxt.blocks.getBlockDefinition(controlsForOfId);
@@ -4143,6 +4238,10 @@ var pxt;
                                 "type": "field_variable",
                                 "name": "VAR",
                                 "variable": controlsForOfDef.block["variable"]
+                                // Please note that most multilingual characters
+                                // cannot be used as variable name at this point.
+                                // Translate or decide the default variable name
+                                // with care.
                             },
                             {
                                 "type": "input_value",
@@ -4532,7 +4631,7 @@ var pxt;
                  */
                 getProcedureCall: function () {
                     // The NAME field is guaranteed to exist, null will never be returned.
-                    return (this.getFieldValue('NAME'));
+                    return /** @type {string} */ (this.getFieldValue('NAME'));
                 },
                 /**
                  * Notification that a procedure is renaming.
@@ -4903,6 +5002,50 @@ var pxt;
                 }
             };
         }
+        /**
+         * <block type="pxt_wait_until">
+         *     <value name="PREDICATE">
+         *          <shadow type="logic_boolean">
+         *              <field name="BOOL">TRUE</field>
+         *          </shadow>
+         *     </value>
+         * </block>
+         */
+        function mkPredicateBlock(type) {
+            var block = document.createElement("block");
+            block.setAttribute("type", type);
+            var value = document.createElement("value");
+            value.setAttribute("name", "PREDICATE");
+            block.appendChild(value);
+            var shadow = document.createElement("shadow");
+            shadow.setAttribute("type", "logic_boolean");
+            value.appendChild(shadow);
+            var field = document.createElement("field");
+            field.setAttribute("name", "BOOL");
+            field.textContent = "TRUE";
+            shadow.appendChild(field);
+            return block;
+        }
+        var jresIconCache = {};
+        function iconToFieldImage(id) {
+            var url = jresIconCache[id];
+            if (!url) {
+                pxt.log("missing jres icon " + id);
+                return undefined;
+            }
+            return new Blockly.FieldImage(url, 40, 40, pxt.Util.isUserLanguageRtl(), '');
+        }
+        function initJresIcons(blockInfo) {
+            jresIconCache = {}; // clear previous cache
+            var jres = blockInfo.apis.jres;
+            if (!jres)
+                return;
+            Object.keys(jres).forEach(function (jresId) {
+                var jresObject = jres[jresId];
+                if (jresObject && jresObject.icon)
+                    jresIconCache[jresId] = jresObject.icon;
+            });
+        }
     })(blocks = pxt.blocks || (pxt.blocks = {}));
 })(pxt || (pxt = {}));
 var pxt;
@@ -4976,7 +5119,7 @@ var pxt;
             block.appendChild(mutationElement);
         }
         blocks.mutateToolboxBlock = mutateToolboxBlock;
-        var MutatorHelper = (function () {
+        var MutatorHelper = /** @class */ (function () {
             function MutatorHelper(b, info) {
                 this.info = info;
                 this.block = b;
@@ -5004,7 +5147,7 @@ var pxt;
                 // Initialize flyout workspace's top block and add sub-blocks based on visible parameters
                 var topBlock = workspace.newBlock(this.topBlockType);
                 topBlock.initSvg();
-                var _loop_2 = function(input) {
+                var _loop_2 = function (input) {
                     if (input.name === MutatorHelper.mutatorStatmentInput) {
                         var currentConnection_1 = input.connection;
                         this_1.getVisibleBlockTypes().forEach(function (sub) {
@@ -5019,8 +5162,9 @@ var pxt;
                 var this_1 = this;
                 for (var _i = 0, _a = topBlock.inputList; _i < _a.length; _i++) {
                     var input = _a[_i];
-                    var state_2 = _loop_2(input);
-                    if (state_2 === "break") break;
+                    var state_1 = _loop_2(input);
+                    if (state_1 === "break")
+                        break;
                 }
                 return topBlock;
             };
@@ -5066,16 +5210,17 @@ var pxt;
             MutatorHelper.mutatedVariableInputName = "properties";
             return MutatorHelper;
         }());
-        var DestructuringMutator = (function (_super) {
+        var DestructuringMutator = /** @class */ (function (_super) {
             __extends(DestructuringMutator, _super);
             function DestructuringMutator(b, info) {
-                _super.call(this, b, info);
-                this.currentlyVisible = [];
-                this.parameterRenames = {};
-                this.prefix = this.info.attributes.mutatePrefix;
-                this.block.appendDummyInput(MutatorHelper.mutatedVariableInputName);
-                this.block.appendStatementInput("HANDLER")
+                var _this = _super.call(this, b, info) || this;
+                _this.currentlyVisible = [];
+                _this.parameterRenames = {};
+                _this.prefix = _this.info.attributes.mutatePrefix;
+                _this.block.appendDummyInput(MutatorHelper.mutatedVariableInputName);
+                _this.block.appendStatementInput("HANDLER")
                     .setCheck("null");
+                return _this;
             }
             DestructuringMutator.prototype.getMutationType = function () {
                 return MutatorTypes.ObjectDestructuringMutator;
@@ -5096,7 +5241,7 @@ var pxt;
                 }).join(", ");
                 var functionString = "function ({ " + declarationString + " })";
                 if (this.info.attributes.mutatePropertyEnum) {
-                    return blocks.mkText(" [" + this.parameters.map(function (p) { return (_this.info.attributes.mutatePropertyEnum + "." + p); }).join(", ") + "]," + functionString);
+                    return blocks.mkText(" [" + this.parameters.map(function (p) { return _this.info.attributes.mutatePropertyEnum + "." + p; }).join(", ") + "]," + functionString);
                 }
                 else {
                     return blocks.mkText(functionString);
@@ -5255,11 +5400,12 @@ var pxt;
             DestructuringMutator.prefixLabel = "0prefix_label_";
             return DestructuringMutator;
         }(MutatorHelper));
-        var ArrayMutator = (function (_super) {
+        var ArrayMutator = /** @class */ (function (_super) {
             __extends(ArrayMutator, _super);
             function ArrayMutator() {
-                _super.apply(this, arguments);
-                this.count = 0;
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.count = 0;
+                return _this;
             }
             ArrayMutator.prototype.getMutationType = function () {
                 return MutatorTypes.RestParameterMutator;
@@ -5339,11 +5485,12 @@ var pxt;
             ArrayMutator.valueInputPrefix = "value_input_";
             return ArrayMutator;
         }(MutatorHelper));
-        var DefaultInstanceMutator = (function (_super) {
+        var DefaultInstanceMutator = /** @class */ (function (_super) {
             __extends(DefaultInstanceMutator, _super);
             function DefaultInstanceMutator() {
-                _super.apply(this, arguments);
-                this.showing = false;
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.showing = false;
+                return _this;
             }
             DefaultInstanceMutator.prototype.getMutationType = function () {
                 return MutatorTypes.DefaultInstanceMutator;
@@ -5407,7 +5554,6 @@ var pxt;
 })(pxt || (pxt = {}));
 /// <reference path="../localtypings/pxtblockly.d.ts" />
 /// <reference path="../built/pxtlib.d.ts" />
-/// <reference path="../typings/globals/jquery/index.d.ts" />
 var pxt;
 (function (pxt) {
     var blocks;
@@ -5423,13 +5569,13 @@ var pxt;
                 y += emPixels; //buffer
             });
         }
+        var BlockLayout;
         (function (BlockLayout) {
             BlockLayout[BlockLayout["Align"] = 1] = "Align";
             // Shuffle deprecated
             BlockLayout[BlockLayout["Clean"] = 3] = "Clean";
             BlockLayout[BlockLayout["Flow"] = 4] = "Flow";
-        })(blocks_11.BlockLayout || (blocks_11.BlockLayout = {}));
-        var BlockLayout = blocks_11.BlockLayout;
+        })(BlockLayout = blocks_11.BlockLayout || (blocks_11.BlockLayout = {}));
         function render(blocksXml, options) {
             if (options === void 0) { options = { emPixels: 14, layout: BlockLayout.Flow }; }
             if (!workspace) {
@@ -5443,7 +5589,6 @@ var pxt;
                 workspace = Blockly.inject(blocklyDiv, {
                     scrollbars: false,
                     readOnly: true,
-                    zoom: false,
                     sound: false,
                     media: pxt.webConfig.commitCdnUrl + "blockly/media/",
                     rtl: pxt.Util.isUserLanguageRtl()
@@ -5649,7 +5794,7 @@ var pxt;
 /// <reference path="../../localtypings/blockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldColorWheel = (function (_super) {
+    var FieldColorWheel = /** @class */ (function (_super) {
         __extends(FieldColorWheel, _super);
         /**
          * Class for a color wheel field.
@@ -5662,17 +5807,18 @@ var pxtblockly;
          * @constructor
          */
         function FieldColorWheel(value_, params, opt_validator) {
-            _super.call(this, String(value_), '0', '255', null, '10', 'Color', opt_validator);
-            this.isFieldCustom_ = true;
-            this.params = params;
-            if (this.params['min'])
-                this.min_ = parseFloat(this.params['min']);
-            if (this.params['max'])
-                this.max_ = parseFloat(this.params['max']);
-            if (this.params['label'])
-                this.labelText_ = this.params['label'];
-            if (this.params['channel'])
-                this.channel_ = this.params['channel'];
+            var _this = _super.call(this, String(value_), '0', '255', null, '10', 'Color', opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            _this.params = params;
+            if (_this.params['min'])
+                _this.min_ = parseFloat(_this.params['min']);
+            if (_this.params['max'])
+                _this.max_ = parseFloat(_this.params['max']);
+            if (_this.params['label'])
+                _this.labelText_ = _this.params['label'];
+            if (_this.params['channel'])
+                _this.channel_ = _this.params['channel'];
+            return _this;
         }
         /**
          * Set the gradient CSS properties for the given node and channel
@@ -5776,17 +5922,18 @@ var pxtblockly;
 /// <reference path="../../localtypings/blockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldColorNumber = (function (_super) {
+    var FieldColorNumber = /** @class */ (function (_super) {
         __extends(FieldColorNumber, _super);
         function FieldColorNumber(text, params, opt_validator) {
-            _super.call(this, text, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, text, opt_validator) || this;
+            _this.isFieldCustom_ = true;
             if (params.colours)
-                this.setColours(JSON.parse(params.colours));
+                _this.setColours(JSON.parse(params.colours));
             if (params.columns)
-                this.setColumns(parseInt(params.columns));
+                _this.setColumns(parseInt(params.columns));
             if (params.className)
-                this.className_ = params.className;
+                _this.className_ = params.className;
+            return _this;
         }
         /**
          * Return the current colour.
@@ -5828,11 +5975,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/blockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldColorPicker = (function (_super) {
+    var FieldColorPicker = /** @class */ (function (_super) {
         __extends(FieldColorPicker, _super);
         function FieldColorPicker(text, params, opt_validator) {
-            _super.call(this, text, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, text, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         FieldColorPicker.prototype.getValue = function () {
             return "\"" + this.colour_ + "\"";
@@ -5844,25 +5992,26 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldGridPicker = (function (_super) {
+    var FieldGridPicker = /** @class */ (function (_super) {
         __extends(FieldGridPicker, _super);
         function FieldGridPicker(text, options, validator) {
-            _super.call(this, options.data);
-            this.isFieldCustom_ = true;
-            this.tooltips_ = [];
-            this.columns_ = parseInt(options.columns) || 4;
-            this.maxRows_ = parseInt(options.maxRows) || 0;
-            this.width_ = parseInt(options.width) || 400;
-            this.backgroundColour_ = pxtblockly.parseColour(options.colour);
-            this.itemColour_ = options.itemColour || "rgba(255, 255, 255, 0.6)";
-            this.borderColour_ = Blockly.PXTUtils.fadeColour(this.backgroundColour_, 0.4, false);
+            var _this = _super.call(this, options.data) || this;
+            _this.isFieldCustom_ = true;
+            _this.tooltips_ = [];
+            _this.columns_ = parseInt(options.columns) || 4;
+            _this.maxRows_ = parseInt(options.maxRows) || 0;
+            _this.width_ = parseInt(options.width) || 400;
+            _this.backgroundColour_ = pxtblockly.parseColour(options.colour);
+            _this.itemColour_ = options.itemColour || "rgba(255, 255, 255, 0.6)";
+            _this.borderColour_ = Blockly.PXTUtils.fadeColour(_this.backgroundColour_, 0.4, false);
             var tooltipCfg = {
                 xOffset: parseInt(options.tooltipsXOffset) || 15,
                 yOffset: parseInt(options.tooltipsYOffset) || -10
             };
-            this.tooltipConfig_ = tooltipCfg;
-            this.hasSearchBar_ = !!options.hasSearchBar || false;
-            this.hideRect_ = !!options.hideRect || false;
+            _this.tooltipConfig_ = tooltipCfg;
+            _this.hasSearchBar_ = !!options.hasSearchBar || false;
+            _this.hideRect_ = !!options.hideRect || false;
+            return _this;
         }
         /**
          * When disposing the grid picker, make sure the tooltips are disposed too.
@@ -5907,7 +6056,7 @@ var pxtblockly;
             var tableContainerDom = tableContainer.getElement();
             var menuItemsDom = tableContainerDom.getElementsByClassName('goog-menuitem');
             var largestTextItem = -1;
-            var _loop_3 = function(i) {
+            var _loop_3 = function (i) {
                 var elem = menuItemsDom[i];
                 elem.style.borderColor = this_2.backgroundColour_;
                 elem.style.backgroundColor = this_2.itemColour_;
@@ -6346,18 +6495,18 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldImageDropdown = (function (_super) {
+    var FieldImageDropdown = /** @class */ (function (_super) {
         __extends(FieldImageDropdown, _super);
         function FieldImageDropdown(text, options, validator) {
-            _super.call(this, options.data);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, options.data) || this;
+            _this.isFieldCustom_ = true;
             /**
              * Callback for when a button is clicked inside the drop-down.
              * Should be bound to the FieldIconMenu.
              * @param {Event} e DOM event for the click/touch
              * @private
              */
-            this.buttonClick_ = function (e) {
+            _this.buttonClick_ = function (e) {
                 var value = e.target.getAttribute('data-value');
                 this.setValue(value);
                 this.setText(value);
@@ -6366,17 +6515,18 @@ var pxtblockly;
             /**
              * Callback for when the drop-down is hidden.
              */
-            this.onHide_ = function () {
+            _this.onHide_ = function () {
                 Blockly.DropDownDiv.content_.removeAttribute('role');
                 Blockly.DropDownDiv.content_.removeAttribute('aria-haspopup');
                 Blockly.DropDownDiv.content_.removeAttribute('aria-activedescendant');
             };
-            this.columns_ = parseInt(options.columns);
-            this.maxRows_ = parseInt(options.maxRows) || 0;
-            this.width_ = parseInt(options.width) || 300;
-            this.backgroundColour_ = pxtblockly.parseColour(options.colour);
-            this.itemColour_ = options.itemColour || "rgba(255, 255, 255, 0.6)";
-            this.borderColour_ = Blockly.PXTUtils.fadeColour(this.backgroundColour_, 0.4, false);
+            _this.columns_ = parseInt(options.columns);
+            _this.maxRows_ = parseInt(options.maxRows) || 0;
+            _this.width_ = parseInt(options.width) || 300;
+            _this.backgroundColour_ = pxtblockly.parseColour(options.colour);
+            _this.itemColour_ = options.itemColour || "rgba(255, 255, 255, 0.6)";
+            _this.borderColour_ = Blockly.PXTUtils.fadeColour(_this.backgroundColour_, 0.4, false);
+            return _this;
         }
         /**
          * Create a dropdown menu under the text.
@@ -6628,49 +6778,116 @@ var pxtblockly;
         Note[Note["A5"] = 880] = "A5";
         Note[Note["Bb5"] = 932] = "Bb5";
         Note[Note["B5"] = 988] = "B5";
+        Note[Note["C6"] = 1047] = "C6";
+        Note[Note["CSharp6"] = 1109] = "CSharp6";
+        Note[Note["D6"] = 1175] = "D6";
+        Note[Note["Eb6"] = 1245] = "Eb6";
+        Note[Note["E6"] = 1319] = "E6";
+        Note[Note["F6"] = 1397] = "F6";
+        Note[Note["FSharp6"] = 1480] = "FSharp6";
+        Note[Note["G6"] = 1568] = "G6";
+        Note[Note["GSharp6"] = 1568] = "GSharp6";
+        Note[Note["A6"] = 1760] = "A6";
+        Note[Note["Bb6"] = 1865] = "Bb6";
+        Note[Note["B6"] = 1976] = "B6";
+        Note[Note["C7"] = 2093] = "C7";
     })(Note || (Note = {}));
-    var PianoSize;
-    (function (PianoSize) {
-        PianoSize[PianoSize["small"] = 12] = "small";
-        PianoSize[PianoSize["medium"] = 36] = "medium";
-        PianoSize[PianoSize["large"] = 60] = "large";
-    })(PianoSize || (PianoSize = {}));
+    var Notes = {
+        28: { name: "C", prefixedName: "Low C", freq: 131 },
+        29: { name: "C#", prefixedName: "Low C#", freq: 139 },
+        30: { name: "D", prefixedName: "Low D", freq: 147 },
+        31: { name: "D#", prefixedName: "Low D#", freq: 156 },
+        32: { name: "E", prefixedName: "Low E", freq: 165 },
+        33: { name: "F", prefixedName: "Low F", freq: 175 },
+        34: { name: "F#", prefixedName: "Low F#", freq: 185 },
+        35: { name: "G", prefixedName: "Low G", freq: 196 },
+        36: { name: "G#", prefixedName: "Low G#", freq: 208 },
+        37: { name: "A", prefixedName: "Low A", freq: 220 },
+        38: { name: "A#", prefixedName: "Low A#", freq: 233 },
+        39: { name: "B", prefixedName: "Low B", freq: 247 },
+        40: { name: "C", prefixedName: "Middle C", freq: 262 },
+        41: { name: "C#", prefixedName: "Middle C#", freq: 277 },
+        42: { name: "D", prefixedName: "Middle D", freq: 294 },
+        43: { name: "D#", prefixedName: "Middle D#", freq: 311 },
+        44: { name: "E", prefixedName: "Middle E", freq: 330 },
+        45: { name: "F", prefixedName: "Middle F", freq: 349 },
+        46: { name: "F#", prefixedName: "Middle F#", freq: 370 },
+        47: { name: "G", prefixedName: "Middle G", freq: 392 },
+        48: { name: "G#", prefixedName: "Middle G#", freq: 415 },
+        49: { name: "A", prefixedName: "Middle A", freq: 440 },
+        50: { name: "A#", prefixedName: "Middle A#", freq: 466 },
+        51: { name: "B", prefixedName: "Middle B", freq: 494 },
+        52: { name: "C", prefixedName: "Tenor C", altPrefixedName: "High C", freq: 523 },
+        53: { name: "C#", prefixedName: "Tenor C#", altPrefixedName: "High C#", freq: 554 },
+        54: { name: "D", prefixedName: "Tenor D", altPrefixedName: "High D", freq: 587 },
+        55: { name: "D#", prefixedName: "Tenor D#", altPrefixedName: "High D#", freq: 622 },
+        56: { name: "E", prefixedName: "Tenor E", altPrefixedName: "High E", freq: 659 },
+        57: { name: "F", prefixedName: "Tenor F", altPrefixedName: "High F", freq: 698 },
+        58: { name: "F#", prefixedName: "Tenor F#", altPrefixedName: "High F#", freq: 740 },
+        59: { name: "G", prefixedName: "Tenor G", altPrefixedName: "High G", freq: 784 },
+        60: { name: "G#", prefixedName: "Tenor G#", altPrefixedName: "High G#", freq: 831 },
+        61: { name: "A", prefixedName: "Tenor A", altPrefixedName: "High A", freq: 880 },
+        62: { name: "A#", prefixedName: "Tenor A#", altPrefixedName: "High A#", freq: 932 },
+        63: { name: "B", prefixedName: "Tenor B", altPrefixedName: "High B", freq: 988 },
+        64: { name: "C", prefixedName: "High C", freq: 1046 },
+        65: { name: "C#", prefixedName: "High C#", freq: 1109 },
+        66: { name: "D", prefixedName: "High D", freq: 1175 },
+        67: { name: "D#", prefixedName: "High D#", freq: 1245 },
+        68: { name: "E", prefixedName: "High E", freq: 1319 },
+        69: { name: "F", prefixedName: "High F", freq: 1397 },
+        70: { name: "F#", prefixedName: "High F#", freq: 1478 },
+        71: { name: "G", prefixedName: "High G", freq: 1568 },
+        72: { name: "G#", prefixedName: "High G#", freq: 1661 },
+        73: { name: "A", prefixedName: "High A", freq: 1760 },
+        74: { name: "A#", prefixedName: "High A#", freq: 1865 },
+        75: { name: "B", prefixedName: "High B", freq: 1976 }
+    };
     var regex = /^Note\.(.+)$/;
     //  Class for a note input field.
-    var FieldNote = (function (_super) {
+    var FieldNote = /** @class */ (function (_super) {
         __extends(FieldNote, _super);
         function FieldNote(text, params, validator) {
-            _super.call(this, text);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, text) || this;
+            _this.isFieldCustom_ = true;
             /**
              * default number of piano keys
              * @type {number}
              * @private
              */
-            this.nKeys_ = PianoSize.medium;
+            _this.nKeys_ = 36;
+            _this.minNote_ = 28;
+            _this.maxNote_ = 63;
             /**
              * Absolute error for note frequency identification (Hz)
              * @type {number}
              */
-            this.eps = 2;
+            _this.eps = 2;
             /**
              * array of notes frequency
              * @type {Array.<number>}
              * @private
              */
-            this.noteFreq_ = [];
+            _this.noteFreq_ = [];
             /**
              * array of notes names
              * @type {Array.<string>}
              * @private
              */
-            this.noteName_ = [];
-            FieldNote.superClass_.constructor.call(this, text, validator);
-            this.note_ = text;
+            _this.noteName_ = [];
+            FieldNote.superClass_.constructor.call(_this, text, validator);
+            _this.note_ = text;
             if (params.editorColour) {
-                this.colour_ = pxtblockly.parseColour(params.editorColour);
-                this.colourBorder_ = goog.color.rgbArrayToHex(goog.color.darken(goog.color.hexToRgb(this.colour_), 0.2));
+                _this.colour_ = pxtblockly.parseColour(params.editorColour);
+                _this.colourBorder_ = goog.color.rgbArrayToHex(goog.color.darken(goog.color.hexToRgb(_this.colour_), 0.2));
             }
+            var minNote = parseInt(params.minNote) || _this.minNote_;
+            var maxNote = parseInt(params.maxNote) || _this.maxNote_;
+            if (minNote >= 28 && maxNote <= 76 && maxNote > minNote) {
+                _this.minNote_ = minNote;
+                _this.maxNote_ = maxNote;
+                _this.nKeys_ = _this.maxNote_ - _this.minNote_ + 1;
+            }
+            return _this;
         }
         /**
          * Ensure that only a non negative number may be entered.
@@ -6702,88 +6919,21 @@ var pxtblockly;
             createNotesArray();
             this.setValue(this.callValidator(this.getValue()));
             /**
-             * return next note of a piano key
-             * @param {string} note current note
-             * @return {string} next note
-             * @private
-             */
-            function nextNote(note) {
-                switch (note) {
-                    case "A#":
-                        return "B";
-                    case "B":
-                        return "C";
-                    case "C#":
-                        return "D";
-                    case "D#":
-                        return "E";
-                    case "E":
-                        return "F";
-                    case "F#":
-                        return "G";
-                    case "G#":
-                        return "A";
-                }
-                return note + "#";
-            }
-            /**
-             * return next note prefix
-             * @param {string} prefix current note prefix
-             * @return {string} next note prefix
-             * @private
-             */
-            function nextNotePrefix(prefix) {
-                switch (prefix) {
-                    case "Deep":
-                        return "Low";
-                    case "Low":
-                        return "Middle";
-                    case "Middle":
-                        if (thisField.nKeys_ == PianoSize.medium)
-                            return "High";
-                        return "Tenor";
-                    case "Tenor":
-                        return "High";
-                }
-                return "";
-            }
-            /**
              * create Array of notes name and frequencies
              * @private
              */
             function createNotesArray() {
-                var prefix;
-                var curNote = "C";
-                var keyNumber;
-                // set piano start key number and key prefix (keyNumbers -> https://en.wikipedia.org/wiki/Piano_key_frequencies)
-                switch (thisField.nKeys_) {
-                    case PianoSize.small:
-                        keyNumber = 40;
-                        //  no prefix for a single octave
-                        prefix = "";
-                        break;
-                    case PianoSize.medium:
-                        keyNumber = 28;
-                        prefix = "Low";
-                        break;
-                    case PianoSize.large:
-                        keyNumber = 16;
-                        prefix = "Deep";
-                        break;
-                }
-                for (var i = 0; i < thisField.nKeys_; i++) {
-                    // set name of the i note
-                    thisField.noteName_.push(Util.rlf(prefix + " " + curNote));
-                    // get frequency using math formula -> https://en.wikipedia.org/wiki/Piano_key_frequencies
-                    var curFreq = Math.pow(2, (keyNumber - 49) / 12) * 440;
-                    // set frequency of the i note
-                    thisField.noteFreq_.push(curFreq);
-                    // get name of the next note
-                    curNote = nextNote(curNote);
-                    if ((i + 1) % 12 == 0)
-                        prefix = nextNotePrefix(prefix);
-                    // increment keyNumber
-                    keyNumber++;
+                for (var i = thisField.minNote_; i <= thisField.maxNote_; i++) {
+                    var name_6 = Notes[i].prefixedName;
+                    // special case: one octave
+                    if (thisField.nKeys_ < 13) {
+                        name_6 = Notes[i].name;
+                    }
+                    else if (thisField.minNote_ >= 28 && thisField.maxNote_ <= 63) {
+                        name_6 = Notes[i].altPrefixedName || name_6;
+                    }
+                    thisField.noteName_.push(name_6);
+                    thisField.noteFreq_.push(Notes[i].freq);
                 }
                 // Do not remove this comment.
                 // lf("C")
@@ -6935,8 +7085,6 @@ var pxtblockly;
          * @return {!Blockly.FieldNote} Returns itself (for method chaining).
          */
         FieldNote.prototype.setNumberOfKeys = function (size) {
-            if (size != PianoSize.small && size != PianoSize.medium && size != PianoSize.large)
-                return this;
             this.nKeys_ = size;
             return this;
         };
@@ -7329,11 +7477,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldNumberDropdown = (function (_super) {
+    var FieldNumberDropdown = /** @class */ (function (_super) {
         __extends(FieldNumberDropdown, _super);
         function FieldNumberDropdown(value, options, opt_validator) {
-            _super.call(this, value, options.data, options.min, options.max, options.precision, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, value, options.data, options.min, options.max, options.precision, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         FieldNumberDropdown.prototype.getOptions = function () {
             var newOptions;
@@ -7351,11 +7500,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldProcedure = (function (_super) {
+    var FieldProcedure = /** @class */ (function (_super) {
         __extends(FieldProcedure, _super);
         function FieldProcedure(funcname, opt_validator) {
-            _super.call(this, null, opt_validator);
-            this.setValue(funcname || '');
+            var _this = _super.call(this, null, opt_validator) || this;
+            _this.setValue(funcname || '');
+            return _this;
         }
         FieldProcedure.prototype.getOptions = function () {
             return this.dropdownCreate();
@@ -7439,11 +7589,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldTextDropdown = (function (_super) {
+    var FieldTextDropdown = /** @class */ (function (_super) {
         __extends(FieldTextDropdown, _super);
         function FieldTextDropdown(text, options, opt_validator) {
-            _super.call(this, text, options.values, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, text, options.values, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         return FieldTextDropdown;
     }(Blockly.FieldTextDropdown));
@@ -7452,11 +7603,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/pxtblockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldTextInput = (function (_super) {
+    var FieldTextInput = /** @class */ (function (_super) {
         __extends(FieldTextInput, _super);
         function FieldTextInput(value, options, opt_validator) {
-            _super.call(this, value, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, value, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         return FieldTextInput;
     }(Blockly.FieldTextInput));
@@ -7465,16 +7617,17 @@ var pxtblockly;
 /// <reference path="../../localtypings/blockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldToggle = (function (_super) {
+    var FieldToggle = /** @class */ (function (_super) {
         __extends(FieldToggle, _super);
         function FieldToggle(state, params, opt_validator) {
-            _super.call(this, state, opt_validator);
-            this.isFieldCustom_ = true;
-            this.CURSOR = 'pointer';
-            this.params = params;
-            this.setValue(state);
-            this.addArgType('toggle');
-            this.type_ = params.type;
+            var _this = _super.call(this, state, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            _this.CURSOR = 'pointer';
+            _this.params = params;
+            _this.setValue(state);
+            _this.addArgType('toggle');
+            _this.type_ = params.type;
+            return _this;
         }
         FieldToggle.prototype.init = function () {
             if (this.fieldGroup_) {
@@ -7719,13 +7872,15 @@ var pxtblockly;
     pxtblockly.FieldToggle = FieldToggle;
 })(pxtblockly || (pxtblockly = {}));
 /// <reference path="../../localtypings/blockly.d.ts" />
+/// <reference path="./field_toggle.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldToggleOnOff = (function (_super) {
+    var FieldToggleOnOff = /** @class */ (function (_super) {
         __extends(FieldToggleOnOff, _super);
         function FieldToggleOnOff(state, params, opt_validator) {
-            _super.call(this, state, params, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, state, params, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         FieldToggleOnOff.prototype.getTrueText = function () {
             return lf("ON");
@@ -7738,13 +7893,15 @@ var pxtblockly;
     pxtblockly.FieldToggleOnOff = FieldToggleOnOff;
 })(pxtblockly || (pxtblockly = {}));
 /// <reference path="../../localtypings/blockly.d.ts" />
+/// <reference path="./field_toggle.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldToggleYesNo = (function (_super) {
+    var FieldToggleYesNo = /** @class */ (function (_super) {
         __extends(FieldToggleYesNo, _super);
         function FieldToggleYesNo(state, params, opt_validator) {
-            _super.call(this, state, params, opt_validator);
-            this.isFieldCustom_ = true;
+            var _this = _super.call(this, state, params, opt_validator) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         FieldToggleYesNo.prototype.getTrueText = function () {
             return lf("Yes");
@@ -7759,11 +7916,12 @@ var pxtblockly;
 /// <reference path="../../localtypings/blockly.d.ts" />
 var pxtblockly;
 (function (pxtblockly) {
-    var FieldTsExpression = (function (_super) {
+    var FieldTsExpression = /** @class */ (function (_super) {
         __extends(FieldTsExpression, _super);
         function FieldTsExpression() {
-            _super.apply(this, arguments);
-            this.isFieldCustom_ = true;
+            var _this = _super !== null && _super.apply(this, arguments) || this;
+            _this.isFieldCustom_ = true;
+            return _this;
         }
         /**
          * Same as parent, but adds a different class to text when disabled

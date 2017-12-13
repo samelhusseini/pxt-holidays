@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /// <reference path="../libs/core/enums.d.ts"/>
 var pxsim;
 (function (pxsim) {
@@ -54,7 +59,6 @@ var pxsim;
         card.randomColor = randomColor;
     })(card = pxsim.card || (pxsim.card = {}));
 })(pxsim || (pxsim = {}));
-var pxsim;
 (function (pxsim) {
     var loops;
     (function (loops) {
@@ -81,12 +85,11 @@ var pxsim;
         loops.pauseAsync = pauseAsync;
     })(loops = pxsim.loops || (pxsim.loops = {}));
 })(pxsim || (pxsim = {}));
-var pxsim;
 (function (pxsim) {
     var lights;
     (function (lights) {
         /**
-         * Set the lights background
+         * Set the lights
          */
         //% weight=89
         //% blockId="setLightColor" block="set lights %color=colorNumberPicker"
@@ -94,6 +97,15 @@ var pxsim;
             pxsim.board().drawLights([color.toString()]);
         }
         lights.setLightColor = setLightColor;
+        /**
+         * Clear the lights
+         */
+        //% weight=89
+        //% blockId="clearLights" block="clear lights"
+        function clearLights() {
+            pxsim.board().clearLights();
+        }
+        lights.clearLights = clearLights;
         /**
          * Set the animation on the lights
          */
@@ -112,7 +124,6 @@ var pxsim;
     })(lights = pxsim.lights || (pxsim.lights = {}));
 })(pxsim || (pxsim = {}));
 function logMsg(m) { console.log(m); }
-var pxsim;
 (function (pxsim) {
     var console;
     (function (console) {
@@ -128,7 +139,6 @@ var pxsim;
         console.log = log;
     })(console = pxsim.console || (pxsim.console = {}));
 })(pxsim || (pxsim = {}));
-/// <reference path="../node_modules/pxt-core/typings/globals/bluebird/index.d.ts"/>
 /// <reference path="../node_modules/pxt-core/built/pxtsim.d.ts"/>
 var pxsim;
 (function (pxsim) {
@@ -156,15 +166,20 @@ var pxsim;
      * Represents the entire state of the executing program.
      * Do not store state anywhere else!
      */
-    var Board = (function (_super) {
+    var Board = /** @class */ (function (_super) {
         __extends(Board, _super);
         function Board() {
-            _super.call(this);
-            this.lightGraphics = [];
+            var _this = _super.call(this) || this;
+            _this.lightGraphics = [];
             // Initialize phaser
-            this.initPhaser();
+            _this.initPhaser();
+            return _this;
         }
         Board.prototype.initAsync = function (msg) {
+            postContainerMessage({
+                type: "simulator.message",
+                key: "init"
+            });
             var that = this;
             return new Promise(function (resolve, reject) {
                 (function waitForFoo() {
@@ -191,7 +206,7 @@ var pxsim;
             this.game.load.image('baubles', staticPath + "/sprites/baubles.png");
             this.game.load.image('bell', staticPath + "/sprites/bell.png");
             this.game.load.image('candies', staticPath + "/sprites/candies.png");
-            this.game.load.image('candy-cane', staticPath + "/sprites/candy-cane.png");
+            this.game.load.image('candycane', staticPath + "/sprites/candy-cane.png");
             this.game.load.image('christmas-sock', staticPath + "/sprites/christmas-sock.png");
             this.game.load.image('christmas-tree', staticPath + "/sprites/christmas-tree.png");
             this.game.load.image('church', staticPath + "/sprites/church.png");
@@ -273,24 +288,26 @@ var pxsim;
                 case "24":
                     return "barbecue";
                 case "25":
-                    return "kwanzaa1";
+                    return "balloons";
                 case "26":
-                    return "kwanzaa2";
-                case "27":
-                    return "kwanzaa3";
-                case "28":
-                    return "kwanzaa4";
-                case "29":
-                    return "kwanzaa5";
-                case "30":
                     return "stlucia";
+                case "27":
+                    return "kwanzaa1";
+                case "28":
+                    return "kwanzaa2";
+                case "29":
+                    return "kwanzaa3";
+                case "30":
+                    return "kwanzaa4";
                 case "31":
-                    return "hebrew1";
+                    return "kwanzaa5";
                 case "32":
-                    return "hebrew2";
+                    return "hebrew1";
                 case "33":
-                    return "hebrew3";
+                    return "hebrew2";
                 case "34":
+                    return "hebrew3";
+                case "35":
                     return "yarmulke";
             }
             return "";
@@ -315,8 +332,14 @@ var pxsim;
                 this.iconElement = null;
             }
             var height = this.game.world.height;
-            this.iconElement = this.game.add.sprite(220, height / 5, iconName);
-            this.iconElement.scale.setTo(0.5, 0.5);
+            var width = this.game.world.width;
+            this.iconElement = this.game.add.sprite(width / 2, height / 5, iconName);
+            var imageCached = this.game.cache.getImage(iconName);
+            var newHeight = height / 5 * 3;
+            var newWidth = imageCached.height / imageCached.width * newHeight;
+            //this.iconElement.scale.setTo(0.5, 0.5);
+            this.iconElement.width = newWidth;
+            this.iconElement.height = newHeight;
         };
         Board.prototype.drawLights = function (lightBuffer) {
             if (!this.lightGraphics || this.lightGraphics.length == 0) {
@@ -377,6 +400,15 @@ var pxsim;
                         j = 0;
                 }
             }
+        };
+        Board.prototype.clearLights = function () {
+            this.lightArc.clear();
+            this.game.bmd.clear();
+            for (var i = 0; i < this.lightGraphics.length; i++) {
+                this.lightGraphics[i].clear();
+            }
+            this.lightGraphics = [];
+            this.lightArc = null;
         };
         Board.prototype.calcCircleCenter = function (A, B, C) {
             var yDelta_a = B.y - A.y;

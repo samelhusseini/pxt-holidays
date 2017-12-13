@@ -1,4 +1,3 @@
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 /// <reference path="./winrtrefs.d.ts"/>
 /// <reference path="../built/pxtlib.d.ts"/>
 var pxt;
@@ -60,14 +59,13 @@ var pxt;
         winrt.saveOnlyAsync = saveOnlyAsync;
     })(winrt = pxt.winrt || (pxt.winrt = {}));
 })(pxt || (pxt = {}));
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 /// <reference path="./winrtrefs.d.ts"/>
 /// <reference path="../built/pxtlib.d.ts"/>
 var pxt;
 (function (pxt) {
     var winrt;
     (function (winrt) {
-        var WindowsRuntimeIO = (function () {
+        var WindowsRuntimeIO = /** @class */ (function () {
             function WindowsRuntimeIO() {
                 this.onData = function (v) { };
                 this.onEvent = function (v) { };
@@ -246,6 +244,7 @@ var pxt;
         }
     })(winrt = pxt.winrt || (pxt.winrt = {}));
 })(pxt || (pxt = {}));
+/// <reference path="./winrtrefs.d.ts"/>
 var pxt;
 (function (pxt) {
     var winrt;
@@ -537,7 +536,7 @@ var pxt;
             function pathjoin() {
                 var parts = [];
                 for (var _i = 0; _i < arguments.length; _i++) {
-                    parts[_i - 0] = arguments[_i];
+                    parts[_i] = arguments[_i];
                 }
                 return parts.join('\\');
             }

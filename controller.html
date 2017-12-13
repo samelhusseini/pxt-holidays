@@ -47,9 +47,9 @@
         .card-content {
             position: absolute;
             top: 0;
-            left: 0;
+            left: 50%;
             right: 0;
-            bottom: 50%;
+            bottom: 0;
         }
 
         .sharing-dialog {
@@ -70,7 +70,7 @@
 
         .shadow {
             position: relative;
-            border: solid 0.5rem black;
+            border: solid 0.7rem black;
             height: 100%;
             opacity: .15;
             top: 8px;
@@ -94,11 +94,13 @@
             height: 100%;
         }
 
-        .share-button {
+        .sim-buttons {
+            text-align: center;
             position: absolute;
+            width: 50%;
             z-index: 100;
-            top: 25%;
-            right: 2rem;
+            bottom: 35%;
+            right: 0;
         }
 
         .back-button {
@@ -108,22 +110,25 @@
             left: 2rem;
         }
 
-        .play-button {
-            position: absolute;
-            z-index: 100;
-            bottom: 2rem;
-            right: 2rem;
-        }
-
         .left-back {
             position: absolute;
-            top: 40px;
-            left: 0;
-            background-image: url('./docs/static/left-back.svg');
+            bottom: 0;
+            right: 0;
+            background-image: url('./static/left-back.svg');
             background-size: cover;
             width: 200px;
             height: 300px;
             z-index: 1;
+        }
+
+        .loading-screen {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: black;
+            z-index: 100;
         }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/JQuery-Snowfall/1.7.4/snowfall.min.js"></script>
@@ -144,7 +149,7 @@
     <script src="./react/react.min.js"></script>
     <script src="./react/react-dom.min.js"></script>
 
-    <script type="text/javascript" src="./phaser/phaser.min.js"></script>
+    <script type="text/javascript" src="./tonejs/tone.min.js"></script>
 
     <!-- Main -->
     <script src="./site/main_bundle.js"></script>

@@ -1,8 +1,13 @@
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /// <reference path='../built/pxtlib.d.ts' />
 var pxt;
 (function (pxt) {
@@ -59,7 +64,7 @@ var pxt;
             }
         }
         function promiseElementType(tp) {
-            if ((tp.flags & ts.TypeFlags.Reference) && tp.symbol.name == "Promise") {
+            if (pxtc.isObjectType(tp) && (tp.objectFlags & ts.ObjectFlags.Reference) && tp.symbol.name == "Promise") {
                 return tp.typeArguments[0];
             }
             return null;
@@ -145,7 +150,7 @@ var pxt;
             else if (asyncName) {
                 pxt.U.userError(currNs + "::" + fnname + " doesn't return a promise");
             }
-            var args = fn.parameters.map(function (p) { return ("" + p.name.getText() + (p.questionToken ? "?" : "") + ": " + mapType(typeOf(p))); });
+            var args = fn.parameters.map(function (p) { return "" + p.name.getText() + (p.questionToken ? "?" : "") + ": " + mapType(typeOf(p)); });
             var localname = fnname.replace(/Async$/, "");
             var defkw = isMethod ? "public" : "function";
             if (!isMethod)
@@ -194,198 +199,198 @@ var ts;
     (function (pxtc) {
         var avr;
         (function (avr) {
-            var AVRProcessor = (function (_super) {
+            var AVRProcessor = /** @class */ (function (_super) {
                 __extends(AVRProcessor, _super);
                 function AVRProcessor() {
-                    var _this = this;
-                    _super.call(this);
+                    var _this = _super.call(this) || this;
                     // TODO: use $lbl whenever we need an address
                     // Registers
                     // $Rd - bits 8:7:6:5:4 (r0)
                     // $Rr - bits 9:3:2:1:0 (r1)
-                    this.addEnc("$r0", "R0-31", function (v) { return _this.inrange(31, v, v << 4); });
-                    this.addEnc("$r1", "R0-31", function (v) { return _this.inrange(31, v, (v & 15) | ((v & 16) << 5)); });
-                    this.addEnc("$r2", "R0-4", function (v) {
+                    _this.addEnc("$r0", "R0-31", function (v) { return _this.inrange(31, v, v << 4); });
+                    _this.addEnc("$r1", "R0-31", function (v) { return _this.inrange(31, v, (v & 15) | ((v & 16) << 5)); });
+                    _this.addEnc("$r2", "R0-4", function (v) {
                         var r = _this.inseq([24, 26, 28, 30], v);
                         return r == null ? null : r << 4;
                     });
-                    this.addEnc("$r3", "R0-16-31", function (v) { return _this.inminmax(16, 31, v, (v - 16) << 4); });
-                    this.addEnc("$r4", "R0-7", function (v) { return _this.inrange(7, v, v << 4); });
-                    this.addEnc("$r6", "R0-31", function (v) { return _this.inrange(31, v, (v << 4) | (v & 15) | ((v & 16) << 5)); });
-                    this.addEnc("$r7", "R0-31", function (v) { return _this.inrange(31, v, v << 3); });
-                    this.addEnc("$r8", "Reven", function (v) { return v & 0x1 ? null : (v >> 1) << 4; });
-                    this.addEnc("$r9", "Reven", function (v) { return v & 0x1 ? null : (v >> 1); });
-                    this.addEnc("$r10", "R0-16-23", function (v) { return _this.inminmax(16, 23, v, (v - 16) << 4); });
-                    this.addEnc("$r11", "R0-16-23", function (v) { return _this.inminmax(16, 23, v, v - 16); });
-                    this.addEnc("$r12", "R0-16-31", function (v) { return _this.inminmax(16, 31, v, v - 16); });
+                    _this.addEnc("$r3", "R0-16-31", function (v) { return _this.inminmax(16, 31, v, (v - 16) << 4); });
+                    _this.addEnc("$r4", "R0-7", function (v) { return _this.inrange(7, v, v << 4); });
+                    _this.addEnc("$r6", "R0-31", function (v) { return _this.inrange(31, v, (v << 4) | (v & 15) | ((v & 16) << 5)); });
+                    _this.addEnc("$r7", "R0-31", function (v) { return _this.inrange(31, v, v << 3); });
+                    _this.addEnc("$r8", "Reven", function (v) { return v & 0x1 ? null : (v >> 1) << 4; });
+                    _this.addEnc("$r9", "Reven", function (v) { return v & 0x1 ? null : (v >> 1); });
+                    _this.addEnc("$r10", "R0-16-23", function (v) { return _this.inminmax(16, 23, v, (v - 16) << 4); });
+                    _this.addEnc("$r11", "R0-16-23", function (v) { return _this.inminmax(16, 23, v, v - 16); });
+                    _this.addEnc("$r12", "R0-16-31", function (v) { return _this.inminmax(16, 31, v, v - 16); });
                     // Immediates:
-                    this.addEnc("$i0", "#0-63", function (v) { return _this.inrange(63, v, (v & 0x0f) | (v & 0x30) << 2); });
-                    this.addEnc("$i1", "#0-255", function (v) { return _this.inrange(255, v, (v & 0x0f) | (v & 0xf0) << 4); });
-                    this.addEnc("$i2", "#0-127", function (v) { return _this.inrange(127, v, v << 3); });
-                    this.addEnc("$i3", "#0-255", function (v) { return _this.inrange(255, v, (~v & 0x0f) | (~v & 0xf0) << 4); });
-                    this.addEnc("$i4", "#0-15", function (v) { return _this.inrange(15, v, v << 4); });
-                    this.addEnc("$i5", "#0-63", function (v) { return _this.inrange(63, v, (v & 0x0f) | (v & 0x30) << 5); });
-                    this.addEnc("$i6", "#0-127", function (v) { return _this.inrange(127, v, (v & 0x0f) | (v & 0x70) << 4); });
-                    this.addEnc("$i7", "#0-4095", function (v) { return _this.inrange(4095, v, v); });
-                    this.addEnc("$i8", "#0-63", function (v) { return _this.inrange(63, v, v & 0x7 | (v & 0x18) << 7) | (v & 0x20) << 7; });
-                    this.addEnc("$i9", "#0-7", function (v) { return _this.inrange(7, v, v); });
+                    _this.addEnc("$i0", "#0-63", function (v) { return _this.inrange(63, v, (v & 0x0f) | (v & 0x30) << 2); });
+                    _this.addEnc("$i1", "#0-255", function (v) { return _this.inrange(255, v, (v & 0x0f) | (v & 0xf0) << 4); });
+                    _this.addEnc("$i2", "#0-127", function (v) { return _this.inrange(127, v, v << 3); });
+                    _this.addEnc("$i3", "#0-255", function (v) { return _this.inrange(255, v, (~v & 0x0f) | (~v & 0xf0) << 4); });
+                    _this.addEnc("$i4", "#0-15", function (v) { return _this.inrange(15, v, v << 4); });
+                    _this.addEnc("$i5", "#0-63", function (v) { return _this.inrange(63, v, (v & 0x0f) | (v & 0x30) << 5); });
+                    _this.addEnc("$i6", "#0-127", function (v) { return _this.inrange(127, v, (v & 0x0f) | (v & 0x70) << 4); });
+                    _this.addEnc("$i7", "#0-4095", function (v) { return _this.inrange(4095, v, v); });
+                    _this.addEnc("$i8", "#0-63", function (v) { return _this.inrange(63, v, v & 0x7 | (v & 0x18) << 7) | (v & 0x20) << 7; });
+                    _this.addEnc("$i9", "#0-7", function (v) { return _this.inrange(7, v, v); });
                     // labels
                     // this.addEnc("$la", "LABEL", v => this.inrange(255, v >> 1, v >> 1)).isWordAligned = true;
-                    this.addEnc("$la", "LABEL", function (v) { return _this.inrange(65535, v, v); });
-                    this.addEnc("$lb", "LABEL", function (v) { return _this.inrangeSigned(127, v >> 1, v >> 1) << 3; });
-                    this.addEnc("$lc", "LABEL", function (v) { return _this.inrange(65535, v >> 1, v >> 1); });
-                    this.addEnc("$ld", "LABEL", function (v) { return _this.inrangeSigned(2047, v >> 1, v >> 1); });
-                    this.addInst("adc   $r0, $r1", 0x1C00, 0xfC00);
-                    this.addInst("add   $r0, $r1", 0x0C00, 0xfC00);
+                    _this.addEnc("$la", "LABEL", function (v) { return _this.inrange(65535, v, v); });
+                    _this.addEnc("$lb", "LABEL", function (v) { return _this.inrangeSigned(127, v >> 1, v >> 1) << 3; });
+                    _this.addEnc("$lc", "LABEL", function (v) { return _this.inrange(65535, v >> 1, v >> 1); });
+                    _this.addEnc("$ld", "LABEL", function (v) { return _this.inrangeSigned(2047, v >> 1, v >> 1); });
+                    _this.addInst("adc   $r0, $r1", 0x1C00, 0xfC00);
+                    _this.addInst("add   $r0, $r1", 0x0C00, 0xfC00);
                     // adiw deviates from broken syntax in PDF
-                    this.addInst("adiw  $r2, $i0", 0x9600, 0xff00);
-                    this.addInst("and   $r0, $r1", 0x2000, 0xfC00);
-                    this.addInst("andi  $r3, $i1", 0x7000, 0xf000);
-                    this.addInst("asr   $r0", 0x9405, 0xfe0f);
-                    this.addInst("bclr  $r4", 0x9488, 0xff8f);
-                    this.addInst("bld   $r0, $i9", 0xf800, 0xfe08);
-                    this.addInst("brbc  $i9, $lb", 0xf400, 0xfc00);
-                    this.addInst("brbs  $i9, $lb", 0xf000, 0xfc00);
-                    this.addInst("brcc  $lb", 0xf400, 0xfc07);
-                    this.addInst("brcs  $lb", 0xf000, 0xfc07);
-                    this.addInst("break", 0x9598, 0xffff);
-                    this.addInst("breq  $lb", 0xf001, 0xfc07);
-                    this.addInst("brge  $lb", 0xf404, 0xfc07);
-                    this.addInst("brhc  $lb", 0xf405, 0xfc07);
-                    this.addInst("brhs  $lb", 0xf005, 0xfc07);
-                    this.addInst("brid  $lb", 0xf407, 0xfc07);
-                    this.addInst("brie  $lb", 0xf007, 0xfc07);
+                    _this.addInst("adiw  $r2, $i0", 0x9600, 0xff00);
+                    _this.addInst("and   $r0, $r1", 0x2000, 0xfC00);
+                    _this.addInst("andi  $r3, $i1", 0x7000, 0xf000);
+                    _this.addInst("asr   $r0", 0x9405, 0xfe0f);
+                    _this.addInst("bclr  $r4", 0x9488, 0xff8f);
+                    _this.addInst("bld   $r0, $i9", 0xf800, 0xfe08);
+                    _this.addInst("brbc  $i9, $lb", 0xf400, 0xfc00);
+                    _this.addInst("brbs  $i9, $lb", 0xf000, 0xfc00);
+                    _this.addInst("brcc  $lb", 0xf400, 0xfc07);
+                    _this.addInst("brcs  $lb", 0xf000, 0xfc07);
+                    _this.addInst("break", 0x9598, 0xffff);
+                    _this.addInst("breq  $lb", 0xf001, 0xfc07);
+                    _this.addInst("brge  $lb", 0xf404, 0xfc07);
+                    _this.addInst("brhc  $lb", 0xf405, 0xfc07);
+                    _this.addInst("brhs  $lb", 0xf005, 0xfc07);
+                    _this.addInst("brid  $lb", 0xf407, 0xfc07);
+                    _this.addInst("brie  $lb", 0xf007, 0xfc07);
                     // conflict with brbs?
-                    this.addInst("brlo  $lb", 0xf000, 0xfc07);
-                    this.addInst("brlt  $lb", 0xf004, 0xfc07);
-                    this.addInst("brmi  $lb", 0xf002, 0xfc07);
-                    this.addInst("brne  $lb", 0xf401, 0xfc07);
-                    this.addInst("brpl  $lb", 0xf402, 0xfc07);
+                    _this.addInst("brlo  $lb", 0xf000, 0xfc07);
+                    _this.addInst("brlt  $lb", 0xf004, 0xfc07);
+                    _this.addInst("brmi  $lb", 0xf002, 0xfc07);
+                    _this.addInst("brne  $lb", 0xf401, 0xfc07);
+                    _this.addInst("brpl  $lb", 0xf402, 0xfc07);
                     // error in doc? - this has same opcode as brcc
-                    this.addInst("brsh  $lb", 0xf400, 0xfc07);
-                    this.addInst("brtc  $lb", 0xf406, 0xfc07);
-                    this.addInst("brts  $lb", 0xf006, 0xfc07);
-                    this.addInst("brvc  $lb", 0xf403, 0xfc07);
-                    this.addInst("brvs  $lb", 0xf003, 0xfc07);
-                    this.addInst("bset  $r4", 0x9408, 0xff8f);
-                    this.addInst("bst   $r0, $i9", 0xfa00, 0xfe08);
+                    _this.addInst("brsh  $lb", 0xf400, 0xfc07);
+                    _this.addInst("brtc  $lb", 0xf406, 0xfc07);
+                    _this.addInst("brts  $lb", 0xf006, 0xfc07);
+                    _this.addInst("brvc  $lb", 0xf403, 0xfc07);
+                    _this.addInst("brvs  $lb", 0xf003, 0xfc07);
+                    _this.addInst("bset  $r4", 0x9408, 0xff8f);
+                    _this.addInst("bst   $r0, $i9", 0xfa00, 0xfe08);
                     // call - 32 bit - special handling
-                    this.addInst("call  $lc", 0x940e, 0xffff, true);
-                    this.addInst("cbi   $r7, $i9", 0x9800, 0xff00);
-                    this.addInst("cbr   $r3, $i3", 0x7000, 0xf000);
-                    this.addInst("clc", 0x9488, 0xffff);
-                    this.addInst("clh", 0x94d8, 0xffff);
-                    this.addInst("cli", 0x94f8, 0xffff);
-                    this.addInst("cln", 0x94a8, 0xffff);
-                    this.addInst("clr $r6", 0x2400, 0xfc00);
-                    this.addInst("cls", 0x94c8, 0xffff);
-                    this.addInst("clt", 0x94e8, 0xffff);
-                    this.addInst("clv", 0x94b8, 0xffff);
-                    this.addInst("clz", 0x9498, 0xffff);
-                    this.addInst("com   $r0", 0x9400, 0xfe0f);
-                    this.addInst("cp    $r0, $r1", 0x1400, 0xfC00);
-                    this.addInst("cpc   $r0, $r1", 0x0400, 0xfC00);
-                    this.addInst("cpi   $r3, $i1", 0x3000, 0xf000);
-                    this.addInst("cpse  $r0, $r1", 0x1000, 0xfC00);
-                    this.addInst("dec   $r0", 0x940a, 0xfe0f);
-                    this.addInst("des   $i4", 0x940b, 0xff0f);
-                    this.addInst("eicall", 0x9519, 0xffff);
-                    this.addInst("eijmp", 0x9419, 0xffff);
-                    this.addInst("elpm", 0x95d8, 0xffff);
-                    this.addInst("elpm  $r0, Z0", 0x9006, 0xfe0f);
-                    this.addInst("elpm  $r0, Z+0", 0x9007, 0xfe0f);
-                    this.addInst("eor   $r0, $r1", 0x2400, 0xfC00);
-                    this.addInst("fmul   $r10, $r11", 0x0308, 0xff88);
-                    this.addInst("fmuls  $r10, $r11", 0x0380, 0xff88);
-                    this.addInst("fmulsu $r10, $r11", 0x0388, 0xff88);
-                    this.addInst("icall", 0x9509, 0xffff);
-                    this.addInst("ijmp", 0x9409, 0xffff);
-                    this.addInst("in    $r0, $i5", 0xb000, 0xf800);
-                    this.addInst("inc   $r0", 0x9403, 0xfe0f);
+                    _this.addInst("call  $lc", 0x940e, 0xffff, true);
+                    _this.addInst("cbi   $r7, $i9", 0x9800, 0xff00);
+                    _this.addInst("cbr   $r3, $i3", 0x7000, 0xf000);
+                    _this.addInst("clc", 0x9488, 0xffff);
+                    _this.addInst("clh", 0x94d8, 0xffff);
+                    _this.addInst("cli", 0x94f8, 0xffff);
+                    _this.addInst("cln", 0x94a8, 0xffff);
+                    _this.addInst("clr $r6", 0x2400, 0xfc00);
+                    _this.addInst("cls", 0x94c8, 0xffff);
+                    _this.addInst("clt", 0x94e8, 0xffff);
+                    _this.addInst("clv", 0x94b8, 0xffff);
+                    _this.addInst("clz", 0x9498, 0xffff);
+                    _this.addInst("com   $r0", 0x9400, 0xfe0f);
+                    _this.addInst("cp    $r0, $r1", 0x1400, 0xfC00);
+                    _this.addInst("cpc   $r0, $r1", 0x0400, 0xfC00);
+                    _this.addInst("cpi   $r3, $i1", 0x3000, 0xf000);
+                    _this.addInst("cpse  $r0, $r1", 0x1000, 0xfC00);
+                    _this.addInst("dec   $r0", 0x940a, 0xfe0f);
+                    _this.addInst("des   $i4", 0x940b, 0xff0f);
+                    _this.addInst("eicall", 0x9519, 0xffff);
+                    _this.addInst("eijmp", 0x9419, 0xffff);
+                    _this.addInst("elpm", 0x95d8, 0xffff);
+                    _this.addInst("elpm  $r0, Z0", 0x9006, 0xfe0f);
+                    _this.addInst("elpm  $r0, Z+0", 0x9007, 0xfe0f);
+                    _this.addInst("eor   $r0, $r1", 0x2400, 0xfC00);
+                    _this.addInst("fmul   $r10, $r11", 0x0308, 0xff88);
+                    _this.addInst("fmuls  $r10, $r11", 0x0380, 0xff88);
+                    _this.addInst("fmulsu $r10, $r11", 0x0388, 0xff88);
+                    _this.addInst("icall", 0x9509, 0xffff);
+                    _this.addInst("ijmp", 0x9409, 0xffff);
+                    _this.addInst("in    $r0, $i5", 0xb000, 0xf800);
+                    _this.addInst("inc   $r0", 0x9403, 0xfe0f);
                     // jmp - 32 bit - special handling
-                    this.addInst("jmp  $lc", 0x940c, 0xffff, true);
-                    this.addInst("lac   Z, $r0", 0x9206, 0xfe0f);
-                    this.addInst("las   Z, $r0", 0x9205, 0xfe0f);
-                    this.addInst("lat   Z, $r0", 0x9207, 0xfe0f);
-                    this.addInst("ld    $r0, X", 0x900c, 0xfe0f);
-                    this.addInst("ld    $r0, X+", 0x900d, 0xfe0f);
-                    this.addInst("ld    $r0, -X", 0x900e, 0xfe0f);
-                    this.addInst("ld    $r0, Y", 0x8008, 0xfe0f);
-                    this.addInst("ld    $r0, Y+", 0x9009, 0xfe0f);
-                    this.addInst("ld    $r0, -Y", 0x900a, 0xfe0f);
-                    this.addInst("ldd   $r0, Y, $i8", 0x8008, 0xd208);
-                    this.addInst("ld    $r0, Z", 0x8000, 0xfe0f);
-                    this.addInst("ld    $r0, Z+", 0x9001, 0xfe0f);
-                    this.addInst("ld    $r0, -Z", 0x9002, 0xfe0f);
-                    this.addInst("ldd   $r0, Z, $i8", 0x8000, 0xd208);
-                    this.addInst("ldi   $r3, $i1", 0xe000, 0xf000);
+                    _this.addInst("jmp  $lc", 0x940c, 0xffff, true);
+                    _this.addInst("lac   Z, $r0", 0x9206, 0xfe0f);
+                    _this.addInst("las   Z, $r0", 0x9205, 0xfe0f);
+                    _this.addInst("lat   Z, $r0", 0x9207, 0xfe0f);
+                    _this.addInst("ld    $r0, X", 0x900c, 0xfe0f);
+                    _this.addInst("ld    $r0, X+", 0x900d, 0xfe0f);
+                    _this.addInst("ld    $r0, -X", 0x900e, 0xfe0f);
+                    _this.addInst("ld    $r0, Y", 0x8008, 0xfe0f);
+                    _this.addInst("ld    $r0, Y+", 0x9009, 0xfe0f);
+                    _this.addInst("ld    $r0, -Y", 0x900a, 0xfe0f);
+                    _this.addInst("ldd   $r0, Y, $i8", 0x8008, 0xd208);
+                    _this.addInst("ld    $r0, Z", 0x8000, 0xfe0f);
+                    _this.addInst("ld    $r0, Z+", 0x9001, 0xfe0f);
+                    _this.addInst("ld    $r0, -Z", 0x9002, 0xfe0f);
+                    _this.addInst("ldd   $r0, Z, $i8", 0x8000, 0xd208);
+                    _this.addInst("ldi   $r3, $i1", 0xe000, 0xf000);
                     // lds - 32 bit (special handling required)
-                    this.addInst("lds   $r0, $la", 0x9000, 0xfe0f, true);
-                    this.addInst("lds   $r3, $i6", 0xa000, 0xf800);
-                    this.addInst("lpm", 0x95a8, 0xffff);
-                    this.addInst("lpm   $r0, Z", 0x9004, 0xfe0f);
-                    this.addInst("lpm   $r0, Z+", 0x9005, 0xfe0f);
-                    this.addInst("lsl   $r6", 0x0c00, 0xfc00);
-                    this.addInst("lsr   $r0", 0x9406, 0xfe0f);
-                    this.addInst("mov   $r0, $r1", 0x2C00, 0xfC00);
-                    this.addInst("movw  $r8, $r9", 0x0100, 0xff00);
-                    this.addInst("mul   $r0, $r1", 0x9c00, 0xfC00);
-                    this.addInst("muls  $r3, $r12", 0x0200, 0xff00);
-                    this.addInst("mulsu $r10, $r11", 0x0300, 0xff88);
-                    this.addInst("neg $r0", 0x9401, 0xfe0f);
-                    this.addInst("nop", 0x0000, 0xffff);
-                    this.addInst("or    $r0, $r1", 0x2800, 0xfC00);
-                    this.addInst("ori   $r3, $i1", 0x6000, 0xf000);
-                    this.addInst("out   $i5, $r0", 0xb800, 0xf800);
-                    this.addInst("pop $r0", 0x900f, 0xfe0f);
-                    this.addInst("push $r0", 0x920f, 0xfe0f);
-                    this.addInst("rcall $ld", 0xd000, 0xf000);
-                    this.addInst("ret", 0x9508, 0xffff);
-                    this.addInst("reti", 0x9518, 0xffff);
-                    this.addInst("rjmp $ld", 0xc000, 0xf000);
-                    this.addInst("rol $r6", 0x1c00, 0xfc00);
-                    this.addInst("ror $r0", 0x9407, 0xfe0f);
-                    this.addInst("sbc   $r0, $r1", 0x0800, 0xfC00);
-                    this.addInst("sbci  $r3, $i1", 0x4000, 0xf000);
-                    this.addInst("sbi   $r7, $i9", 0x9a00, 0xff00);
-                    this.addInst("sbic  $r7, $i9", 0x9900, 0xff00);
-                    this.addInst("sbis  $r7, $i9", 0x9b00, 0xff00);
-                    this.addInst("sbiw  $r2, $i0", 0x9700, 0xff00);
-                    this.addInst("sbr   $r3, $i1", 0x6000, 0xf000);
-                    this.addInst("sbrc  $r0, $i9", 0xfc00, 0xfe08);
-                    this.addInst("sbrs  $r0, $i9", 0xfe00, 0xfe08);
-                    this.addInst("sec", 0x9408, 0xffff);
-                    this.addInst("seh", 0x9458, 0xffff);
-                    this.addInst("sei", 0x9478, 0xffff);
-                    this.addInst("sen", 0x9428, 0xffff);
-                    this.addInst("sec", 0x9408, 0xffff);
-                    this.addInst("ser $r3", 0xef0f, 0xff0f);
-                    this.addInst("ses", 0x9448, 0xffff);
-                    this.addInst("set", 0x9468, 0xffff);
-                    this.addInst("sev", 0x9438, 0xffff);
-                    this.addInst("sez", 0x9418, 0xffff);
-                    this.addInst("sleep", 0x9588, 0xffff);
-                    this.addInst("spm", 0x95e8, 0xffff);
-                    this.addInst("st    X, $r0", 0x920c, 0xfe0f);
-                    this.addInst("st    X+, $r0", 0x920d, 0xfe0f);
-                    this.addInst("st    -X, $r0", 0x920e, 0xfe0f);
-                    this.addInst("st    Y, $r0", 0x8208, 0xfe0f);
-                    this.addInst("st    Y+, $r0", 0x9209, 0xfe0f);
-                    this.addInst("st    -Y, $r0", 0x920a, 0xfe0f);
-                    this.addInst("std   Y, $i8, $r0", 0x8208, 0xd208);
-                    this.addInst("st    Z, $r0", 0x8200, 0xfe0f);
-                    this.addInst("st    Z+, $r0", 0x9201, 0xfe0f);
-                    this.addInst("st    -Z, $r0", 0x9202, 0xfe0f);
-                    this.addInst("std   Z, $i8, $r0", 0x8200, 0xd208);
+                    _this.addInst("lds   $r0, $la", 0x9000, 0xfe0f, true);
+                    _this.addInst("lds   $r3, $i6", 0xa000, 0xf800);
+                    _this.addInst("lpm", 0x95a8, 0xffff);
+                    _this.addInst("lpm   $r0, Z", 0x9004, 0xfe0f);
+                    _this.addInst("lpm   $r0, Z+", 0x9005, 0xfe0f);
+                    _this.addInst("lsl   $r6", 0x0c00, 0xfc00);
+                    _this.addInst("lsr   $r0", 0x9406, 0xfe0f);
+                    _this.addInst("mov   $r0, $r1", 0x2C00, 0xfC00);
+                    _this.addInst("movw  $r8, $r9", 0x0100, 0xff00);
+                    _this.addInst("mul   $r0, $r1", 0x9c00, 0xfC00);
+                    _this.addInst("muls  $r3, $r12", 0x0200, 0xff00);
+                    _this.addInst("mulsu $r10, $r11", 0x0300, 0xff88);
+                    _this.addInst("neg $r0", 0x9401, 0xfe0f);
+                    _this.addInst("nop", 0x0000, 0xffff);
+                    _this.addInst("or    $r0, $r1", 0x2800, 0xfC00);
+                    _this.addInst("ori   $r3, $i1", 0x6000, 0xf000);
+                    _this.addInst("out   $i5, $r0", 0xb800, 0xf800);
+                    _this.addInst("pop $r0", 0x900f, 0xfe0f);
+                    _this.addInst("push $r0", 0x920f, 0xfe0f);
+                    _this.addInst("rcall $ld", 0xd000, 0xf000);
+                    _this.addInst("ret", 0x9508, 0xffff);
+                    _this.addInst("reti", 0x9518, 0xffff);
+                    _this.addInst("rjmp $ld", 0xc000, 0xf000);
+                    _this.addInst("rol $r6", 0x1c00, 0xfc00);
+                    _this.addInst("ror $r0", 0x9407, 0xfe0f);
+                    _this.addInst("sbc   $r0, $r1", 0x0800, 0xfC00);
+                    _this.addInst("sbci  $r3, $i1", 0x4000, 0xf000);
+                    _this.addInst("sbi   $r7, $i9", 0x9a00, 0xff00);
+                    _this.addInst("sbic  $r7, $i9", 0x9900, 0xff00);
+                    _this.addInst("sbis  $r7, $i9", 0x9b00, 0xff00);
+                    _this.addInst("sbiw  $r2, $i0", 0x9700, 0xff00);
+                    _this.addInst("sbr   $r3, $i1", 0x6000, 0xf000);
+                    _this.addInst("sbrc  $r0, $i9", 0xfc00, 0xfe08);
+                    _this.addInst("sbrs  $r0, $i9", 0xfe00, 0xfe08);
+                    _this.addInst("sec", 0x9408, 0xffff);
+                    _this.addInst("seh", 0x9458, 0xffff);
+                    _this.addInst("sei", 0x9478, 0xffff);
+                    _this.addInst("sen", 0x9428, 0xffff);
+                    _this.addInst("sec", 0x9408, 0xffff);
+                    _this.addInst("ser $r3", 0xef0f, 0xff0f);
+                    _this.addInst("ses", 0x9448, 0xffff);
+                    _this.addInst("set", 0x9468, 0xffff);
+                    _this.addInst("sev", 0x9438, 0xffff);
+                    _this.addInst("sez", 0x9418, 0xffff);
+                    _this.addInst("sleep", 0x9588, 0xffff);
+                    _this.addInst("spm", 0x95e8, 0xffff);
+                    _this.addInst("st    X, $r0", 0x920c, 0xfe0f);
+                    _this.addInst("st    X+, $r0", 0x920d, 0xfe0f);
+                    _this.addInst("st    -X, $r0", 0x920e, 0xfe0f);
+                    _this.addInst("st    Y, $r0", 0x8208, 0xfe0f);
+                    _this.addInst("st    Y+, $r0", 0x9209, 0xfe0f);
+                    _this.addInst("st    -Y, $r0", 0x920a, 0xfe0f);
+                    _this.addInst("std   Y, $i8, $r0", 0x8208, 0xd208);
+                    _this.addInst("st    Z, $r0", 0x8200, 0xfe0f);
+                    _this.addInst("st    Z+, $r0", 0x9201, 0xfe0f);
+                    _this.addInst("st    -Z, $r0", 0x9202, 0xfe0f);
+                    _this.addInst("std   Z, $i8, $r0", 0x8200, 0xd208);
                     // sts - 32-bit (special handing required)
-                    this.addInst("sts   $la, $r0", 0x9200, 0xfe0f, true);
-                    this.addInst("sts   $i6, $r3", 0xa800, 0xf800);
-                    this.addInst("sub   $r0, $r1", 0x1800, 0xfC00);
-                    this.addInst("subi  $r3, $i1", 0x5000, 0xf000);
-                    this.addInst("swap  $r0", 0x9402, 0xfe0f);
-                    this.addInst("tst   $r6", 0x2000, 0xfc00);
-                    this.addInst("wdr", 0x95a8, 0xffff);
-                    this.addInst("xch   Z, $r0", 0x9204, 0xfe0F);
+                    _this.addInst("sts   $la, $r0", 0x9200, 0xfe0f, true);
+                    _this.addInst("sts   $i6, $r3", 0xa800, 0xf800);
+                    _this.addInst("sub   $r0, $r1", 0x1800, 0xfC00);
+                    _this.addInst("subi  $r3, $i1", 0x5000, 0xf000);
+                    _this.addInst("swap  $r0", 0x9402, 0xfe0f);
+                    _this.addInst("tst   $r6", 0x2000, 0xfc00);
+                    _this.addInst("wdr", 0x95a8, 0xffff);
+                    _this.addInst("xch   Z, $r0", 0x9204, 0xfe0F);
+                    return _this;
                 }
                 AVRProcessor.prototype.wordSize = function () {
                     return 2;
@@ -534,7 +539,7 @@ var ts;
         //   - r5 is for captured locals in lambda
         //   - r6 for global{}
         // - for calls to user functions, all arguments passed on stack
-        var AssemblerSnippets = (function () {
+        var AssemblerSnippets = /** @class */ (function () {
             function AssemblerSnippets() {
             }
             AssemblerSnippets.prototype.hasCommonalize = function () { return false; };
@@ -600,7 +605,7 @@ var ts;
             return v || 1;
         }
         pxtc.numBytes = numBytes;
-        var ProctoAssembler = (function () {
+        var ProctoAssembler = /** @class */ (function () {
             function ProctoAssembler(t, bin, proc) {
                 var _this = this;
                 this.resText = "";
@@ -781,7 +786,9 @@ var ts;
                     else {
                         this.emitExpr(jmp.expr);
                         // TODO: remove ARM-specific code
-                        if (jmp.expr.exprKind == pxtc.ir.EK.RuntimeCall && jmp.expr.data === "thumb::subs") {
+                        if (jmp.expr.exprKind == pxtc.ir.EK.RuntimeCall &&
+                            (jmp.expr.data === "thumb::subs" || pxtc.U.startsWith(jmp.expr.data, "_cmp_"))) {
+                            // no cmp required
                         }
                         else {
                             this.write(this.t.cmp_zero("r0"));
@@ -1249,12 +1256,12 @@ var ts;
          * For example, an 8-bit value is returned in R24 and an 32-bit value is returned R22...R25.
          */
         // for now, everything is 16-bit (word)
-        var AVRSnippets = (function (_super) {
+        var AVRSnippets = /** @class */ (function (_super) {
             __extends(AVRSnippets, _super);
             function AVRSnippets() {
-                _super.apply(this, arguments);
+                var _this = _super !== null && _super.apply(this, arguments) || this;
                 // mapping from virtual registers to AVR registers
-                this.rmap_lo = {
+                _this.rmap_lo = {
                     "r0": "r24",
                     "r1": "r22",
                     "r2": "r20",
@@ -1262,7 +1269,7 @@ var ts;
                     "r5": "r4",
                     "r6": "r2"
                 };
-                this.rmap_hi = {
+                _this.rmap_hi = {
                     "r0": "r25",
                     "r1": "r23",
                     "r2": "r21",
@@ -1270,7 +1277,7 @@ var ts;
                     "r5": "r5",
                     "r6": "r3"
                 };
-                this.inst_lo = {
+                _this.inst_lo = {
                     "adds": "add",
                     "subs": "sub",
                     "ands": "and",
@@ -1281,13 +1288,14 @@ var ts;
                     "asrs": "Number_::",
                     "lsrs": "Number_::" // case SK.GreaterThanGreaterThanGreaterThanToken
                 };
-                this.inst_hi = {
+                _this.inst_hi = {
                     "adds": "adc",
                     "subs": "sbc",
                     "ands": "and",
                     "orrs": "or",
                     "eors": "eor"
                 };
+                return _this;
             }
             AVRSnippets.prototype.nop = function () { return "nop"; };
             AVRSnippets.prototype.reg_gets_imm = function (reg, imm) {
@@ -1559,7 +1567,7 @@ var ts;
             return JSON.stringify(s);
         }
         function vtableToCS(info) {
-            var s = ("static readonly VTable " + info.id + "_VT = new VTable(" + qs(pxtc.getName(info.decl)) + ", ") +
+            var s = "static readonly VTable " + info.id + "_VT = new VTable(" + qs(pxtc.getName(info.decl)) + ", " +
                 ("  " + info.refmask.length + ", new FnPtr[] {\n");
             for (var _i = 0, _a = info.vtable; _i < _a.length; _i++) {
                 var m = _a[_i];
@@ -1611,7 +1619,7 @@ var ts;
                 writeRaw("\n\npublic static void Main() { " + proc.label() + "(new CTX(0), null).GetAwaiter().GetResult(); }\n");
             }
             var storeArgs = proc.args.map(function (l, i) {
-                return ("    " + locref(l) + " = " + i + " >= args.Length ? TValue.Undefined : args[" + i + "];\n");
+                return "    " + locref(l) + " = " + i + " >= args.Length ? TValue.Undefined : args[" + i + "];\n";
             })
                 .join("");
             writeRaw("\nstatic Action<Task, object> " + proc.label() + "_delegate;\nstatic Task " + proc.label() + "(CTX parent, object[] args) {\n    var s = new " + ctxTp + "(parent);\n    if (" + proc.label() + "_delegate == null) {\n        " + proc.label() + "_delegate = " + proc.label() + "_task;\n    }\n" + storeArgs + "\n    " + proc.label() + "_task(null, s);\n    return s.completion.Task;\n}\n\nstatic void " + proc.label() + "_task(Task prevTask, object s_) {\n    var s = (" + ctxTp + ")s_;\n    var r0 = TValue.Undefined;\n    var step = s.pc;\n    s.pc = -1;\n\n    while (true) {\n    switch (step) {\n    case 0:\n");
@@ -1897,7 +1905,7 @@ var ts;
                 if (calledProcId.ifaceIndex != null) {
                     if (calledProcId.mapMethod) {
                         write("if (" + argsArray + "[0] is PXT.RefMap) {");
-                        var args = topExpr.args.map(function (a, i) { return (argsArray + "[" + i + "]"); });
+                        var args = topExpr.args.map(function (a, i) { return argsArray + "[" + i + "]"; });
                         args[0] = "(PXT.RefMap)" + args[0];
                         args.splice(1, 0, calledProcId.mapIdx.toString());
                         write("  s.retval = " + shimToCs(calledProcId.mapMethod).replace("Ref", "") + "(" + args.join(", ") + ");");
@@ -2001,7 +2009,7 @@ var ts;
         }
         pxtc.shimToJs = shimToJs;
         function vtableToJs(info) {
-            var s = ("var " + info.id + "_VT = {\n") +
+            var s = "var " + info.id + "_VT = {\n" +
                 ("  name: " + JSON.stringify(pxtc.getName(info.decl)) + ",\n") +
                 ("  refmask: " + JSON.stringify(info.refmask) + ",\n") +
                 "  methods: [\n";
@@ -2307,7 +2315,7 @@ var ts;
                 if (procid.ifaceIndex != null) {
                     if (procid.mapMethod) {
                         write("if (" + frameRef + ".arg0.vtable === 42) {");
-                        var args = topExpr.args.map(function (a, i) { return (frameRef + ".arg" + i); });
+                        var args = topExpr.args.map(function (a, i) { return frameRef + ".arg" + i; });
                         args.splice(1, 0, procid.mapIdx.toString());
                         write("  s.retval = " + shimToJs(procid.mapMethod) + "(" + args.join(", ") + ");");
                         write("  " + frameRef + ".fn = doNothing;");
@@ -2365,6 +2373,16 @@ var ts;
 (function (ts) {
     var pxtc;
     (function (pxtc) {
+        pxtc.thumbCmpMap = {
+            "numops::lt": "_cmp_lt",
+            "numops::gt": "_cmp_gt",
+            "numops::le": "_cmp_le",
+            "numops::ge": "_cmp_ge",
+            "numops::eq": "_cmp_eq",
+            "numops::eqq": "_cmp_eqq",
+            "numops::neq": "_cmp_neq",
+            "numops::neqq": "_cmp_neqq",
+        };
         var inlineArithmetic = {
             "numops::adds": "_numops_adds",
             "numops::subs": "_numops_subs",
@@ -2372,14 +2390,16 @@ var ts;
             "numops::ands": "_numops_ands",
             "pxt::toInt": "_numops_toInt",
             "pxt::fromInt": "_numops_fromInt",
+            "pxt::incr": "_pxt_incr",
+            "pxt::decr": "_pxt_decr",
         };
         // snippets for ARM Thumb assembly
-        var ThumbSnippets = (function (_super) {
+        var ThumbSnippets = /** @class */ (function (_super) {
             __extends(ThumbSnippets, _super);
             function ThumbSnippets() {
-                _super.apply(this, arguments);
+                return _super !== null && _super.apply(this, arguments) || this;
             }
-            ThumbSnippets.prototype.hasCommonalize = function () { return true; };
+            ThumbSnippets.prototype.hasCommonalize = function () { return !!pxtc.target.commonalize; };
             ThumbSnippets.prototype.stackAligned = function () {
                 return pxtc.target.stackAlign && pxtc.target.stackAlign > 1;
             };
@@ -2503,9 +2523,19 @@ var ts;
                             r += "    adds r0, r0, #1\n";
                         r += "    blx lr\n";
                     }
-                    r += "\n.boxed:\n    " + this.pushLR() + "\n    bl numops::" + op + "\n    " + this.popPC() + "\n";
+                    r += "\n.boxed:\n    push {r4, lr}\n    push {r0, r1}\n    bl numops::" + op + "\n    movs r4, r0\n    pop {r0}\n    bl _pxt_decr\n    pop {r0}\n    bl _pxt_decr\n    movs r0, r4\n    pop {r4, pc}\n";
                 }
                 r += "\n@scope _numops_toInt\n_numops_toInt:\n    asrs r0, r0, #1\n    bcc .over\n    blx lr\n.over:\n    " + this.pushLR() + "\n    lsls r0, r0, #1\n    bl pxt::toInt\n    " + this.popPC() + "\n\n_numops_fromInt:\n    lsls r2, r0, #1\n    asrs r1, r2, #1\n    cmp r0, r1\n    bne .over2\n    adds r0, r2, #1\n    blx lr\n.over2:\n    " + this.pushLR() + "\n    bl pxt::fromInt\n    " + this.popPC() + "\n";
+                for (var _b = 0, _c = ["incr", "decr"]; _b < _c.length; _b++) {
+                    var op = _c[_b];
+                    r += "\n_pxt_" + op + ":\n    @scope _pxt_" + op + "\n    lsls r3, r0, #30\n    beq .t0\n    bx lr\n.t0:\n    cmp r0, #0\n    beq .skip\n    " + this.pushLR() + "\n    bl pxt::" + op + "\n    " + this.popPC() + "\n.skip:\n    bx lr\n";
+                }
+                for (var _d = 0, _e = Object.keys(pxtc.thumbCmpMap); _d < _e.length; _d++) {
+                    var op = _e[_d];
+                    op = op.replace(/.*::/, "");
+                    // this make sure to set the Z flag correctly
+                    r += "\n_cmp_" + op + ":\n    @scope _cmp_" + op + "\n    lsls r2, r0, #31\n    beq .boxed\n    lsls r2, r1, #31\n    beq .boxed\n    subs r0, r1\n    b" + op.replace("qq", "q").replace("neq", "ne") + " .true\n.false:\n    movs r0, #0\n    bx lr\n.true:\n    movs r0, #1\n    bx lr\n.boxed:\n    push {r4, lr}\n    push {r0, r1}\n    bl numops::" + op + "\n    bl numops::toBoolDecr\n    movs r4, r0\n    pop {r0}\n    bl _pxt_decr\n    pop {r0}\n    bl _pxt_decr\n    movs r0, r4\n    pop {r4, pc}\n";
+                }
                 return r;
             };
             ThumbSnippets.prototype.emit_int = function (v, reg) {
@@ -3022,7 +3052,7 @@ var ts;
                 "Math.min": { blockId: "math_op2", block: "of %x|and %y" },
                 "Math.max": { blockId: "math_op2", block: "of %x|and %y" }
             };
-            var RenameMap = (function () {
+            var RenameMap = /** @class */ (function () {
                 function RenameMap(renames) {
                     this.renames = renames;
                     this.renames.sort(function (a, b) { return a.span.start - b.span.start; });
@@ -3055,7 +3085,7 @@ var ts;
                 return RenameMap;
             }());
             decompiler.RenameMap = RenameMap;
-            var LSHost = (function () {
+            var LSHost = /** @class */ (function () {
                 function LSHost(p) {
                     this.p = p;
                 }
@@ -3080,7 +3110,7 @@ var ts;
                     };
                 };
                 LSHost.prototype.getCurrentDirectory = function () { return "."; };
-                LSHost.prototype.getDefaultLibFileName = function (options) { return null; };
+                LSHost.prototype.getDefaultLibFileName = function (options) { return ""; };
                 LSHost.prototype.useCaseSensitiveFileNames = function () { return true; };
                 return LSHost;
             }());
@@ -3260,38 +3290,9 @@ var ts;
                             error(expr);
                             return false;
                         }
-                        return callInfo.attrs.blockId && !callInfo.attrs.handlerStatement && !callInfo.isExpression && hasArrowFunction(callInfo);
+                        return callInfo.attrs.blockId && !callInfo.attrs.handlerStatement && !callInfo.isExpression && hasStatementInput(callInfo);
                     }
                     return false;
-                }
-                function isOutputExpression(expr) {
-                    switch (expr.kind) {
-                        case SK.BinaryExpression:
-                            return !/[=<>]/.test(expr.operatorToken.getText());
-                        case SK.PrefixUnaryExpression: {
-                            var op = expr.operator;
-                            return op != SK.PlusPlusToken && op != SK.MinusMinusToken;
-                        }
-                        case SK.PostfixUnaryExpression: {
-                            var op = expr.operator;
-                            return op != SK.PlusPlusToken && op != SK.MinusMinusToken;
-                        }
-                        case SK.CallExpression:
-                            var callInfo = expr.callInfo;
-                            if (!callInfo) {
-                                error(expr);
-                            }
-                            return callInfo.isExpression;
-                        case SK.ParenthesizedExpression:
-                        case SK.NumericLiteral:
-                        case SK.StringLiteral:
-                        case SK.NoSubstitutionTemplateLiteral:
-                        case SK.TrueKeyword:
-                        case SK.FalseKeyword:
-                        case SK.NullKeyword:
-                            return true;
-                        default: return false;
-                    }
                 }
                 function emitStatementNode(n) {
                     if (!n) {
@@ -3581,7 +3582,7 @@ var ts;
                     var callInfo = n.callInfo;
                     if (!callInfo) {
                         error(n);
-                        return;
+                        return undefined;
                     }
                     if (callInfo.attrs.blockId === "lists_length" || callInfo.attrs.blockId === "text_length") {
                         var r = mkExpr(pxtc.U.htmlEscape(callInfo.attrs.blockId));
@@ -3630,8 +3631,9 @@ var ts;
                     if (topLevel === void 0) { topLevel = false; }
                     var node = n;
                     var stmt;
-                    if (checkStatement(node, env, asExpression, topLevel)) {
-                        stmt = getTypeScriptStatementBlock(node);
+                    var err = checkStatement(node, env, asExpression, topLevel);
+                    if (err) {
+                        stmt = getTypeScriptStatementBlock(node, undefined, err);
                     }
                     else {
                         switch (node.kind) {
@@ -3687,7 +3689,7 @@ var ts;
                                 else {
                                     error(node, pxtc.Util.lf("Statement kind unsupported in blocks: {0}", SK[node.kind]));
                                 }
-                                return;
+                                return undefined;
                         }
                     }
                     if (stmt) {
@@ -3703,6 +3705,7 @@ var ts;
                             stmt.comment = commentText;
                         }
                         else {
+                            // ERROR TODO
                         }
                     }
                     return stmt;
@@ -3713,7 +3716,7 @@ var ts;
                         return undefined;
                     }
                 }
-                function getTypeScriptStatementBlock(node, prefix) {
+                function getTypeScriptStatementBlock(node, prefix, error) {
                     var r = mkStmt(pxtc.TS_STATEMENT_TYPE);
                     r.mutation = {};
                     trackVariableUsagesInText(node);
@@ -3739,8 +3742,11 @@ var ts;
                     }
                     var parts = text.split("\n");
                     r.mutation["numlines"] = parts.length.toString();
+                    if (error && options.includeGreyBlockMessages) {
+                        r.mutation["error"] = pxtc.U.htmlEscape(error);
+                    }
                     parts.forEach(function (p, i) {
-                        r.mutation[("line" + i)] = pxtc.U.htmlEscape(p);
+                        r.mutation["line" + i] = pxtc.U.htmlEscape(p);
                     });
                     return r;
                 }
@@ -3748,7 +3754,7 @@ var ts;
                     var arg = node.arguments[0];
                     if (arg.kind != SK.StringLiteral && arg.kind != SK.NoSubstitutionTemplateLiteral) {
                         error(node);
-                        return;
+                        return undefined;
                     }
                     var res = mkStmt(info.attrs.blockId);
                     res.fields = [];
@@ -3756,7 +3762,7 @@ var ts;
                     var nc = info.attrs.imageLiteral * 5;
                     if (nc * 5 != leds.length) {
                         error(node, pxtc.Util.lf("Invalid image pattern"));
-                        return;
+                        return undefined;
                     }
                     for (var r = 0; r < 5; ++r) {
                         for (var c = 0; c < nc; ++c) {
@@ -3785,7 +3791,7 @@ var ts;
                             return r;
                         default:
                             error(n, pxtc.Util.lf("Unsupported operator token in statement {0}", SK[n.operatorToken.kind]));
-                            return;
+                            return undefined;
                     }
                 }
                 function getWhileStatement(n) {
@@ -3892,7 +3898,7 @@ var ts;
                     var isPlusPlus = node.operator === SK.PlusPlusToken;
                     if (!isPlusPlus && node.operator !== SK.MinusMinusToken) {
                         error(node);
-                        return;
+                        return undefined;
                     }
                     return getVariableSetOrChangeBlock(node.operand, isPlusPlus ? 1 : -1, true);
                 }
@@ -3906,14 +3912,28 @@ var ts;
                 }
                 function getCallStatement(node, asExpression) {
                     var info = node.callInfo;
+                    if (info.attrs.blockId === pxtc.PAUSE_UNTIL_TYPE) {
+                        var r_1 = mkStmt(pxtc.PAUSE_UNTIL_TYPE);
+                        var lambda = node.arguments[0];
+                        var condition = void 0;
+                        if (lambda.body.kind === SK.Block) {
+                            // We already checked to make sure the body is a single return statement
+                            condition = lambda.body.statements[0].expression;
+                        }
+                        else {
+                            condition = lambda.body;
+                        }
+                        r_1.inputs = [mkValue("PREDICATE", getOutputBlock(condition), "logic_boolean")];
+                        return r_1;
+                    }
                     if (!info.attrs.blockId || !info.attrs.block) {
                         var builtin = builtinBlocks[info.qName];
                         if (!builtin) {
                             var name_2 = getVariableName(node.expression);
                             if (env.declaredFunctions[name_2]) {
-                                var r_1 = mkStmt("procedures_callnoreturn");
-                                r_1.mutation = { "name": name_2 };
-                                return r_1;
+                                var r_2 = mkStmt("procedures_callnoreturn");
+                                r_2.mutation = { "name": name_2 };
+                                return r_2;
                             }
                             else {
                                 return getTypeScriptStatementBlock(node);
@@ -3926,6 +3946,11 @@ var ts;
                         return getImageLiteralStatement(node, info);
                     }
                     if (ts.isFunctionLike(info.decl)) {
+                        // const decl = info.decl as FunctionLikeDeclaration;
+                        // if (decl.parameters && decl.parameters.length === 1 && ts.isRestParameter(decl.parameters[0])) {
+                        //     openCallExpressionBlockWithRestParameter(node, info);
+                        //     return;
+                        // }
                     }
                     var paramInfo = getParameterInfo(info, blocksInfo);
                     var r = {
@@ -4092,7 +4117,8 @@ var ts;
                     var eventStatements = [];
                     var blockStatements = next || [];
                     // Go over the statements in reverse so that we can insert the nodes into the existing list if there is one
-                    statements.reverse().forEach(function (statement) {
+                    for (var i = statements.length - 1; i >= 0; i--) {
+                        var statement = statements[i];
                         if ((statement.kind === SK.FunctionDeclaration ||
                             (statement.kind == SK.ExpressionStatement && isEventExpression(statement))) &&
                             !checkStatement(statement, env, false, topLevel)) {
@@ -4101,7 +4127,7 @@ var ts;
                         else {
                             blockStatements.unshift(statement);
                         }
-                    });
+                    }
                     eventStatements.map(function (n) { return getStatementBlock(n, undefined, undefined, false, topLevel); }).forEach(emitStatementNode);
                     var emitOnStart = topLevel && !options.snippetMode;
                     if (blockStatements.length) {
@@ -4399,7 +4425,14 @@ var ts;
                     if (!asExpression && info.isExpression) {
                         return pxtc.Util.lf("No output expressions as statements");
                     }
-                    var hasCallback = hasArrowFunction(info);
+                    if (info.attrs.blockId === pxtc.PAUSE_UNTIL_TYPE) {
+                        var predicate = n.arguments[0];
+                        if (n.arguments.length === 1 && checkPredicate(predicate)) {
+                            return undefined;
+                        }
+                        return pxtc.Util.lf("Predicates must be inline expressions that return a value");
+                    }
+                    var hasCallback = hasStatementInput(info);
                     if (hasCallback && !info.attrs.handlerStatement && !topLevel) {
                         return pxtc.Util.lf("Events must be top level");
                     }
@@ -4538,6 +4571,23 @@ var ts;
                         }
                         return false;
                     }
+                    function checkPredicate(p) {
+                        if (p.kind !== SK.FunctionExpression && p.kind !== SK.ArrowFunction) {
+                            return false;
+                        }
+                        var predicate = p;
+                        if (isOutputExpression(predicate.body)) {
+                            return true;
+                        }
+                        var body = predicate.body;
+                        if (body.statements.length === 1) {
+                            var stmt = unwrapNode(body.statements[0]);
+                            if (stmt.kind === SK.ReturnStatement) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
                 }
                 function checkFunctionDeclaration(n, topLevel) {
                     if (!topLevel) {
@@ -4563,7 +4613,7 @@ var ts;
                     if (decl.initializer.kind === ts.SyntaxKind.NullKeyword || decl.initializer.kind === ts.SyntaxKind.FalseKeyword || isDefaultArray(decl.initializer)) {
                         return true;
                     }
-                    else if (ts.isStringOrNumericLiteral(decl.initializer.kind)) {
+                    else if (ts.isStringOrNumericLiteral(decl.initializer)) {
                         var text = decl.initializer.getText();
                         return text === "0" || isEmptyString(text);
                     }
@@ -4723,7 +4773,9 @@ var ts;
             function isUndefined(node) {
                 return node && node.kind === SK.Identifier && node.text === "undefined";
             }
-            function hasArrowFunction(info) {
+            function hasStatementInput(info) {
+                if (info.attrs.blockId === pxtc.PAUSE_UNTIL_TYPE)
+                    return false;
                 var parameters = info.decl.parameters;
                 return info.args.some(function (arg, index) { return arg && isFunctionExpression(arg); });
             }
@@ -4789,6 +4841,34 @@ var ts;
             function isFunctionExpression(node) {
                 return node.kind === SK.ArrowFunction || node.kind === SK.FunctionExpression;
             }
+            function isOutputExpression(expr) {
+                switch (expr.kind) {
+                    case SK.BinaryExpression:
+                        var tk = expr.operatorToken.kind;
+                        return tk != SK.PlusEqualsToken && tk != SK.MinusEqualsToken && tk != SK.EqualsToken;
+                    case SK.PrefixUnaryExpression: {
+                        var op = expr.operator;
+                        return op != SK.PlusPlusToken && op != SK.MinusMinusToken;
+                    }
+                    case SK.PostfixUnaryExpression: {
+                        var op = expr.operator;
+                        return op != SK.PlusPlusToken && op != SK.MinusMinusToken;
+                    }
+                    case SK.CallExpression:
+                        var callInfo = expr.callInfo;
+                        pxtc.assert(!!callInfo);
+                        return callInfo.isExpression;
+                    case SK.ParenthesizedExpression:
+                    case SK.NumericLiteral:
+                    case SK.StringLiteral:
+                    case SK.NoSubstitutionTemplateLiteral:
+                    case SK.TrueKeyword:
+                    case SK.FalseKeyword:
+                    case SK.NullKeyword:
+                        return true;
+                    default: return false;
+                }
+            }
         })(decompiler = pxtc.decompiler || (pxtc.decompiler = {}));
     })(pxtc = ts.pxtc || (ts.pxtc = {}));
 })(ts || (ts = {}));
@@ -4813,11 +4893,10 @@ var ts;
     (function (pxtc) {
         var thumb;
         (function (thumb) {
-            var ThumbProcessor = (function (_super) {
+            var ThumbProcessor = /** @class */ (function (_super) {
                 __extends(ThumbProcessor, _super);
                 function ThumbProcessor() {
-                    var _this = this;
-                    _super.call(this);
+                    var _this = _super.call(this) || this;
                     // Registers
                     // $r0 - bits 2:1:0
                     // $r1 - bits 5:4:3
@@ -4825,14 +4904,14 @@ var ts;
                     // $r3 - bits 6:5:4:3
                     // $r4 - bits 8:7:6
                     // $r5 - bits 10:9:8
-                    this.addEnc("$r0", "R0-7", function (v) { return _this.inrange(7, v, v); });
-                    this.addEnc("$r1", "R0-7", function (v) { return _this.inrange(7, v, v << 3); });
-                    this.addEnc("$r2", "R0-15", function (v) { return _this.inrange(15, v, (v & 7) | ((v & 8) << 4)); });
-                    this.addEnc("$r3", "R0-15", function (v) { return _this.inrange(15, v, v << 3); });
-                    this.addEnc("$r4", "R0-7", function (v) { return _this.inrange(7, v, v << 6); });
-                    this.addEnc("$r5", "R0-7", function (v) { return _this.inrange(7, v, v << 8); });
+                    _this.addEnc("$r0", "R0-7", function (v) { return _this.inrange(7, v, v); });
+                    _this.addEnc("$r1", "R0-7", function (v) { return _this.inrange(7, v, v << 3); });
+                    _this.addEnc("$r2", "R0-15", function (v) { return _this.inrange(15, v, (v & 7) | ((v & 8) << 4)); });
+                    _this.addEnc("$r3", "R0-15", function (v) { return _this.inrange(15, v, v << 3); });
+                    _this.addEnc("$r4", "R0-7", function (v) { return _this.inrange(7, v, v << 6); });
+                    _this.addEnc("$r5", "R0-7", function (v) { return _this.inrange(7, v, v << 8); });
                     // this for setting both $r0 and $r1 (two argument adds and subs)
-                    this.addEnc("$r01", "R0-7", function (v) { return _this.inrange(7, v, (v | v << 3)); });
+                    _this.addEnc("$r01", "R0-7", function (v) { return _this.inrange(7, v, (v | v << 3)); });
                     // Immdiates:
                     // $i0 - bits 7-0
                     // $i1 - bits 7-0 * 4
@@ -4842,127 +4921,128 @@ var ts;
                     // $i5 - bits 10-6 * 4
                     // $i6 - bits 10-6, 0 is 32
                     // $i7 - bits 10-6 * 2
-                    this.addEnc("$i0", "#0-255", function (v) { return _this.inrange(255, v, v); });
-                    this.addEnc("$i1", "#0-1020", function (v) { return _this.inrange(255, v / 4, v >> 2); });
-                    this.addEnc("$i2", "#0-510", function (v) { return _this.inrange(127, v / 4, v >> 2); });
-                    this.addEnc("$i3", "#0-7", function (v) { return _this.inrange(7, v, v << 6); });
-                    this.addEnc("$i4", "#0-31", function (v) { return _this.inrange(31, v, v << 6); });
-                    this.addEnc("$i5", "#0-124", function (v) { return _this.inrange(31, v / 4, (v >> 2) << 6); });
-                    this.addEnc("$i6", "#1-32", function (v) { return v == 0 ? null : v == 32 ? 0 : _this.inrange(31, v, v << 6); });
-                    this.addEnc("$i7", "#0-62", function (v) { return _this.inrange(31, v / 2, (v >> 1) << 6); });
-                    this.addEnc("$i32", "#0-2^32", function (v) { return 1; });
-                    this.addEnc("$rl0", "{R0-7,...}", function (v) { return _this.inrange(255, v, v); });
-                    this.addEnc("$rl1", "{LR,R0-7,...}", function (v) { return (v & 0x4000) ? _this.inrange(255, (v & ~0x4000), 0x100 | (v & 0xff)) : _this.inrange(255, v, v); });
-                    this.addEnc("$rl2", "{PC,R0-7,...}", function (v) { return (v & 0x8000) ? _this.inrange(255, (v & ~0x8000), 0x100 | (v & 0xff)) : _this.inrange(255, v, v); });
-                    this.addEnc("$la", "LABEL", function (v) { return _this.inrange(255, v / 4, v >> 2); }).isWordAligned = true;
-                    this.addEnc("$lb", "LABEL", function (v) { return _this.inrangeSigned(127, v / 2, v >> 1); });
-                    this.addEnc("$lb11", "LABEL", function (v) { return _this.inrangeSigned(1023, v / 2, v >> 1); });
+                    _this.addEnc("$i0", "#0-255", function (v) { return _this.inrange(255, v, v); });
+                    _this.addEnc("$i1", "#0-1020", function (v) { return _this.inrange(255, v / 4, v >> 2); });
+                    _this.addEnc("$i2", "#0-510", function (v) { return _this.inrange(127, v / 4, v >> 2); });
+                    _this.addEnc("$i3", "#0-7", function (v) { return _this.inrange(7, v, v << 6); });
+                    _this.addEnc("$i4", "#0-31", function (v) { return _this.inrange(31, v, v << 6); });
+                    _this.addEnc("$i5", "#0-124", function (v) { return _this.inrange(31, v / 4, (v >> 2) << 6); });
+                    _this.addEnc("$i6", "#1-32", function (v) { return v == 0 ? null : v == 32 ? 0 : _this.inrange(31, v, v << 6); });
+                    _this.addEnc("$i7", "#0-62", function (v) { return _this.inrange(31, v / 2, (v >> 1) << 6); });
+                    _this.addEnc("$i32", "#0-2^32", function (v) { return 1; });
+                    _this.addEnc("$rl0", "{R0-7,...}", function (v) { return _this.inrange(255, v, v); });
+                    _this.addEnc("$rl1", "{LR,R0-7,...}", function (v) { return (v & 0x4000) ? _this.inrange(255, (v & ~0x4000), 0x100 | (v & 0xff)) : _this.inrange(255, v, v); });
+                    _this.addEnc("$rl2", "{PC,R0-7,...}", function (v) { return (v & 0x8000) ? _this.inrange(255, (v & ~0x8000), 0x100 | (v & 0xff)) : _this.inrange(255, v, v); });
+                    _this.addEnc("$la", "LABEL", function (v) { return _this.inrange(255, v / 4, v >> 2); }).isWordAligned = true;
+                    _this.addEnc("$lb", "LABEL", function (v) { return _this.inrangeSigned(127, v / 2, v >> 1); });
+                    _this.addEnc("$lb11", "LABEL", function (v) { return _this.inrangeSigned(1023, v / 2, v >> 1); });
                     //this.addInst("nop",                   0xbf00, 0xffff);  // we use mov r8,r8 as gcc
-                    this.addInst("adcs  $r0, $r1", 0x4140, 0xffc0);
-                    this.addInst("add   $r2, $r3", 0x4400, 0xff00);
-                    this.addInst("add   $r5, pc, $i1", 0xa000, 0xf800);
-                    this.addInst("add   $r5, sp, $i1", 0xa800, 0xf800);
-                    this.addInst("add   sp, $i2", 0xb000, 0xff80).canBeShared = true;
-                    this.addInst("adds  $r0, $r1, $i3", 0x1c00, 0xfe00);
-                    this.addInst("adds  $r0, $r1, $r4", 0x1800, 0xfe00);
-                    this.addInst("adds  $r01, $r4", 0x1800, 0xfe00);
-                    this.addInst("adds  $r5, $i0", 0x3000, 0xf800);
-                    this.addInst("adr   $r5, $la", 0xa000, 0xf800);
-                    this.addInst("ands  $r0, $r1", 0x4000, 0xffc0);
-                    this.addInst("asrs  $r0, $r1", 0x4100, 0xffc0);
-                    this.addInst("asrs  $r0, $r1, $i6", 0x1000, 0xf800);
-                    this.addInst("bics  $r0, $r1", 0x4380, 0xffc0);
-                    this.addInst("bkpt  $i0", 0xbe00, 0xff00);
-                    this.addInst("blx   $r3", 0x4780, 0xff87);
-                    this.addInst("bx    $r3", 0x4700, 0xff80);
-                    this.addInst("cmn   $r0, $r1", 0x42c0, 0xffc0);
-                    this.addInst("cmp   $r0, $r1", 0x4280, 0xffc0);
-                    this.addInst("cmp   $r2, $r3", 0x4500, 0xff00);
-                    this.addInst("cmp   $r5, $i0", 0x2800, 0xf800);
-                    this.addInst("eors  $r0, $r1", 0x4040, 0xffc0);
-                    this.addInst("ldmia $r5!, $rl0", 0xc800, 0xf800);
-                    this.addInst("ldmia $r5, $rl0", 0xc800, 0xf800);
-                    this.addInst("ldr   $r0, [$r1, $i5]", 0x6800, 0xf800); // this is used for debugger breakpoint - cannot be shared
-                    this.addInst("ldr   $r0, [$r1, $r4]", 0x5800, 0xfe00);
-                    this.addInst("ldr   $r5, [pc, $i1]", 0x4800, 0xf800);
-                    this.addInst("ldr   $r5, $la", 0x4800, 0xf800);
-                    this.addInst("ldr   $r5, [sp, $i1]", 0x9800, 0xf800).canBeShared = true;
-                    this.addInst("ldrb  $r0, [$r1, $i4]", 0x7800, 0xf800);
-                    this.addInst("ldrb  $r0, [$r1, $r4]", 0x5c00, 0xfe00);
-                    this.addInst("ldrh  $r0, [$r1, $i7]", 0x8800, 0xf800);
-                    this.addInst("ldrh  $r0, [$r1, $r4]", 0x5a00, 0xfe00);
-                    this.addInst("ldrsb $r0, [$r1, $r4]", 0x5600, 0xfe00);
-                    this.addInst("ldrsh $r0, [$r1, $r4]", 0x5e00, 0xfe00);
-                    this.addInst("lsls  $r0, $r1", 0x4080, 0xffc0);
-                    this.addInst("lsls  $r0, $r1, $i4", 0x0000, 0xf800);
-                    this.addInst("lsrs  $r0, $r1", 0x40c0, 0xffc0);
-                    this.addInst("lsrs  $r0, $r1, $i6", 0x0800, 0xf800);
+                    _this.addInst("adcs  $r0, $r1", 0x4140, 0xffc0);
+                    _this.addInst("add   $r2, $r3", 0x4400, 0xff00);
+                    _this.addInst("add   $r5, pc, $i1", 0xa000, 0xf800);
+                    _this.addInst("add   $r5, sp, $i1", 0xa800, 0xf800);
+                    _this.addInst("add   sp, $i2", 0xb000, 0xff80).canBeShared = true;
+                    _this.addInst("adds  $r0, $r1, $i3", 0x1c00, 0xfe00);
+                    _this.addInst("adds  $r0, $r1, $r4", 0x1800, 0xfe00);
+                    _this.addInst("adds  $r01, $r4", 0x1800, 0xfe00);
+                    _this.addInst("adds  $r5, $i0", 0x3000, 0xf800);
+                    _this.addInst("adr   $r5, $la", 0xa000, 0xf800);
+                    _this.addInst("ands  $r0, $r1", 0x4000, 0xffc0);
+                    _this.addInst("asrs  $r0, $r1", 0x4100, 0xffc0);
+                    _this.addInst("asrs  $r0, $r1, $i6", 0x1000, 0xf800);
+                    _this.addInst("bics  $r0, $r1", 0x4380, 0xffc0);
+                    _this.addInst("bkpt  $i0", 0xbe00, 0xff00);
+                    _this.addInst("blx   $r3", 0x4780, 0xff87);
+                    _this.addInst("bx    $r3", 0x4700, 0xff80);
+                    _this.addInst("cmn   $r0, $r1", 0x42c0, 0xffc0);
+                    _this.addInst("cmp   $r0, $r1", 0x4280, 0xffc0);
+                    _this.addInst("cmp   $r2, $r3", 0x4500, 0xff00);
+                    _this.addInst("cmp   $r5, $i0", 0x2800, 0xf800);
+                    _this.addInst("eors  $r0, $r1", 0x4040, 0xffc0);
+                    _this.addInst("ldmia $r5!, $rl0", 0xc800, 0xf800);
+                    _this.addInst("ldmia $r5, $rl0", 0xc800, 0xf800);
+                    _this.addInst("ldr   $r0, [$r1, $i5]", 0x6800, 0xf800); // this is used for debugger breakpoint - cannot be shared
+                    _this.addInst("ldr   $r0, [$r1, $r4]", 0x5800, 0xfe00);
+                    _this.addInst("ldr   $r5, [pc, $i1]", 0x4800, 0xf800);
+                    _this.addInst("ldr   $r5, $la", 0x4800, 0xf800);
+                    _this.addInst("ldr   $r5, [sp, $i1]", 0x9800, 0xf800).canBeShared = true;
+                    _this.addInst("ldrb  $r0, [$r1, $i4]", 0x7800, 0xf800);
+                    _this.addInst("ldrb  $r0, [$r1, $r4]", 0x5c00, 0xfe00);
+                    _this.addInst("ldrh  $r0, [$r1, $i7]", 0x8800, 0xf800);
+                    _this.addInst("ldrh  $r0, [$r1, $r4]", 0x5a00, 0xfe00);
+                    _this.addInst("ldrsb $r0, [$r1, $r4]", 0x5600, 0xfe00);
+                    _this.addInst("ldrsh $r0, [$r1, $r4]", 0x5e00, 0xfe00);
+                    _this.addInst("lsls  $r0, $r1", 0x4080, 0xffc0);
+                    _this.addInst("lsls  $r0, $r1, $i4", 0x0000, 0xf800);
+                    _this.addInst("lsrs  $r0, $r1", 0x40c0, 0xffc0);
+                    _this.addInst("lsrs  $r0, $r1, $i6", 0x0800, 0xf800);
                     //this.addInst("mov   $r0, $r1", 0x4600, 0xffc0);
-                    this.addInst("mov   $r2, $r3", 0x4600, 0xff00);
-                    this.addInst("movs  $r0, $r1", 0x0000, 0xffc0);
-                    this.addInst("movs  $r5, $i0", 0x2000, 0xf800);
-                    this.addInst("muls  $r0, $r1", 0x4340, 0xffc0);
-                    this.addInst("mvns  $r0, $r1", 0x43c0, 0xffc0);
-                    this.addInst("negs  $r0, $r1", 0x4240, 0xffc0);
-                    this.addInst("nop", 0x46c0, 0xffff); // mov r8, r8
-                    this.addInst("orrs  $r0, $r1", 0x4300, 0xffc0);
-                    this.addInst("pop   $rl2", 0xbc00, 0xfe00);
-                    this.addInst("push  $rl1", 0xb400, 0xfe00);
-                    this.addInst("rev   $r0, $r1", 0xba00, 0xffc0);
-                    this.addInst("rev16 $r0, $r1", 0xba40, 0xffc0);
-                    this.addInst("revsh $r0, $r1", 0xbac0, 0xffc0);
-                    this.addInst("rors  $r0, $r1", 0x41c0, 0xffc0);
-                    this.addInst("sbcs  $r0, $r1", 0x4180, 0xffc0);
-                    this.addInst("sev", 0xbf40, 0xffff);
-                    this.addInst("stmia $r5!, $rl0", 0xc000, 0xf800);
-                    this.addInst("str   $r0, [$r1, $i5]", 0x6000, 0xf800).canBeShared = true;
-                    this.addInst("str   $r0, [$r1, $r4]", 0x5000, 0xfe00);
-                    this.addInst("str   $r5, [sp, $i1]", 0x9000, 0xf800).canBeShared = true;
-                    this.addInst("strb  $r0, [$r1, $i4]", 0x7000, 0xf800);
-                    this.addInst("strb  $r0, [$r1, $r4]", 0x5400, 0xfe00);
-                    this.addInst("strh  $r0, [$r1, $i7]", 0x8000, 0xf800);
-                    this.addInst("strh  $r0, [$r1, $r4]", 0x5200, 0xfe00);
-                    this.addInst("sub   sp, $i2", 0xb080, 0xff80);
-                    this.addInst("subs  $r0, $r1, $i3", 0x1e00, 0xfe00);
-                    this.addInst("subs  $r0, $r1, $r4", 0x1a00, 0xfe00);
-                    this.addInst("subs  $r01, $r4", 0x1a00, 0xfe00);
-                    this.addInst("subs  $r5, $i0", 0x3800, 0xf800);
-                    this.addInst("svc   $i0", 0xdf00, 0xff00);
-                    this.addInst("sxtb  $r0, $r1", 0xb240, 0xffc0);
-                    this.addInst("sxth  $r0, $r1", 0xb200, 0xffc0);
-                    this.addInst("tst   $r0, $r1", 0x4200, 0xffc0);
-                    this.addInst("udf   $i0", 0xde00, 0xff00);
-                    this.addInst("uxtb  $r0, $r1", 0xb2c0, 0xffc0);
-                    this.addInst("uxth  $r0, $r1", 0xb280, 0xffc0);
-                    this.addInst("wfe", 0xbf20, 0xffff);
-                    this.addInst("wfi", 0xbf30, 0xffff);
-                    this.addInst("yield", 0xbf10, 0xffff);
-                    this.addInst("cpsid i", 0xb672, 0xffff);
-                    this.addInst("cpsie i", 0xb662, 0xffff);
-                    this.addInst("beq   $lb", 0xd000, 0xff00);
-                    this.addInst("bne   $lb", 0xd100, 0xff00);
-                    this.addInst("bcs   $lb", 0xd200, 0xff00);
-                    this.addInst("bcc   $lb", 0xd300, 0xff00);
-                    this.addInst("bmi   $lb", 0xd400, 0xff00);
-                    this.addInst("bpl   $lb", 0xd500, 0xff00);
-                    this.addInst("bvs   $lb", 0xd600, 0xff00);
-                    this.addInst("bvc   $lb", 0xd700, 0xff00);
-                    this.addInst("bhi   $lb", 0xd800, 0xff00);
-                    this.addInst("bls   $lb", 0xd900, 0xff00);
-                    this.addInst("bge   $lb", 0xda00, 0xff00);
-                    this.addInst("blt   $lb", 0xdb00, 0xff00);
-                    this.addInst("bgt   $lb", 0xdc00, 0xff00);
-                    this.addInst("ble   $lb", 0xdd00, 0xff00);
-                    this.addInst("bhs   $lb", 0xd200, 0xff00); // cs
-                    this.addInst("blo   $lb", 0xd300, 0xff00); // cc
-                    this.addInst("b     $lb11", 0xe000, 0xf800);
-                    this.addInst("bal   $lb11", 0xe000, 0xf800);
+                    _this.addInst("mov   $r2, $r3", 0x4600, 0xff00);
+                    _this.addInst("movs  $r0, $r1", 0x0000, 0xffc0);
+                    _this.addInst("movs  $r5, $i0", 0x2000, 0xf800);
+                    _this.addInst("muls  $r0, $r1", 0x4340, 0xffc0);
+                    _this.addInst("mvns  $r0, $r1", 0x43c0, 0xffc0);
+                    _this.addInst("negs  $r0, $r1", 0x4240, 0xffc0);
+                    _this.addInst("nop", 0x46c0, 0xffff); // mov r8, r8
+                    _this.addInst("orrs  $r0, $r1", 0x4300, 0xffc0);
+                    _this.addInst("pop   $rl2", 0xbc00, 0xfe00);
+                    _this.addInst("push  $rl1", 0xb400, 0xfe00);
+                    _this.addInst("rev   $r0, $r1", 0xba00, 0xffc0);
+                    _this.addInst("rev16 $r0, $r1", 0xba40, 0xffc0);
+                    _this.addInst("revsh $r0, $r1", 0xbac0, 0xffc0);
+                    _this.addInst("rors  $r0, $r1", 0x41c0, 0xffc0);
+                    _this.addInst("sbcs  $r0, $r1", 0x4180, 0xffc0);
+                    _this.addInst("sev", 0xbf40, 0xffff);
+                    _this.addInst("stmia $r5!, $rl0", 0xc000, 0xf800);
+                    _this.addInst("str   $r0, [$r1, $i5]", 0x6000, 0xf800).canBeShared = true;
+                    _this.addInst("str   $r0, [$r1, $r4]", 0x5000, 0xfe00);
+                    _this.addInst("str   $r5, [sp, $i1]", 0x9000, 0xf800).canBeShared = true;
+                    _this.addInst("strb  $r0, [$r1, $i4]", 0x7000, 0xf800);
+                    _this.addInst("strb  $r0, [$r1, $r4]", 0x5400, 0xfe00);
+                    _this.addInst("strh  $r0, [$r1, $i7]", 0x8000, 0xf800);
+                    _this.addInst("strh  $r0, [$r1, $r4]", 0x5200, 0xfe00);
+                    _this.addInst("sub   sp, $i2", 0xb080, 0xff80);
+                    _this.addInst("subs  $r0, $r1, $i3", 0x1e00, 0xfe00);
+                    _this.addInst("subs  $r0, $r1, $r4", 0x1a00, 0xfe00);
+                    _this.addInst("subs  $r01, $r4", 0x1a00, 0xfe00);
+                    _this.addInst("subs  $r5, $i0", 0x3800, 0xf800);
+                    _this.addInst("svc   $i0", 0xdf00, 0xff00);
+                    _this.addInst("sxtb  $r0, $r1", 0xb240, 0xffc0);
+                    _this.addInst("sxth  $r0, $r1", 0xb200, 0xffc0);
+                    _this.addInst("tst   $r0, $r1", 0x4200, 0xffc0);
+                    _this.addInst("udf   $i0", 0xde00, 0xff00);
+                    _this.addInst("uxtb  $r0, $r1", 0xb2c0, 0xffc0);
+                    _this.addInst("uxth  $r0, $r1", 0xb280, 0xffc0);
+                    _this.addInst("wfe", 0xbf20, 0xffff);
+                    _this.addInst("wfi", 0xbf30, 0xffff);
+                    _this.addInst("yield", 0xbf10, 0xffff);
+                    _this.addInst("cpsid i", 0xb672, 0xffff);
+                    _this.addInst("cpsie i", 0xb662, 0xffff);
+                    _this.addInst("beq   $lb", 0xd000, 0xff00);
+                    _this.addInst("bne   $lb", 0xd100, 0xff00);
+                    _this.addInst("bcs   $lb", 0xd200, 0xff00);
+                    _this.addInst("bcc   $lb", 0xd300, 0xff00);
+                    _this.addInst("bmi   $lb", 0xd400, 0xff00);
+                    _this.addInst("bpl   $lb", 0xd500, 0xff00);
+                    _this.addInst("bvs   $lb", 0xd600, 0xff00);
+                    _this.addInst("bvc   $lb", 0xd700, 0xff00);
+                    _this.addInst("bhi   $lb", 0xd800, 0xff00);
+                    _this.addInst("bls   $lb", 0xd900, 0xff00);
+                    _this.addInst("bge   $lb", 0xda00, 0xff00);
+                    _this.addInst("blt   $lb", 0xdb00, 0xff00);
+                    _this.addInst("bgt   $lb", 0xdc00, 0xff00);
+                    _this.addInst("ble   $lb", 0xdd00, 0xff00);
+                    _this.addInst("bhs   $lb", 0xd200, 0xff00); // cs
+                    _this.addInst("blo   $lb", 0xd300, 0xff00); // cc
+                    _this.addInst("b     $lb11", 0xe000, 0xf800);
+                    _this.addInst("bal   $lb11", 0xe000, 0xf800);
                     // handled specially - 32 bit instruction
-                    this.addInst("bl    $lb", 0xf000, 0xf800, true);
+                    _this.addInst("bl    $lb", 0xf000, 0xf800, true);
                     // this is normally emitted as 'b' but will be emitted as 'bl' if needed
-                    this.addInst("bb    $lb", 0xe000, 0xf800, true);
+                    _this.addInst("bb    $lb", 0xe000, 0xf800, true);
                     // this will emit as PC-relative LDR or ADDS
-                    this.addInst("ldlit   $r5, $i32", 0x4800, 0xf800);
+                    _this.addInst("ldlit   $r5, $i32", 0x4800, 0xf800);
+                    return _this;
                 }
                 ThumbProcessor.prototype.toFnPtr = function (v, baseOff) {
                     return (v + baseOff) | 1;
@@ -4999,6 +5079,8 @@ var ts;
                     };
                 };
                 ThumbProcessor.prototype.commonalize = function (file) {
+                    if (!pxtc.target.commonalize)
+                        return;
                     // this is a heuristic - we could allow more instructions
                     // to be shared, but it seems to result in less sharing
                     var canBeShared = function (l) {
@@ -5016,6 +5098,9 @@ var ts;
                                     return true;
                                 case "bl":
                                     switch (l.words[1]) {
+                                        case "_numops_fromInt":
+                                        case "_pxt_incr":
+                                        case "_pxt_decr":
                                         case "pxt::incr":
                                         case "pxt::decr":
                                         case "pxt::fromInt":
@@ -5442,6 +5527,7 @@ var ts;
         (function (ir) {
             var U = pxtc.Util;
             var assert = U.assert;
+            var EK;
             (function (EK) {
                 EK[EK["None"] = 0] = "None";
                 EK[EK["NumberLiteral"] = 1] = "NumberLiteral";
@@ -5458,10 +5544,9 @@ var ts;
                 EK[EK["Sequence"] = 12] = "Sequence";
                 EK[EK["JmpValue"] = 13] = "JmpValue";
                 EK[EK["Nop"] = 14] = "Nop";
-            })(ir.EK || (ir.EK = {}));
-            var EK = ir.EK;
+            })(EK = ir.EK || (ir.EK = {}));
             var currExprId = 0;
-            var Node = (function () {
+            var Node = /** @class */ (function () {
                 function Node() {
                 }
                 Node.prototype.isExpr = function () { return false; };
@@ -5474,14 +5559,15 @@ var ts;
                 return Node;
             }());
             ir.Node = Node;
-            var Expr = (function (_super) {
+            var Expr = /** @class */ (function (_super) {
                 __extends(Expr, _super);
                 function Expr(exprKind, args, data) {
-                    _super.call(this);
-                    this.exprKind = exprKind;
-                    this.args = args;
-                    this.data = data;
-                    this.callingConvention = ir.CallingConvention.Plain;
+                    var _this = _super.call(this) || this;
+                    _this.exprKind = exprKind;
+                    _this.args = args;
+                    _this.data = data;
+                    _this.callingConvention = ir.CallingConvention.Plain;
+                    return _this;
                 }
                 Expr.clone = function (e) {
                     var copy = new Expr(e.exprKind, e.args.slice(0), e.data);
@@ -5545,6 +5631,7 @@ var ts;
                 return Expr;
             }(Node));
             ir.Expr = Expr;
+            var SK;
             (function (SK) {
                 SK[SK["None"] = 0] = "None";
                 SK[SK["Expr"] = 1] = "Expr";
@@ -5552,22 +5639,22 @@ var ts;
                 SK[SK["Jmp"] = 3] = "Jmp";
                 SK[SK["StackEmpty"] = 4] = "StackEmpty";
                 SK[SK["Breakpoint"] = 5] = "Breakpoint";
-            })(ir.SK || (ir.SK = {}));
-            var SK = ir.SK;
+            })(SK = ir.SK || (ir.SK = {}));
+            var JmpMode;
             (function (JmpMode) {
                 JmpMode[JmpMode["Always"] = 1] = "Always";
                 JmpMode[JmpMode["IfZero"] = 2] = "IfZero";
                 JmpMode[JmpMode["IfNotZero"] = 3] = "IfNotZero";
                 JmpMode[JmpMode["IfJmpValEq"] = 4] = "IfJmpValEq";
                 JmpMode[JmpMode["IfLambda"] = 5] = "IfLambda";
-            })(ir.JmpMode || (ir.JmpMode = {}));
-            var JmpMode = ir.JmpMode;
-            var Stmt = (function (_super) {
+            })(JmpMode = ir.JmpMode || (ir.JmpMode = {}));
+            var Stmt = /** @class */ (function (_super) {
                 __extends(Stmt, _super);
                 function Stmt(stmtKind, expr) {
-                    _super.call(this);
-                    this.stmtKind = stmtKind;
-                    this.expr = expr;
+                    var _this = _super.call(this) || this;
+                    _this.stmtKind = stmtKind;
+                    _this.expr = expr;
+                    return _this;
                 }
                 Stmt.prototype.isStmt = function () { return true; };
                 Stmt.prototype.toString = function () {
@@ -5657,7 +5744,7 @@ var ts;
                     }
                 }
             }
-            var Cell = (function () {
+            var Cell = /** @class */ (function () {
                 function Cell(index, def, info) {
                     this.index = index;
                     this.def = def;
@@ -5773,13 +5860,14 @@ var ts;
             ir.Cell = Cell;
             //Cells that represent variables that are generated by the compiler as temporaries
             //The user cannot access these cells from JS or blocks
-            var UnnamedCell = (function (_super) {
+            var UnnamedCell = /** @class */ (function (_super) {
                 __extends(UnnamedCell, _super);
                 function UnnamedCell(index, owningProc) {
-                    _super.call(this, index, null, null);
-                    this.index = index;
-                    this.owningProc = owningProc;
-                    this.uid = UnnamedCell.unnamedCellCounter++;
+                    var _this = _super.call(this, index, null, null) || this;
+                    _this.index = index;
+                    _this.owningProc = owningProc;
+                    _this.uid = UnnamedCell.unnamedCellCounter++;
+                    return _this;
                 }
                 UnnamedCell.prototype.getName = function () {
                     return "unnamed" + this.uid;
@@ -5822,17 +5910,18 @@ var ts;
                         return false;
                 }
             }
-            var Procedure = (function (_super) {
+            var Procedure = /** @class */ (function (_super) {
                 __extends(Procedure, _super);
                 function Procedure() {
-                    _super.apply(this, arguments);
-                    this.numArgs = 0;
-                    this.isRoot = false;
-                    this.locals = [];
-                    this.captured = [];
-                    this.args = [];
-                    this.body = [];
-                    this.lblNo = 0;
+                    var _this = _super !== null && _super.apply(this, arguments) || this;
+                    _this.numArgs = 0;
+                    _this.isRoot = false;
+                    _this.locals = [];
+                    _this.captured = [];
+                    _this.args = [];
+                    _this.body = [];
+                    _this.lblNo = 0;
+                    return _this;
                 }
                 Procedure.prototype.reset = function () {
                     this.body = [];
@@ -6051,7 +6140,7 @@ var ts;
                             var b = allBrkp[i];
                             if (!b)
                                 continue;
-                            s += (b.line + 1) + ": ";
+                            s += b.line + 1 + ": ";
                             var n = allBrkp[i + 1];
                             s += "\n";
                         }
@@ -6111,6 +6200,10 @@ var ts;
             ir.rtcall = rtcall;
             function rtcallMask(name, mask, callingConv, args) {
                 var decrs = [];
+                if (U.startsWith(name, "@nomask@")) {
+                    name = name.slice(8);
+                    mask = 0;
+                }
                 if (pxtc.isStackMachine())
                     name += "^" + mask;
                 else
@@ -6184,6 +6277,14 @@ var ts;
 (function (ts) {
     var pxtc;
     (function (pxtc) {
+        var HasLiteralType;
+        (function (HasLiteralType) {
+            HasLiteralType[HasLiteralType["Enum"] = 0] = "Enum";
+            HasLiteralType[HasLiteralType["Number"] = 1] = "Number";
+            HasLiteralType[HasLiteralType["String"] = 2] = "String";
+            HasLiteralType[HasLiteralType["Boolean"] = 3] = "Boolean";
+            HasLiteralType[HasLiteralType["Unsupported"] = 4] = "Unsupported";
+        })(HasLiteralType || (HasLiteralType = {}));
         // in tagged mode,
         // * the lowest bit set means 31 bit signed integer
         // * the lowest bit clear, and second lowest set means special constant
@@ -6268,23 +6369,32 @@ var ts;
             return pxtc.target.isNative && (pxtc.target.nativeType == pxtc.NATIVE_TYPE_AVRVM || pxtc.target.nativeType == pxtc.NATIVE_TYPE_AVR);
         }
         pxtc.isAVR = isAVR;
+        function isThumb() {
+            return pxtc.target.isNative && (pxtc.target.nativeType == pxtc.NATIVE_TYPE_THUMB);
+        }
+        pxtc.isThumb = isThumb;
+        function isThisType(type) {
+            // Internal TS field
+            return type.isThisType;
+        }
         function isRefType(t) {
             checkType(t);
             if (noRefCounting())
                 return false;
-            if (t.flags & ts.TypeFlags.ThisType)
-                return true;
             if (t.flags & ts.TypeFlags.Null)
                 return false;
             if (t.flags & ts.TypeFlags.Undefined)
                 return false;
             if (t.flags & ts.TypeFlags.TypeParameter) {
+                if (isThisType(t)) {
+                    return true;
+                }
                 var b = lookupTypeParameter(t);
                 if (b)
                     return b.isRef;
                 pxtc.U.oops("unbound type parameter: " + checker.typeToString(t));
             }
-            if (t.flags & (ts.TypeFlags.NumberLike | ts.TypeFlags.Boolean))
+            if (t.flags & (ts.TypeFlags.NumberLike | ts.TypeFlags.Boolean | ts.TypeFlags.NumberLiteral | ts.TypeFlags.BooleanLiteral | ts.TypeFlags.Enum | ts.TypeFlags.EnumLike))
                 return pxtc.target.taggedInts ? true : false;
             var sym = t.getSymbol();
             if (sym) {
@@ -6335,7 +6445,7 @@ var ts;
         function getBitSize(decl) {
             if (!decl || !decl.type)
                 return 0 /* None */;
-            if (!(typeOf(decl).flags & ts.TypeFlags.Number))
+            if (!(isNumberType(typeOf(decl))))
                 return 0 /* None */;
             if (decl.type.kind != pxtc.SK.TypeReference)
                 return 0 /* None */;
@@ -6389,7 +6499,7 @@ var ts;
                 if (l.bitSize != 0 /* None */) {
                     l._debugType = (isBitSizeSigned(l.bitSize) ? "int" : "uint") + (8 * sizeOfBitSize(l.bitSize));
                 }
-                else if (tp.flags & ts.TypeFlags.String) {
+                else if (isStringType(tp)) {
                     l._debugType = "string";
                 }
                 else if (tp.flags & ts.TypeFlags.NumberLike) {
@@ -6473,6 +6583,10 @@ var ts;
                 }
             }
         }
+        function isObjectType(t) {
+            return "objectFlags" in t;
+        }
+        pxtc.isObjectType = isObjectType;
         function isGlobalVar(d) {
             if (!d)
                 return false;
@@ -6489,23 +6603,6 @@ var ts;
             return (decl.kind == pxtc.SK.FunctionDeclaration && !getEnclosingFunction(decl)) ||
                 isClassFunction(decl);
         }
-        function isSideEffectfulInitializer(init) {
-            if (!init)
-                return false;
-            if (isStringLiteral(init))
-                return false;
-            switch (init.kind) {
-                case pxtc.SK.NullKeyword:
-                case pxtc.SK.NumericLiteral:
-                case pxtc.SK.TrueKeyword:
-                case pxtc.SK.FalseKeyword:
-                    return false;
-                case pxtc.SK.ArrayLiteralExpression:
-                    return init.elements.some(isSideEffectfulInitializer);
-                default:
-                    return true;
-            }
-        }
         var lf = pxtc.assembler.lf;
         var checker;
         var lastSecondaryError;
@@ -6517,7 +6614,7 @@ var ts;
                 node = node.parent.parent; // we need variable stmt
             var cmtCore = function (node) {
                 var src = ts.getSourceFileOfNode(node);
-                var doc = ts.getLeadingCommentRangesOfNodeFromText(node, src.text);
+                var doc = ts.getLeadingCommentRangesOfNode(node, src);
                 if (!doc)
                     return "";
                 var cmt = doc.map(function (r) { return src.text.slice(r.pos, r.end); }).join("\n");
@@ -6555,7 +6652,7 @@ var ts;
                     res.blockId = fn.symbol.parent.name + "_" + getDeclName(fn);
                     res.block = "" + pxtc.U.uncapitalize(node.symbol.name) + (fn.parameters.length ? '|' + fn.parameters
                         .filter(function (p) { return !p.questionToken; })
-                        .map(function (p) { return (pxtc.U.uncapitalize(p.name.text) + " %" + p.name.text); }).join('|') : '');
+                        .map(function (p) { return pxtc.U.uncapitalize(p.name.text) + " %" + p.name.text; }).join('|') : '');
                 }
             }
             node.pxtCommentAttrs = res;
@@ -6569,7 +6666,7 @@ var ts;
         }
         pxtc.getName = getName;
         function genericRoot(t) {
-            if (t.flags & ts.TypeFlags.Reference) {
+            if (isObjectType(t) && t.objectFlags & ts.ObjectFlags.Reference) {
                 var r = t;
                 if (r.typeArguments && r.typeArguments.length)
                     return r.target;
@@ -6577,14 +6674,26 @@ var ts;
             return null;
         }
         function isArrayType(t) {
-            return (t.flags & ts.TypeFlags.Reference) && t.symbol.name == "Array";
+            if (!isObjectType(t)) {
+                return false;
+            }
+            return (t.objectFlags & ts.ObjectFlags.Reference) && t.symbol.name == "Array";
         }
         function isInterfaceType(t) {
-            return !!(t.flags & ts.TypeFlags.Interface) || !!(t.flags & ts.TypeFlags.Anonymous);
+            if (!isObjectType(t)) {
+                return false;
+            }
+            return !!(t.objectFlags & ts.ObjectFlags.Interface) || !!(t.objectFlags & ts.ObjectFlags.Anonymous);
         }
         function isClassType(t) {
+            if (isThisType(t)) {
+                return true;
+            }
+            if (!isObjectType(t)) {
+                return false;
+            }
             // check if we like the class?
-            return !!(t.flags & ts.TypeFlags.Class) || !!(t.flags & ts.TypeFlags.ThisType);
+            return !!((t.objectFlags & ts.ObjectFlags.Class) || (t.symbol.flags & ts.SymbolFlags.Class));
         }
         function isObjectLiteral(t) {
             return t.symbol && (t.symbol.flags & (ts.SymbolFlags.ObjectLiteral | ts.SymbolFlags.TypeLiteral)) !== 0;
@@ -6626,12 +6735,20 @@ var ts;
             return null;
         }
         function isBuiltinType(t) {
-            var ok = ts.TypeFlags.String | ts.TypeFlags.Number | ts.TypeFlags.Boolean | ts.TypeFlags.Enum;
+            var ok = ts.TypeFlags.String | ts.TypeFlags.StringLiteral |
+                ts.TypeFlags.Number | ts.TypeFlags.NumberLiteral |
+                ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLiteral |
+                ts.TypeFlags.Enum | ts.TypeFlags.EnumLiteral;
             return t.flags & ok;
+        }
+        function isGenericType(t) {
+            var g = genericRoot(t);
+            return !!(g && g.typeParameters && g.typeParameters.length);
         }
         function checkType(t) {
             var ok = ts.TypeFlags.String | ts.TypeFlags.Number | ts.TypeFlags.Boolean |
-                ts.TypeFlags.Void | ts.TypeFlags.Enum | ts.TypeFlags.Null | ts.TypeFlags.Undefined;
+                ts.TypeFlags.StringLiteral | ts.TypeFlags.NumberLiteral | ts.TypeFlags.BooleanLiteral |
+                ts.TypeFlags.Void | ts.TypeFlags.Enum | ts.TypeFlags.EnumLiteral | ts.TypeFlags.Null | ts.TypeFlags.Undefined;
             if ((t.flags & ok) == 0) {
                 if (isArrayType(t))
                     return t;
@@ -6642,6 +6759,8 @@ var ts;
                 if (isFunctionType(t))
                     return t;
                 if (lookupTypeParameter(t))
+                    return t;
+                if (isUnionOfLiterals(t))
                     return t;
                 var g = genericRoot(t);
                 if (g) {
@@ -6670,6 +6789,46 @@ var ts;
             if (!r)
                 return r;
             return checkType(r);
+        }
+        function checkUnionOfLiterals(t) {
+            if (!(t.flags & ts.TypeFlags.Union)) {
+                return HasLiteralType.Unsupported;
+            }
+            var u = t;
+            var allGood = true;
+            var constituentType;
+            u.types.forEach(function (tp) {
+                if (constituentType === undefined) {
+                    if (tp.flags & ts.TypeFlags.NumberLike)
+                        constituentType = HasLiteralType.Number;
+                    else if (tp.flags & ts.TypeFlags.BooleanLike)
+                        constituentType = HasLiteralType.Boolean;
+                    else if (tp.flags & ts.TypeFlags.StringLike)
+                        constituentType = HasLiteralType.String;
+                    else if (tp.flags & ts.TypeFlags.EnumLike)
+                        constituentType = HasLiteralType.Enum;
+                }
+                else {
+                    switch (constituentType) {
+                        case HasLiteralType.Number:
+                            allGood = allGood && !!(tp.flags & ts.TypeFlags.NumberLike);
+                            break;
+                        case HasLiteralType.Boolean:
+                            allGood = allGood && !!(tp.flags & ts.TypeFlags.BooleanLike);
+                            break;
+                        case HasLiteralType.String:
+                            allGood = allGood && !!(tp.flags & ts.TypeFlags.StringLike);
+                            break;
+                        case HasLiteralType.Enum:
+                            allGood = allGood && !!(tp.flags & ts.TypeFlags.EnumLike);
+                            break;
+                    }
+                }
+            });
+            return allGood ? constituentType : HasLiteralType.Unsupported;
+        }
+        function isUnionOfLiterals(t) {
+            return checkUnionOfLiterals(t) !== HasLiteralType.Unsupported;
         }
         // does src inherit from tgt via heritage clauses?
         function inheritsFrom(src, tgt) {
@@ -6765,6 +6924,9 @@ var ts;
                             _c = [false, "Property " + superProp.name + " not present in " + subType.getSymbol().name], ret = _c[0], msg = _c[1];
                         }
                         else {
+                            // we will reach this case for something like
+                            // let x: Foo = { a:42 }
+                            // where x has some optional properties, in addition to "a"
                         }
                     }
                     var _b, _c;
@@ -6787,8 +6949,8 @@ var ts;
             if (isStructureType(superType) && !castableToStructureType(subType)) {
                 return insertSubtype(key, [false, "Cast to class/interface not supported."]);
             }
-            if (isClassType(superType)) {
-                if (isClassType(subType)) {
+            if (isClassType(superType) && !isGenericType(superType)) {
+                if (isClassType(subType) && !isGenericType(subType)) {
                     var superDecl = superType.symbol.valueDeclaration;
                     var subDecl = subType.symbol.valueDeclaration;
                     // only allow upcast (sub -> ... -> sup) in inheritance chain
@@ -6844,6 +7006,7 @@ var ts;
                 }
             }
             else if (lookupTypeParameter(superType)) {
+                // TODO
             }
             return insertSubtype(key, [true, ""]);
             var _c, _e;
@@ -6857,8 +7020,7 @@ var ts;
                 return fun.typeParameters;
             if (isClassFunction(fun) || fun.kind == pxtc.SK.MethodSignature) {
                 if (fun.parent.kind == pxtc.SK.ClassDeclaration || fun.parent.kind == pxtc.SK.InterfaceDeclaration) {
-                    var tp = fun.parent.typeParameters;
-                    return tp || [];
+                    return fun.parent.typeParameters || [];
                 }
             }
             return [];
@@ -6868,8 +7030,11 @@ var ts;
             var rettp = checker.getReturnTypeOfSignature(sig);
             return !(rettp.flags & ts.TypeFlags.Void);
         }
+        function isNamedDeclaration(node) {
+            return !!(node && node.name);
+        }
         function getDeclName(node) {
-            var text = node && node.name ? node.name.text : null;
+            var text = isNamedDeclaration(node) ? node.name.text : null;
             if (!text && node.kind == pxtc.SK.Constructor)
                 text = "constructor";
             if (node && node.parent && node.parent.kind == pxtc.SK.ClassDeclaration)
@@ -6880,7 +7045,7 @@ var ts;
         pxtc.getDeclName = getDeclName;
         function getTypeBindings(t) {
             var g = genericRoot(t);
-            if (!g)
+            if (!g || !g.typeParameters)
                 return [];
             return getTypeBindingsCore(g.typeParameters, t.typeArguments);
         }
@@ -6897,7 +7062,7 @@ var ts;
             if (!func)
                 return;
             for (var outer = getEnclosingFunction(func); outer; outer = getEnclosingFunction(outer)) {
-                var _loop_1 = function(tp) {
+                var _loop_1 = function (tp) {
                     var res = checker.getTypeAtLocation(tp);
                     var binding = typeBindings.filter(function (b) { return b.tp == res; })[0];
                     if (!binding) {
@@ -6921,10 +7086,10 @@ var ts;
             return text.replace(/[^\w]+/g, "_") + "__P" + getNodeId(node) + refMask(bindings);
         }
         pxtc.getFunctionLabel = getFunctionLabel;
-        function mkBogusMethod(info, name) {
+        function mkBogusMethod(info, name, parameter) {
             var rootFunction = {
                 kind: pxtc.SK.MethodDeclaration,
-                parameters: [],
+                parameters: parameter ? [parameter] : [],
                 name: {
                     kind: pxtc.SK.Identifier,
                     text: name,
@@ -6942,7 +7107,7 @@ var ts;
             };
             return rootFunction;
         }
-        function compileBinary(program, host, opts, res) {
+        function compileBinary(program, host, opts, res, entryPoint) {
             pxtc.target = opts.target;
             var diagnostics = ts.createDiagnosticCollection();
             checker = program.getTypeChecker();
@@ -6972,6 +7137,7 @@ var ts;
                                 code: 9043,
                                 messageText: lf("The hex file is not available, please connect to internet and try again.")
                             }],
+                        emittedFiles: [],
                         emitSkipped: true
                     };
                 }
@@ -7000,10 +7166,16 @@ var ts;
                 res.usedSymbols = {};
                 res.usedArguments = {};
             }
-            var allStmts = opts.forceEmit && res.diagnostics.length > 0
-                ? [] // TODO: panic
-                : pxtc.Util.concat(program.getSourceFiles().map(function (f) { return f.statements; }));
-            var src = program.getSourceFiles()[0];
+            var allStmts = [];
+            if (!opts.forceEmit || res.diagnostics.length == 0) {
+                var files = program.getSourceFiles();
+                files.forEach(function (f) {
+                    f.statements.forEach(function (s) {
+                        allStmts.push(s);
+                    });
+                });
+            }
+            var src = program.getSourceFiles().filter(function (f) { return pxtc.Util.endsWith(f.fileName, entryPoint); })[0];
             var rootFunction = {
                 kind: pxtc.SK.FunctionDeclaration,
                 parameters: [],
@@ -7048,6 +7220,7 @@ var ts;
             }
             return {
                 diagnostics: diagnostics.getDiagnostics(),
+                emittedFiles: undefined,
                 emitSkipped: !!opts.noEmit
             };
             function error(node, code, msg, arg0, arg1, arg2) {
@@ -7098,7 +7271,7 @@ var ts;
                     case ts.SyntaxKind.TypeOfExpression:
                         syntax = lf("typeof");
                         break;
-                    case ts.SyntaxKind.SpreadElementExpression:
+                    case ts.SyntaxKind.SpreadElement:
                         syntax = lf("spread");
                         break;
                     case ts.SyntaxKind.TryStatement:
@@ -7119,7 +7292,7 @@ var ts;
                     msg = lf("{0} not currently supported", syntax);
                 }
                 else {
-                    msg = lf("{0} not supported", syntax);
+                    msg = lf("{0} not supported", ts.SyntaxKind[n.kind]);
                 }
                 if (alternative) {
                     msg += " - " + alternative;
@@ -7153,6 +7326,7 @@ var ts;
                     info.written = true;
                 var varParent = getEnclosingFunction(v);
                 if (varParent == null || varParent == proc.action) {
+                    // not captured
                 }
                 else {
                     var curr = proc.action;
@@ -7195,7 +7369,7 @@ var ts;
                 if (diagnostics.getModificationCount() || opts.noEmit || !host)
                     return;
                 bin.writeFile = function (fn, data) {
-                    return host.writeFile(fn, data, false, null);
+                    return host.writeFile(fn, data, false, null, program.getSourceFiles());
                 };
                 if (opts.target.isNative) {
                     if (opts.extinfo.yotta)
@@ -7252,7 +7426,7 @@ var ts;
                                 if (!h.types || h.types.length != 1)
                                     throw userError(9228, lf("invalid extends clause"));
                                 var superType = typeOf(h.types[0]);
-                                if (superType && isClassType(superType)) {
+                                if (superType && isClassType(superType) && !isGenericType(superType)) {
                                     // check if user defined
                                     // let filename = getSourceFileOfNode(tp.symbol.valueDeclaration).fileName
                                     // if (program.getRootFileNames().indexOf(filename) == -1) {
@@ -7324,7 +7498,7 @@ var ts;
                         pxtc.assert(!!proc, "!!proc");
                         storeIface(getName(fn), proc);
                     };
-                    var _loop_2 = function(fld0) {
+                    var _loop_2 = function (fld0) {
                         var fld = fld0;
                         var fname = getName(fld);
                         var setname = "set/" + fname;
@@ -7340,12 +7514,12 @@ var ts;
                         }
                         if (isIfaceMemberUsed(setname)) {
                             if (!fld.irSetter) {
-                                fld.irSetter = mkBogusMethod(inf, setname);
-                                fld.irSetter.parameters.unshift({
+                                fld.irSetter = mkBogusMethod(inf, setname, {
                                     kind: pxtc.SK.Parameter,
                                     name: { text: "v" },
                                     parent: fld.irSetter,
-                                    typeOverride: typeOf(fld)
+                                    typeOverride: typeOf(fld),
+                                    symbol: {}
                                 });
                             }
                             var idx_3 = fieldIndexCore(inf, fld, typeOf(fld));
@@ -7544,11 +7718,48 @@ var ts;
                     jsLit: jsLit
                 };
             }
+            function isConstLiteral(decl) {
+                if (isGlobalVar(decl)) {
+                    if (decl.parent.flags & ts.NodeFlags.Const) {
+                        var init = decl.initializer;
+                        if (!init)
+                            return false;
+                        if (init.kind == pxtc.SK.ArrayLiteralExpression)
+                            return false;
+                        return !isSideEffectfulInitializer(init);
+                    }
+                }
+                return false;
+            }
+            function isSideEffectfulInitializer(init) {
+                if (!init)
+                    return false;
+                if (isStringLiteral(init))
+                    return false;
+                switch (init.kind) {
+                    case pxtc.SK.NullKeyword:
+                    case pxtc.SK.NumericLiteral:
+                    case pxtc.SK.TrueKeyword:
+                    case pxtc.SK.FalseKeyword:
+                        return false;
+                    case pxtc.SK.Identifier:
+                        return !isConstLiteral(getDecl(init));
+                    case pxtc.SK.PropertyAccessExpression:
+                        var d = getDecl(init);
+                        return !d || d.kind != pxtc.SK.EnumMember;
+                    case pxtc.SK.ArrayLiteralExpression:
+                        return init.elements.some(isSideEffectfulInitializer);
+                    default:
+                        return true;
+                }
+            }
             function emitLocalLoad(decl) {
                 if (isGlobalVar(decl)) {
                     var attrs = parseComments(decl);
                     if (attrs.shim)
                         return emitShim(decl, decl, []);
+                    if (isConstLiteral(decl))
+                        return emitExpr(decl.initializer);
                 }
                 var l = lookupCell(decl);
                 recordUse(decl);
@@ -7668,7 +7879,7 @@ var ts;
                 var eltT = arrayElementType(typeOf(node));
                 var isRef = isRefType(eltT);
                 var flag = 0;
-                if (eltT.flags & ts.TypeFlags.String)
+                if (isStringType(eltT))
                     flag = 3;
                 else if (isRef)
                     flag = 1;
@@ -7688,6 +7899,7 @@ var ts;
                 node.properties.forEach(function (p) {
                     if (p.kind == pxtc.SK.ShorthandPropertyAssignment) {
                         userError(9264, "Shorthand properties not supported.");
+                        return;
                     }
                     var refSuff = "";
                     if (isRefCountedExpr(p.initializer))
@@ -7753,6 +7965,13 @@ var ts;
                 }
                 else if (decl.kind == pxtc.SK.PropertySignature || decl.kind == pxtc.SK.PropertyAssignment) {
                     return emitCallCore(node, node, [], null, decl, node.expression);
+                    /*
+                    if (attrs.shim) {
+                        callInfo.args.push(node.expression)
+                        return emitShim(decl, node, [node.expression])
+                    } else {
+                        throw unhandled(node, lf("no {shim:...}"), 9236);
+                    }*/
                 }
                 else if (decl.kind == pxtc.SK.PropertyDeclaration) {
                     if (isStatic(decl)) {
@@ -7783,7 +8002,7 @@ var ts;
                     paramDefl: {},
                 };
                 var indexer = null;
-                if (!assign && t.flags & ts.TypeFlags.String) {
+                if (!assign && isStringType(t)) {
                     indexer = "String_::charAt";
                 }
                 else if (isArrayType(t))
@@ -8110,6 +8329,7 @@ var ts;
                 if (isMethod) {
                     var isSuper = false;
                     if (isStatic(decl)) {
+                        // no additional arguments
                     }
                     else if (recv) {
                         if (recv.kind == pxtc.SK.SuperKeyword) {
@@ -8583,28 +8803,28 @@ var ts;
             }
             function emitFunctionDeclaration(node) {
                 if (!isUsed(node))
-                    return;
+                    return undefined;
                 var attrs = parseComments(node);
                 if (attrs.shim != null) {
                     if (attrs.shim[0] == "@")
-                        return;
+                        return undefined;
                     if (opts.target.isNative) {
-                        pxtc.hex.validateShim(getDeclName(node), attrs.shim, attrs, funcHasReturn(node), getParameters(node).map(function (p) { return !!(typeOf(p).flags & ts.TypeFlags.NumberLike); }));
+                        pxtc.hex.validateShim(getDeclName(node), attrs.shim, attrs, funcHasReturn(node), getParameters(node).map(function (p) { return isNumberLikeType(typeOf(p)); }));
                     }
                     if (!hasShimDummy(node))
-                        return;
+                        return undefined;
                 }
-                if (node.flags & ts.NodeFlags.Ambient)
-                    return;
+                if (ts.isInAmbientContext(node))
+                    return undefined;
                 if (!node.body)
-                    return;
+                    return undefined;
                 var info = getFunctionInfo(node);
                 var lit = null;
                 if (isGenericFunction(node)) {
                     if (!info.usages) {
                         pxtc.assert(opts.testMode && !usedDecls[nodeKey(node)] && !bin.finalPass, "opts.testMode && !usedDecls[nodeKey(node)] && !bin.finalPass");
                         // test mode - make fake binding
-                        var bindings = getTypeParameters(node).map(function (t) { return ({
+                        var bindings = pxtc.Util.toArray(getTypeParameters(node)).map(function (t) { return ({
                             arg: checker.getTypeAtLocation(t),
                             tp: checker.getTypeAtLocation(t),
                             isRef: true
@@ -8619,7 +8839,7 @@ var ts;
                         todo = info.usages.slice(info.prePassUsagesEmitted);
                         info.prePassUsagesEmitted = info.usages.length;
                     }
-                    var _loop_3 = function(bindings) {
+                    var _loop_3 = function (bindings) {
                         scope(function () {
                             var nolit = emitFuncCore(node, bindings);
                             pxtc.U.assert(nolit == null, "nolit == null");
@@ -8646,7 +8866,7 @@ var ts;
                 if (node.operator == pxtc.SK.ExclamationToken) {
                     return fromBool(pxtc.ir.rtcall("Boolean_::bang", [emitCondition(node.operand)]));
                 }
-                if (tp.flags & ts.TypeFlags.Number) {
+                if (isNumberType(tp)) {
                     switch (node.operator) {
                         case pxtc.SK.PlusPlusToken:
                             return emitIncrement(node.operand, "numops::adds", false);
@@ -8714,7 +8934,7 @@ var ts;
             }
             function emitPostfixUnaryExpression(node) {
                 var tp = typeOf(node.operand);
-                if (tp.flags & ts.TypeFlags.Number) {
+                if (isNumberType(tp)) {
                     switch (node.operator) {
                         case pxtc.SK.PlusPlusToken:
                             return emitIncrement(node.operand, "numops::adds", true);
@@ -8820,6 +9040,15 @@ var ts;
                         case "langsupp::ptrneq":
                         case "langsupp::ptrneqq":
                             return "Number_::neq";
+                    }
+                }
+                if (opts.target.taggedInts && isThumb()) {
+                    switch (n) {
+                        case "numops::adds":
+                        case "numops::subs":
+                        case "numops::eors":
+                        case "numops::ands":
+                            return "@nomask@" + n;
                     }
                 }
                 return n;
@@ -8945,7 +9174,7 @@ var ts;
                 }
                 if (e.kind == pxtc.SK.NumericLiteral)
                     return true;
-                return !!(typeOf(e).flags & ts.TypeFlags.NumberLike);
+                return isNumberLikeType(typeOf(e));
             }
             function rtcallMask(name, args, attrs, append) {
                 if (append === void 0) { append = null; }
@@ -9015,7 +9244,7 @@ var ts;
             }
             function emitLazyBinaryExpression(node) {
                 var left = emitExpr(node.left);
-                var isString = typeOf(node.left).flags & ts.TypeFlags.String;
+                var isString = isStringType(typeOf(node.left));
                 var lbl = proc.mkLabel("lazy");
                 if (opts.target.floatingPoint) {
                     left = pxtc.ir.shared(left);
@@ -9064,7 +9293,9 @@ var ts;
                 }
                 proc.emitJmp(lbl, emitExpr(node.right), pxtc.ir.JmpMode.Always);
                 proc.emitLbl(lbl);
-                return pxtc.ir.op(EK.JmpValue, []);
+                var r = pxtc.ir.shared(pxtc.ir.op(EK.JmpValue, []));
+                proc.emitExpr(r);
+                return r;
             }
             function stripEquals(k) {
                 switch (k) {
@@ -9143,7 +9374,7 @@ var ts;
                 var lt = typeOf(node.left);
                 var rt = typeOf(node.right);
                 if (node.operatorToken.kind == pxtc.SK.PlusToken) {
-                    if (lt.flags & ts.TypeFlags.String || rt.flags & ts.TypeFlags.String) {
+                    if (isStringType(lt) || isStringType(rt)) {
                         node.exprInfo = { leftType: checker.typeToString(lt), rightType: checker.typeToString(rt) };
                     }
                 }
@@ -9165,7 +9396,7 @@ var ts;
                     case pxtc.SK.AmpersandAmpersandToken:
                         return emitLazyBinaryExpression(node);
                 }
-                if ((lt.flags & ts.TypeFlags.NumberLike) && (rt.flags & ts.TypeFlags.NumberLike)) {
+                if (isNumericalType(lt) && isNumericalType(rt)) {
                     var noEq = stripEquals(node.operatorToken.kind);
                     var shimName = simpleInstruction(noEq || node.operatorToken.kind);
                     if (!shimName)
@@ -9175,25 +9406,26 @@ var ts;
                     return shim(shimName);
                 }
                 if (node.operatorToken.kind == pxtc.SK.PlusToken) {
-                    if ((lt.flags & ts.TypeFlags.String) || (rt.flags & ts.TypeFlags.String)) {
+                    if (isStringType(lt) || isStringType(rt)) {
                         // TODO use getMask() to limit incr/decr
                         return pxtc.ir.rtcallMask("String_::concat", 3, pxtc.ir.CallingConvention.Plain, [
                             emitAsString(node.left),
-                            emitAsString(node.right)]);
+                            emitAsString(node.right)
+                        ]);
                     }
                 }
-                if (node.operatorToken.kind == pxtc.SK.PlusEqualsToken &&
-                    (lt.flags & ts.TypeFlags.String)) {
+                if (node.operatorToken.kind == pxtc.SK.PlusEqualsToken && isStringType(lt)) {
                     var cleanup = prepForAssignment(node.left);
                     // TODO use getMask() to limit incr/decr
                     var post = pxtc.ir.shared(pxtc.ir.rtcallMask("String_::concat", 3, pxtc.ir.CallingConvention.Plain, [
                         emitExpr(node.left),
-                        emitAsString(node.right)]));
+                        emitAsString(node.right)
+                    ]));
                     emitStore(node.left, irToNode(post));
                     cleanup();
                     return pxtc.ir.op(EK.Incr, [post]);
                 }
-                if ((lt.flags & ts.TypeFlags.String) && (rt.flags & ts.TypeFlags.String)) {
+                if (isStringType(lt) && isStringType(rt)) {
                     switch (node.operatorToken.kind) {
                         case pxtc.SK.EqualsEqualsToken:
                         case pxtc.SK.EqualsEqualsEqualsToken:
@@ -9229,13 +9461,13 @@ var ts;
                 if (isStringLiteral(e))
                     return r;
                 var tp = typeOf(e);
-                if (pxtc.target.floatingPoint && (tp.flags & (ts.TypeFlags.NumberLike | ts.TypeFlags.Boolean)))
+                if (pxtc.target.floatingPoint && (tp.flags & (ts.TypeFlags.NumberLike | ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLiteral)))
                     return pxtc.ir.rtcallMask("numops::toString", 1, pxtc.ir.CallingConvention.Plain, [r]);
                 else if (tp.flags & ts.TypeFlags.NumberLike)
                     return pxtc.ir.rtcall("Number_::toString", [r]);
-                else if (tp.flags & ts.TypeFlags.Boolean)
+                else if (isBooleanType(tp))
                     return pxtc.ir.rtcall("Boolean_::toString", [r]);
-                else if (tp.flags & ts.TypeFlags.String)
+                else if (isStringType(tp))
                     return r; // OK
                 else {
                     var decl = tp.symbol ? tp.symbol.valueDeclaration : null;
@@ -9252,6 +9484,7 @@ var ts;
                         }
                         else {
                             throw userError(9254, lf("type {0} lacks toString() method", getName(decl)));
+                            //return emitStringLiteral("[" + getName(decl) + "]")
                         }
                     }
                     throw userError(9225, lf("don't know how to convert to string"));
@@ -9308,7 +9541,7 @@ var ts;
                             addConfigEntry({ name: nm, key: key, value: val });
                         }
                     }
-                if (node.flags & ts.NodeFlags.Ambient)
+                if (ts.isInAmbientContext(node))
                     return;
                 checkForLetOrConst(node.declarationList);
                 node.declarationList.declarations.forEach(emit);
@@ -9318,6 +9551,17 @@ var ts;
             }
             function emitCondition(expr, inner) {
                 if (inner === void 0) { inner = null; }
+                if (!inner && opts.target.taggedInts && isThumb() && expr.kind == pxtc.SK.BinaryExpression) {
+                    var be = expr;
+                    var lt = typeOf(be.left);
+                    var rt = typeOf(be.right);
+                    if ((lt.flags & ts.TypeFlags.NumberLike) && (rt.flags & ts.TypeFlags.NumberLike)) {
+                        var mapped = pxtc.U.lookup(pxtc.thumbCmpMap, simpleInstruction(be.operatorToken.kind));
+                        if (mapped) {
+                            return pxtc.ir.rtcall(mapped, [emitExpr(be.left), emitExpr(be.right)]);
+                        }
+                    }
+                }
                 if (!inner)
                     inner = emitExpr(expr);
                 // in all cases decr is internal, so no mask
@@ -9325,7 +9569,7 @@ var ts;
                     return pxtc.ir.rtcall("numops::toBoolDecr", [inner]);
                 }
                 else {
-                    if (typeOf(expr).flags & ts.TypeFlags.String) {
+                    if (isStringType(typeOf(expr))) {
                         return pxtc.ir.rtcall("pxtrt::stringToBool", [inner]);
                     }
                     else if (isRefCountedExpr(expr)) {
@@ -9443,7 +9687,7 @@ var ts;
                 var t = typeOf(node.expression);
                 var indexer = "";
                 var length = "";
-                if (t.flags & ts.TypeFlags.String) {
+                if (isStringType(t)) {
                     indexer = "String_::charAt";
                     length = "String_::length";
                 }
@@ -9551,6 +9795,7 @@ var ts;
                 var defaultLabel;
                 var quickCmpMode = isNumber;
                 var expr = pxtc.ir.shared(emitExpr(node.expression));
+                var decrSuff = isRefCountedExpr(node.expression) ? "Decr" : "";
                 var plainExpr = expr;
                 if (isNumber) {
                     emitInJmpValue(expr);
@@ -9560,22 +9805,21 @@ var ts;
                     if (cl.kind == pxtc.SK.CaseClause) {
                         var cc = cl;
                         var cmpExpr = emitExpr(cc.expression);
+                        var mask = isRefCountedExpr(cc.expression) ? 1 : 0;
                         if (opts.target.needsUnboxing) {
                             // we assume the value we're switching over will stay alive
                             // so, the mask only applies to the case expression if needed
-                            var cmpCall = pxtc.ir.rtcallMask(mapIntOpName("pxt::switch_eq"), isRefCountedExpr(cc.expression) ? 1 : 0, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
+                            var cmpCall = pxtc.ir.rtcallMask(mapIntOpName("pxt::switch_eq"), mask, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
                             quickCmpMode = false;
                             proc.emitJmp(lbl, cmpCall, pxtc.ir.JmpMode.IfNotZero, plainExpr);
                         }
-                        else if (switchType.flags & ts.TypeFlags.String) {
-                            var cmpCall = pxtc.ir.rtcallMask("String_::compare", isRefCountedExpr(cc.expression) ? 3 : 2, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
-                            expr = pxtc.ir.op(EK.Incr, [expr]);
+                        else if (isStringType(switchType)) {
+                            var cmpCall = pxtc.ir.rtcallMask("String_::compare" + decrSuff, mask, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
                             proc.emitJmp(lbl, cmpCall, pxtc.ir.JmpMode.IfZero, plainExpr);
                         }
-                        else if (isRefCountedExpr(cc.expression)) {
-                            var cmpCall = pxtc.ir.rtcallMask(mapIntOpName("langsupp::ptreq"), 3, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
+                        else if (isRefCountedExpr(cc.expression) || decrSuff) {
+                            var cmpCall = pxtc.ir.rtcallMask(mapIntOpName("langsupp::ptreq") + decrSuff, 3, pxtc.ir.CallingConvention.Plain, [cmpExpr, expr]);
                             quickCmpMode = false;
-                            expr = pxtc.ir.op(EK.Incr, [expr]);
                             proc.emitJmp(lbl, cmpCall, pxtc.ir.JmpMode.IfNotZero, plainExpr);
                         }
                         else {
@@ -9606,7 +9850,7 @@ var ts;
                     }
                     return lbl;
                 });
-                if (opts.target.taggedInts) {
+                if (opts.target.taggedInts || decrSuff) {
                     proc.emitExpr(pxtc.ir.op(EK.Decr, [expr]));
                 }
                 if (defaultLabel)
@@ -9645,6 +9889,8 @@ var ts;
                 if (!isUsed(node)) {
                     return null;
                 }
+                if (isConstLiteral(node))
+                    return null;
                 var loc = isGlobalVar(node) ?
                     lookupCell(node) : proc.mkLocal(node, getVarInfo(node));
                 if (loc.isByRefLocal()) {
@@ -9747,8 +9993,7 @@ var ts;
                 catch (e) {
                     inCatchErrors--;
                     lastSecondaryError = null;
-                    if (!e.ksEmitterUserError)
-                        console.log(e.stack);
+                    // if (!e.ksEmitterUserError)
                     var code = e.ksErrorCode || 9200;
                     error(node, code, e.message);
                     return null;
@@ -9914,7 +10159,28 @@ var ts;
             a[0] = v;
             return pxtc.U.toHex(new Uint8Array(a.buffer));
         }
-        var Binary = (function () {
+        function checkPrimitiveType(t, flags, tp) {
+            if (t.flags & flags) {
+                return true;
+            }
+            return checkUnionOfLiterals(t) === tp;
+        }
+        function isStringType(t) {
+            return checkPrimitiveType(t, ts.TypeFlags.String | ts.TypeFlags.StringLiteral, HasLiteralType.String);
+        }
+        function isNumberType(t) {
+            return checkPrimitiveType(t, ts.TypeFlags.Number | ts.TypeFlags.NumberLiteral, HasLiteralType.Number);
+        }
+        function isBooleanType(t) {
+            return checkPrimitiveType(t, ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLiteral, HasLiteralType.Boolean);
+        }
+        function isEnumType(t) {
+            return checkPrimitiveType(t, ts.TypeFlags.Enum | ts.TypeFlags.EnumLiteral, HasLiteralType.Enum);
+        }
+        function isNumericalType(t) {
+            return isEnumType(t) || isNumberType(t);
+        }
+        var Binary = /** @class */ (function () {
             function Binary() {
                 this.procs = [];
                 this.globals = [];
@@ -9963,6 +10229,9 @@ var ts;
             return Binary;
         }());
         pxtc.Binary = Binary;
+        function isNumberLikeType(type) {
+            return !!(type.flags & (ts.TypeFlags.NumberLike | ts.TypeFlags.EnumLike));
+        }
     })(pxtc = ts.pxtc || (ts.pxtc = {}));
 })(ts || (ts = {}));
 /// <reference path="../../built/typescriptServices.d.ts"/>
@@ -9980,7 +10249,7 @@ var ts;
     (function (pxtc) {
         function getTsCompilerOptions(opts) {
             var options = ts.getDefaultCompilerOptions();
-            options.target = pxtc.ScriptTarget.ES5;
+            options.target = ts.ScriptTarget.ES5;
             options.module = ts.ModuleKind.None;
             options.noImplicitAny = true;
             options.noImplicitReturns = true;
@@ -10100,30 +10369,41 @@ var ts;
                     return fileText[fn] || "";
                 },
                 directoryExists: function (dn) { return true; },
+                getDirectories: function () { return []; }
             };
             if (!opts.sourceFiles)
                 opts.sourceFiles = Object.keys(opts.fileSystem);
             var tsFiles = opts.sourceFiles.filter(function (f) { return pxtc.U.endsWith(f, ".ts"); });
             // ensure that main.ts is last of TS files
             var tsFilesNoMain = tsFiles.filter(function (f) { return f != "main.ts"; });
+            var hasMain = false;
             if (tsFiles.length > tsFilesNoMain.length) {
                 tsFiles = tsFilesNoMain;
                 tsFiles.push("main.ts");
+                hasMain = true;
             }
             // TODO: ensure that main.ts is last???
             var program = ts.createProgram(tsFiles, options, host);
+            var entryPoint;
+            if (hasMain) {
+                entryPoint = "main.ts";
+            }
+            else {
+                var lastFile = tsFiles[tsFiles.length - 1];
+                entryPoint = lastFile.substring(lastFile.lastIndexOf("/") + 1);
+            }
             // First get and report any syntactic errors.
             res.diagnostics = patchUpDiagnostics(program.getSyntacticDiagnostics(), opts.ignoreFileResolutionErrors);
             if (res.diagnostics.length > 0) {
                 if (opts.forceEmit) {
                     pxt.debug('syntactic errors, forcing emit');
-                    pxtc.compileBinary(program, host, opts, res);
+                    pxtc.compileBinary(program, host, opts, res, entryPoint);
                 }
                 return res;
             }
             // If we didn't have any syntactic errors, then also try getting the global and
             // semantic errors.
-            res.diagnostics = patchUpDiagnostics(program.getOptionsDiagnostics().concat(program.getGlobalDiagnostics()), opts.ignoreFileResolutionErrors);
+            res.diagnostics = patchUpDiagnostics(program.getOptionsDiagnostics().concat(pxtc.Util.toArray(program.getGlobalDiagnostics())), opts.ignoreFileResolutionErrors);
             if (res.diagnostics.length == 0) {
                 res.diagnostics = patchUpDiagnostics(program.getSemanticDiagnostics(), opts.ignoreFileResolutionErrors);
             }
@@ -10133,7 +10413,7 @@ var ts;
                 res.ast = program;
             }
             if (opts.ast || opts.forceEmit || res.diagnostics.length == 0) {
-                var binOutput = pxtc.compileBinary(program, host, opts, res);
+                var binOutput = pxtc.compileBinary(program, host, opts, res, entryPoint);
                 res.times["compilebinary"] = Date.now() - emitStart;
                 res.diagnostics = res.diagnostics.concat(patchUpDiagnostics(binOutput.diagnostics));
             }
@@ -10147,14 +10427,15 @@ var ts;
             return res;
         }
         pxtc.compile = compile;
-        function decompile(opts, fileName) {
+        function decompile(opts, fileName, includeGreyBlockMessages) {
+            if (includeGreyBlockMessages === void 0) { includeGreyBlockMessages = false; }
             var resp = compile(opts);
             if (!resp.success)
                 return resp;
             var file = resp.ast.getSourceFile(fileName);
             var apis = pxtc.getApiInfo(opts, resp.ast);
             var blocksInfo = pxtc.getBlocksInfo(apis);
-            var bresp = pxtc.decompiler.decompileToBlocks(blocksInfo, file, { snippetMode: false, alwaysEmitOnStart: opts.alwaysDecompileOnStart }, pxtc.decompiler.buildRenameMap(resp.ast, file));
+            var bresp = pxtc.decompiler.decompileToBlocks(blocksInfo, file, { snippetMode: false, alwaysEmitOnStart: opts.alwaysDecompileOnStart, includeGreyBlockMessages: includeGreyBlockMessages }, pxtc.decompiler.buildRenameMap(resp.ast, file));
             return bresp;
         }
         pxtc.decompile = decompile;
@@ -11047,6 +11328,7 @@ var ts;
                 if (t.kind == TokenKind.Tree) {
                     var tree = t;
                     if (t.synKind == SK.OpenBraceToken) {
+                        //showMsg(t, "left behind X")
                     }
                     tree.children.forEach(findNonBlocks);
                 }
@@ -11087,7 +11369,7 @@ var ts;
             }
             function ppToks(tokens) {
                 tokens = normalizeSpace(tokens);
-                var _loop_4 = function(i) {
+                var _loop_4 = function (i) {
                     var t = tokens[i];
                     finalFormat(ind, t);
                     writeToken(t);
@@ -11438,6 +11720,7 @@ var ts;
                         if (pxtc.target.taggedInts) {
                             var needNum = spec == "I" || spec == "N" || spec == "F";
                             if (spec == "T") {
+                                // OK, both number and non-number allowed
                             }
                             else if (needNum && !argIsNumber[i])
                                 pxtc.U.userError("expecting number at parameter " + (i + 1) + " of " + nm);
@@ -11485,7 +11768,7 @@ var ts;
             }
             function applyPatches(f, binfile) {
                 if (binfile === void 0) { binfile = null; }
-                // constant strings in the binary are 4-byte aligned, and marked 
+                // constant strings in the binary are 4-byte aligned, and marked
                 // with "@PXT@:" at the beginning - this 6 byte string needs to be
                 // replaced with proper reference count (0xffff to indicate read-only
                 // flash location), string virtual table, and the length of the string
@@ -11506,12 +11789,13 @@ var ts;
                             if (6 + len >= bytes.length)
                                 pxtc.U.oops("constant string too long!");
                             return stringVT.concat([len & 0xff, len >> 8]);
+                            //console.log("patch file: @" + addr + ": " + U.toHex(patchV))
                         }
                     }
                     return null;
                 };
                 if (binfile) {
-                    var _loop_5 = function(i) {
+                    var _loop_5 = function (i) {
                         var patchV = patchAt(binfile, i, function () { return binfile.slice(i, i + 200); });
                         if (patchV)
                             pxtc.U.memcpy(binfile, i, patchV);
@@ -11524,7 +11808,7 @@ var ts;
                     for (var bidx = 0; bidx < f.blocks.length; ++bidx) {
                         var b = f.blocks[bidx];
                         var upper = f.ptrs[bidx] << 8;
-                        var _loop_6 = function(i) {
+                        var _loop_6 = function (i) {
                             var addr = upper + i - 32;
                             var patchV = patchAt(b, i, function () { return pxtc.UF2.readBytesFromFile(f, addr, 200); });
                             if (patchV)
@@ -11683,7 +11967,7 @@ var ts;
         }
         pxtc.vtableToAsm = vtableToAsm;
         function serialize(bin, opts) {
-            var asmsource = "; start\n" + hex.hexPrelude() + "        \n    .hex 708E3B92C615A841C49866C975EE5197 ; magic number\n    .hex " + hex.hexTemplateHash() + " ; hex template hash\n    .hex 0000000000000000 ; @SRCHASH@\n    .short " + bin.globalsWords + "   ; num. globals\n    .short 0 ; patched with number of words resulting from assembly\n    .word _pxt_config_data\n    .word 0 ; reserved\n    .word 0 ; reserved\n";
+            var asmsource = "; start\n" + hex.hexPrelude() + "\n    .hex 708E3B92C615A841C49866C975EE5197 ; magic number\n    .hex " + hex.hexTemplateHash() + " ; hex template hash\n    .hex 0000000000000000 ; @SRCHASH@\n    .short " + bin.globalsWords + "   ; num. globals\n    .short 0 ; patched with number of words resulting from assembly\n    .word _pxt_config_data\n    .word 0 ; reserved\n    .word 0 ; reserved\n";
             var snippets = null;
             if (opts.target.nativeType == pxtc.NATIVE_TYPE_AVR)
                 snippets = new pxtc.AVRSnippets();
@@ -11755,7 +12039,7 @@ var ts;
                 b.errors.forEach(function (e) {
                     var m = /^user(\d+)/.exec(e.scope);
                     if (m) {
-                        // This generally shouldn't happen, but it may for certin kind of global 
+                        // This generally shouldn't happen, but it may for certin kind of global
                         // errors - jump range and label redefinitions
                         var no = parseInt(m[1]); // TODO lookup assembly file name
                         userErrors_1 += pxtc.U.lf("At inline assembly:\n");
@@ -11903,13 +12187,13 @@ var ts;
                 if (!configObject) {
                     reportDiagnostics([result.error], /* compilerHost */ undefined);
                     ts.sys.exit(ts.ExitStatus.DiagnosticsPresent_OutputsSkipped);
-                    return;
+                    return undefined;
                 }
                 var configParseResult = ts.parseJsonConfigFileContent(configObject, ts.sys, dir, commandLine.options, configFileName);
                 if (configParseResult.errors.length > 0) {
                     reportDiagnostics(configParseResult.errors, /* compilerHost */ undefined);
                     ts.sys.exit(ts.ExitStatus.DiagnosticsPresent_OutputsSkipped);
-                    return;
+                    return undefined;
                 }
                 return configParseResult;
             }
@@ -11928,7 +12212,7 @@ var ts;
             function compileProgram() {
                 var diagnostics = program.getSyntacticDiagnostics();
                 if (diagnostics.length === 0) {
-                    diagnostics = program.getOptionsDiagnostics().concat(program.getGlobalDiagnostics());
+                    diagnostics = program.getOptionsDiagnostics().concat(pxtc.Util.toArray(program.getGlobalDiagnostics()));
                     if (diagnostics.length === 0) {
                         diagnostics = program.getSemanticDiagnostics();
                     }
@@ -11940,7 +12224,6 @@ var ts;
         }
     })(pxtc = ts.pxtc || (ts.pxtc = {}));
 })(ts || (ts = {}));
-/// <reference path="../../typings/globals/fusejs/index.d.ts" />
 var ts;
 (function (ts) {
     var pxtc;
@@ -12055,7 +12338,7 @@ var ts;
                 if (stripParams) {
                     t = t.getCallSignatures()[0].getReturnType();
                 }
-                return typechecker.typeToString(t, null, ts.TypeFormatFlags.UseFullyQualifiedType);
+                return typechecker.typeToString(t, undefined, ts.TypeFormatFlags.UseFullyQualifiedType);
             }
             var kind = getSymbolKind(stmt);
             if (kind != pxtc.SymbolKind.None) {
@@ -12095,7 +12378,7 @@ var ts;
                     pkg: pkg,
                     extendsTypes: extendsTypes,
                     retType: kind == pxtc.SymbolKind.Module ? "" : typeOf(decl.type, decl, hasParams),
-                    parameters: !hasParams ? null : (decl.parameters || []).map(function (p, i) {
+                    parameters: !hasParams ? null : (pxtc.Util.toArray(decl.parameters)).map(function (p, i) {
                         var n = pxtc.getName(p);
                         var desc = attributes_1.paramHelp[n] || "";
                         var minVal = attributes_1.paramMin && attributes_1.paramMin[n];
@@ -12123,7 +12406,7 @@ var ts;
                         }
                         var options = {};
                         var paramType = typechecker.getTypeAtLocation(p);
-                        var isEnum = paramType && !!(paramType.flags & ts.TypeFlags.Enum);
+                        var isEnum = paramType && !!(paramType.flags & (ts.TypeFlags.Enum | ts.TypeFlags.EnumLiteral));
                         if (attributes_1.block && attributes_1.paramShadowOptions) {
                             var argNames_1 = [];
                             attributes_1.block.replace(/%(\w+)/g, function (f, n) {
@@ -12176,17 +12459,17 @@ var ts;
                 if (si.kind != pxtc.SymbolKind.EnumMember) {
                     var ns = ts.pxtc.blocksCategory(si);
                     if (ns)
-                        locStrings[("{id:category}" + ns)] = ns;
+                        locStrings["{id:category}" + ns] = ns;
                 }
                 if (si.attributes.jsDoc)
                     jsdocStrings[si.qName] = si.attributes.jsDoc;
                 if (si.attributes.block)
-                    locStrings[(si.qName + "|block")] = si.attributes.block;
+                    locStrings[si.qName + "|block"] = si.attributes.block;
                 if (si.attributes.group)
-                    locStrings[("{id:group}" + si.attributes.group)] = si.attributes.group;
+                    locStrings["{id:group}" + si.attributes.group] = si.attributes.group;
                 if (si.parameters)
                     si.parameters.filter(function (pi) { return !!pi.description; }).forEach(function (pi) {
-                        jsdocStrings[(si.qName + "|param|" + pi.name)] = pi.description;
+                        jsdocStrings[si.qName + "|param|" + pi.name] = pi.description;
                     });
             };
             var mapLocs = function (m, name) {
@@ -12196,7 +12479,7 @@ var ts;
                 Object.keys(m).sort().forEach(function (l) { return locs[l] = m[l]; });
                 files[pkg + name + "-strings.json"] = JSON.stringify(locs, null, 2);
             };
-            var _loop_7 = function(info) {
+            var _loop_7 = function (info) {
                 var isNamespace = info.kind == pxtc.SymbolKind.Module;
                 if (isNamespace) {
                     if (!infos.filter(function (si) { return si.namespace == info.name && !!si.attributes.jsDoc; })[0])
@@ -12208,13 +12491,12 @@ var ts;
             };
             for (var _i = 0, infos_1 = infos; _i < infos_1.length; _i++) {
                 var info = infos_1[_i];
-                var state_7 = _loop_7(info);
-                if (state_7 === "continue") continue;
+                _loop_7(info);
             }
             if (options.locs)
                 enumMembers.forEach(function (em) {
                     if (em.attributes.block)
-                        locStrings[(em.qName + "|block")] = em.attributes.block;
+                        locStrings[em.qName + "|block"] = em.attributes.block;
                     if (em.attributes.jsDoc)
                         locStrings[em.qName] = em.attributes.jsDoc;
                 });
@@ -12241,7 +12523,8 @@ var ts;
         function getApiInfo(opts, program, legacyOnly) {
             if (legacyOnly === void 0) { legacyOnly = false; }
             var res = {
-                byQName: {}
+                byQName: {},
+                jres: opts.jres
             };
             var typechecker = program.getTypeChecker();
             var collectDecls = function (stmt) {
@@ -12378,7 +12661,6 @@ var ts;
         pxtc.fillCompletionEntries = fillCompletionEntries;
     })(pxtc = ts.pxtc || (ts.pxtc = {}));
 })(ts || (ts = {}));
-var ts;
 (function (ts) {
     var pxtc;
     (function (pxtc) {
@@ -12390,11 +12672,13 @@ var ts;
                 target: { isNative: false, hasHex: false },
                 hexinfo: null
             };
-            var Host = (function () {
+            var Host = /** @class */ (function () {
                 function Host() {
                     this.opts = emptyOptions;
                     this.fileVersions = {};
                     this.projectVer = 0;
+                    // resolveModuleNames?(moduleNames: string[], containingFile: string): ResolvedModule[];
+                    // directoryExists?(directoryName: string): boolean;
                 }
                 Host.prototype.getProjectVersion = function () {
                     return this.projectVer + "";
@@ -12527,7 +12811,7 @@ var ts;
                             success: true,
                             times: {}
                         };
-                        var binOutput = pxtc.compileBinary(service.getProgram(), null, host.opts, res);
+                        var binOutput = pxtc.compileBinary(service.getProgram(), null, host.opts, res, "main.ts");
                         allD = binOutput.diagnostics;
                     }
                     return pxtc.patchUpDiagnostics(allD);
@@ -12541,7 +12825,7 @@ var ts;
                     lastFuse = undefined;
                     return lastApiInfo = pxtc.getApiInfo(host.opts, service.getProgram());
                 },
-                blocksInfo: blocksInfoOp,
+                blocksInfo: function (v) { return blocksInfoOp(v); },
                 apiSearch: function (v) {
                     var SEARCH_RESULT_COUNT = 7;
                     var search = v.search;
@@ -12552,7 +12836,7 @@ var ts;
                     // Computes the preferred tooltip or block text to use for search (used for blocks that have multiple tooltips or block texts)
                     var computeSearchProperty = function (tooltipOrBlock, preferredSearch, blockDef) {
                         if (!tooltipOrBlock) {
-                            return;
+                            return undefined;
                         }
                         if (typeof tooltipOrBlock === "string") {
                             // There is only one tooltip or block text; use it
@@ -12568,10 +12852,10 @@ var ts;
                     if (!builtinItems) {
                         builtinItems = [];
                         blockDefinitions = pxt.blocks.blockDefinitions();
-                        var _loop_8 = function(id) {
+                        var _loop_8 = function (id) {
                             var blockDef = blockDefinitions[id];
                             if (blockDef.operators) {
-                                var _loop_9 = function(op) {
+                                var _loop_9 = function (op) {
                                     var opValues = blockDef.operators[op];
                                     opValues.forEach(function (v) { return builtinItems.push({
                                         id: id,
@@ -12728,7 +13012,7 @@ var ts;
                                         }
                                         return "0";
                                     }
-                                    else if (type_1.flags & ts.TypeFlags.Number) {
+                                    else if (type_1.flags & (ts.TypeFlags.Number | ts.TypeFlags.NumberLiteral)) {
                                         return "0";
                                     }
                                 }
@@ -12744,7 +13028,7 @@ var ts;
                     }
                     var type = checker ? checker.getTypeAtLocation(param) : undefined;
                     if (type) {
-                        if (type.flags & ts.TypeFlags.Anonymous) {
+                        if (pxtc.isObjectType(type) && type.objectFlags & ts.ObjectFlags.Anonymous) {
                             var sigs = checker.getSignaturesOfType(type, ts.SignatureKind.Call);
                             if (sigs.length) {
                                 return getFunctionString(sigs[0]);
@@ -12766,7 +13050,7 @@ var ts;
                         returnValue = "return 0;";
                     else if (returnType.flags & ts.TypeFlags.StringLike)
                         returnValue = "return \"\";";
-                    else if (returnType.flags & ts.TypeFlags.Boolean)
+                    else if (returnType.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLiteral))
                         returnValue = "return false;";
                     var displayPartsStr = ts.displayPartsToString(displayParts);
                     functionArgument = displayPartsStr.substr(0, displayPartsStr.lastIndexOf(":"));
@@ -12785,10 +13069,10 @@ var ts;
         (function (vm) {
             var emitErr = pxtc.assembler.emitErr;
             var badNameError = emitErr("opcode name doesn't match", "<name>");
-            var VmInstruction = (function (_super) {
+            var VmInstruction = /** @class */ (function (_super) {
                 __extends(VmInstruction, _super);
                 function VmInstruction(ei, format, opcode) {
-                    _super.call(this, ei, format, opcode, opcode, false);
+                    return _super.call(this, ei, format, opcode, opcode, false) || this;
                 }
                 VmInstruction.prototype.emit = function (ln) {
                     var tokens = ln.words;
@@ -12837,6 +13121,7 @@ var ts;
                             }
                         }
                         else if (formal == actual) {
+                            // skip
                         }
                         else {
                             return emitErr("expecting " + formal, actual);
@@ -12859,13 +13144,12 @@ var ts;
                 return VmInstruction;
             }(pxtc.assembler.Instruction));
             vm.VmInstruction = VmInstruction;
-            var VmProcessor = (function (_super) {
+            var VmProcessor = /** @class */ (function (_super) {
                 __extends(VmProcessor, _super);
                 function VmProcessor(target) {
-                    var _this = this;
-                    _super.call(this);
-                    this.addEnc("$i1", "#0-255", function (v) { return _this.inrange(255, v, v); });
-                    this.addEnc("$i2", "#0-65535", function (v) { return _this.inrange(65535, v, v); });
+                    var _this = _super.call(this) || this;
+                    _this.addEnc("$i1", "#0-255", function (v) { return _this.inrange(255, v, v); });
+                    _this.addEnc("$i2", "#0-65535", function (v) { return _this.inrange(65535, v, v); });
                     pxtc.U.iterMap(target.vmOpCodes, function (opnamefull, opcode) {
                         var m = /(.*)_(\d+)/.exec(opnamefull);
                         var fmt = "";
@@ -12884,6 +13168,7 @@ var ts;
                             _this.instructions[ins.name] = [];
                         _this.instructions[ins.name].push(ins);
                     });
+                    return _this;
                 }
                 VmProcessor.prototype.testAssembler = function () {
                 };

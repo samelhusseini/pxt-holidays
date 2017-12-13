@@ -2,12 +2,12 @@ var pxt;
 (function (pxt) {
     var editor;
     (function (editor) {
+        var FilterState;
         (function (FilterState) {
             FilterState[FilterState["Hidden"] = 0] = "Hidden";
             FilterState[FilterState["Visible"] = 1] = "Visible";
             FilterState[FilterState["Disabled"] = 2] = "Disabled";
-        })(editor.FilterState || (editor.FilterState = {}));
-        var FilterState = editor.FilterState;
+        })(FilterState = editor.FilterState || (editor.FilterState = {}));
     })(editor = pxt.editor || (pxt.editor = {}));
 })(pxt || (pxt = {}));
 var pxt;
@@ -230,19 +230,19 @@ var pxt;
 (function (pxt) {
     var editor;
     (function (editor) {
+        var PermissionResponses;
         (function (PermissionResponses) {
             PermissionResponses[PermissionResponses["Granted"] = 0] = "Granted";
             PermissionResponses[PermissionResponses["Denied"] = 1] = "Denied";
             PermissionResponses[PermissionResponses["NotAvailable"] = 2] = "NotAvailable";
-        })(editor.PermissionResponses || (editor.PermissionResponses = {}));
-        var PermissionResponses = editor.PermissionResponses;
+        })(PermissionResponses = editor.PermissionResponses || (editor.PermissionResponses = {}));
     })(editor = pxt.editor || (pxt.editor = {}));
 })(pxt || (pxt = {}));
 var pxt;
 (function (pxt) {
     var storage;
     (function (storage) {
-        var MemoryStorage = (function () {
+        var MemoryStorage = /** @class */ (function () {
             function MemoryStorage() {
                 this.items = {};
             }
@@ -260,7 +260,7 @@ var pxt;
             };
             return MemoryStorage;
         }());
-        var LocalStorage = (function () {
+        var LocalStorage = /** @class */ (function () {
             function LocalStorage(storageId) {
                 this.storageId = storageId;
             }
@@ -340,7 +340,6 @@ var pxt;
         storage.clearLocal = clearLocal;
     })(storage = pxt.storage || (pxt.storage = {}));
 })(pxt || (pxt = {}));
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 /// <reference path="../localtypings/monaco.d.ts" />
 /// <reference path="../built/pxtlib.d.ts"/>
 var pxt;
@@ -544,17 +543,18 @@ var pxt;
 (function (pxt) {
     var shell;
     (function (shell) {
+        var EditorLayoutType;
         (function (EditorLayoutType) {
             EditorLayoutType[EditorLayoutType["IDE"] = 0] = "IDE";
             EditorLayoutType[EditorLayoutType["Sandbox"] = 1] = "Sandbox";
             EditorLayoutType[EditorLayoutType["Widget"] = 2] = "Widget";
-        })(shell.EditorLayoutType || (shell.EditorLayoutType = {}));
-        var EditorLayoutType = shell.EditorLayoutType;
+        })(EditorLayoutType = shell.EditorLayoutType || (shell.EditorLayoutType = {}));
         var layoutType;
         function init() {
             if (layoutType !== undefined)
                 return;
             var sandbox = /sandbox=1|#sandbox|#sandboxproject/i.test(window.location.href)
+                // in iframe
                 || pxt.BrowserUtils.isIFrame();
             var nosandbox = /nosandbox=1/i.test(window.location.href);
             var layout = /editorlayout=(widget|sandbox|ide)/i.exec(window.location.href);
@@ -595,5 +595,4 @@ var pxt;
         shell.isReadOnly = isReadOnly;
     })(shell = pxt.shell || (pxt.shell = {}));
 })(pxt || (pxt = {}));
-/// <reference path="../typings/globals/bluebird/index.d.ts"/>
 /// <reference path="../built/pxtlib.d.ts"/>
