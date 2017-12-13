@@ -1,3 +1,119 @@
 /*******************************
      User Global Variables
 *******************************/
+
+@fontName  : 'Open Sans';
+
+@primaryColor: @blue;
+@secondaryColor: @pink;
+
+@red:#e74c3c;
+@yellow:#f1c40f;
+@teal:#08415C;
+@violet:#C200C0;
+@brown:#2E282A;
+@grey:#4d5055;
+
+@grey: #3C444A; /*#4c4b4d;*/ /*#1e1e1e;*/
+@darkGrey: #292F36; /*#2F2F2F;*/ /*#313638;*/
+
+
+@blue: #46D3EF;
+@red: #F6252D;
+@green: #00C29F;
+
+@green: #40bf4a; /*#00922B;*/
+@purple:#8073E5;
+@orange:#d25b33; /*#FFA702;*/
+
+@darkBlue: #1c1f2b;
+@darkGreen: #092C3A;
+
+
+@pageBackground: @blue;
+
+/*--------------
+   Form Input
+---------------*/
+
+@linkColor: #3eb1d0;
+
+/*******************************
+         PXT Overrides
+*******************************/
+
+/*-------------------
+   Menu
+--------------------*/
+
+@mainMenuInvertedBackground: @blue;
+@mainMenuTutorialBackground: @orange;
+
+@mainMenuBlocksJsToggleColor: @black;
+
+@tutorialSelectedMenuColor: @blue;
+
+/*-------------------
+   Layout
+--------------------*/
+
+@sideBarWidth: 22rem;
+@simulatorWidth: 24rem;
+@simulatorWidthSmall: 20rem;
+
+/*-------------------
+   Background
+--------------------*/
+
+@simulatorBackground: transparent;
+@editorToolsBackground: @simulatorBackground;
+@blocklySvgColor: transparent; /*#FE9D09;*/
+
+/*-------------------
+   Full screen
+--------------------*/
+
+@fullscreenBackgroundGradientStart: @mainMenuInvertedBackground;
+@fullscreenBackgroundGradientEnd: #fff;
+
+/*-------------------
+   Side Docs
+--------------------*/
+
+@sidedocsButtonsTop: (@mainMenuHeight + 1rem);
+@sidedocsButtonsRight: 4.25rem;
+
+/*-------------------
+   Editor
+--------------------*/
+
+@blocklyToolboxColor: transparent;
+@trashIconColor: @primaryColor;
+
+
+/*-------------------
+   Blockly
+--------------------*/
+
+@blocklyRowWidthWide: 160px;
+@blocklyRowWidthComputer: 140px;
+
+@blocklyScrollbarColor: lighten(@grey, 20%);
+@blocklyScrollbarOpacity: 0.5;
+
+
+/*-------------------
+   Scrollbars
+--------------------*/
+
+@thumbBackground: fade(@blocklyScrollbarColor, 50%);
+@thumbInvertedBackground: fade(@blocklyScrollbarColor, 50%);
+
+/*-------------------
+   Flyout
+--------------------*/
+
+@flyoutLabelColor: black;
+@blocklyFlyoutColor: #235E6F;
+@blocklyFlyoutColorOpacity: 1; /*0.9;*/
+@monacoFlyoutColor: fade(@blocklyFlyoutColor, @blocklyFlyoutColorOpacity);

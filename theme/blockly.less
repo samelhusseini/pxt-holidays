@@ -3,3 +3,62 @@
 @import 'site/globals/site.variables';
 
 @import 'blockly-core';
+@import 'fieldeditors';
+
+/* Reference import */
+@import (reference) "semantic.less";
+
+/* Specifying rounded toolbox borders. */
+div.blocklyTreeRow {
+    border-left-width: 4px !important;
+    padding-left: 4px !important;
+}
+
+/* Blockly Text */
+span.blocklyTreeLabel {
+    font-family: "Gotham SSm A","Gotham SSm B","Montserrat","Lucida Grande","Lucida Sans Unicode","Lucida Sans",Geneva,Verdana,sans-serif  !important;
+    text-transform: uppercase !important;
+    font-size:1rem !important;
+}
+
+/* Toolbox */
+.blocklyToolboxDiv, .monacoToolboxDiv {
+    
+}
+
+.blocklyTreeRow.blocklyHorizontalTree {
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    margin: 0 2px;
+    min-height: 50px;
+    text-align: center;
+}
+
+/* Search box */
+#blocklySearchArea {
+    margin: 0.5rem;
+    margin-top: 0.1rem;
+}
+.blocklySearchInputField {
+    border: 1px solid @darkGrey !important;
+    border-radius: 2.5rem !important;
+}
+.blocklySearchInputField:focus {
+    border: 1px solid @blue !important;
+}
+
+/* Mobile */
+@media only screen and (max-width: @largestMobileScreen) {
+    #filelist {
+        background: transparent;
+    }
+    div.blocklyTreeRow {
+        padding-left: 0px !important;
+    }
+    #blocklyTrashIcon {
+        margin: 0.2rem;
+    }
+    .blocklyToolboxDiv, .monacoToolboxDiv, .blocklyAddPackageDiv {
+        padding: 0.2rem;
+    }
+}

@@ -11,18 +11,16 @@
         "libs/core"
     ],
     "runtime": {
-      "mathBlocks": true,
+      "mathBlocks": false,
       "loopsBlocks": false,
-      "logicBlocks": true,
-      "variablesBlocks": true,
-      "functionBlocks": true,
-      "onStartUnDeletable": true,
+      "logicBlocks": false,
+      "variablesBlocks": false,
+      "functionBlocks": false,
+      "onStartWeight": 100,
       "onStartNamespace": "loops"
     },
     "simulator": {
-        "autoRun": false,
-        "stopOnChange": true,
-        "headless": true
+        "autoRun": true
     },
     "appTheme": {
         "logoUrl": "https://holidays.pxt.io/",
@@ -41,19 +39,19 @@
             }
         ],
         "coloredToolbox": true,
+        "invertedToolbox": true,
         "monacoToolbox": true,
         "invertedMenu": true,
         "invertedMonaco": true,
         "blocklyOptions": { 
             "grid": {
-                "spacing": 45,
-                "length": 7,
-                "colour": "rgba(189, 195, 199, 0.30)",
-                "snap": true
             },
             "zoom": {
-                "startScale": 1.0
-            }
+                "startScale": 0.8,
+                "maxScale": 1.1
+            },
+            "trashcan": true,
+            "hasCategories": false
         },
         "blockColors": {
             "loops": "#27ae60",
@@ -63,19 +61,20 @@
             "functions": "#2c3e50"
         },
         "blocklyColors": {
-            "insertionMarker": "#FFFFFF",
+            "insertionMarker": "#9A6F62",
             "insertionMarkerOpacity": 0.5
         },
-        "simAnimationEnter": "rotate in",
-        "simAnimationExit": "rotate out",
+        "simAnimationEnter": "fly in right",
+        "simAnimationExit": "fly out right",
         "allowParentController": true,
         "hideCookieNotice": true,
         "hideMenuBar": true,
         "hideEditorToolbar": true,
-        "hideFlyoutHeadings": false,
+        "hideFlyoutHeadings": true,
         "extendEditor": true,
         "disableBlockIcons": true,
-        "noReloadOnUpdate": true
+        "noReloadOnUpdate": true,
+        "defaultBlockGap": 8
     },
     "compile" : {
         "onStartText": true,

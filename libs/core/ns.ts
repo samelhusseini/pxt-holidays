@@ -1,15 +1,56 @@
-/**
- * Basic functionalities.
- */
-//% color=#00BCD4 weight=100
-namespace turtle {
+//% color=#27ae60 weight=80
+namespace loops {
 
 }
 
-/**
- * Control flow
- */
-//% color=#FF5722 weight=90
-namespace control {
+//% color=#E55934 weight=100
+namespace card {
 
+    /**
+     * Get the color wheel field editor
+     * @param color color, eg: #ff0000
+     */
+    //% blockId=colorNumberPicker block="%value"
+    //% blockHidden=true
+    //% shim=TD_ID colorSecondary="#FFFFFF"
+    //% value.fieldEditor="colornumber" value.fieldOptions.decompileLiterals=true
+    //% value.defl='#ff0000'
+    export function colorNumberPicker(value: number) {
+        return value;
+    }
+
+    /**
+     * Get the color wheel field editor
+     * @param value value between 0 to 255 to get a color value, eg: 10
+     */
+    //% blockId=colorWheelPicker block="%value"
+    //% blockHidden=true
+    //% shim=TD_ID colorSecondary="#FFFFFF"
+    //% value.fieldEditor="colorwheel" value.fieldOptions.decompileLiterals=true
+    //% value.fieldOptions.sliderWidth='200'
+    //% value.fieldOptions.min=0 value.fieldOptions.max=255
+    export function colorWheelPicker(value: number) {
+        return value;
+    }
+
+    /**
+     * Get the color wheel field editor
+     * @param color color, eg: #ff0000
+     */
+    //% blockId=colorPicker block="%value"
+    //% blockHidden=true
+    //% shim=TD_ID colorSecondary="#FFFFFF"
+    //% value.fieldEditor="colorpicker" value.fieldOptions.decompileLiterals=true
+    //% value.defl='#ff0000'
+    export function colorPicker(value: string) {
+        return value;
+    }
+}
+
+/**
+ * Control the lights.
+ */
+//% color=#3498db weight=90
+namespace lights {
+    
 }

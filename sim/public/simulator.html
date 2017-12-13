@@ -14,10 +14,22 @@
     <script src="/cdn/bluebird.min.js"></script>
     <script src="/cdn/pxtsim.js"></script>
     <script src="/sim/sim.js"></script>
+    <script src="/cdn/phaser/phaser.min.js"></script>
+
+    <style>
+        body {
+            background: white;
+        }
+        #inner-card {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
 </head>
 
 <body>
-    <svg id='svgcanvas' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 280">
-        <circle id='svgsprite' cx="100" cy="100" r="50" class="sprite" />
-    </svg>
+    <div id="inner-card"></div>
 </body>
