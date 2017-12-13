@@ -19849,6 +19849,7 @@ var MainApp = /** @class */ (function (_super) {
             this.sendMessage("proxytosim", {
                 type: "showmaineditor"
             });
+            this.resize();
             this.stopSharing();
         }
         setTimeout(function () {
