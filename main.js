@@ -1068,6 +1068,8 @@ var ProjectView = /** @class */ (function (_super) {
         var files = Util.clone(options.prj.files);
         if (options.filesOverride)
             Util.jsonCopyFrom(files, options.filesOverride);
+        if (options.dependencies)
+            Util.jsonMergeFrom(cfg.dependencies, options.dependencies);
         files["pxt.json"] = JSON.stringify(cfg, null, 4) + "\n";
         return workspace.installAsync({
             name: cfg.name,
@@ -7059,15 +7061,24 @@ Object.defineProperty(exports, "__esModule", { value: true });
 function parseExampleMarkdown(name, md) {
     if (!md)
         return undefined;
-    var m = /```(blocks?|typescript)\s*((.|\s)+?)\s*```/i.exec(md);
+    var m = /```(blocks?|typescript)\s+((.|\s)+?)\s*```/i.exec(md);
     if (!m)
         return undefined;
+    var pm = /```package\s+((.|\s)+?)\s*```/i.exec(md);
+    var dependencies = undefined;
+    if (pm) {
+        dependencies = {};
+        pm[1].split('\n').map(function (s) { return s.replace(/\s*/g, ''); }).filter(function (s) { return !!s; })
+            .map(function (l) { return l.split('='); })
+            .forEach(function (kv) { return dependencies[kv[0]] = kv[1] || "*"; });
+    }
     return {
         name: name,
         filesOverride: {
             "main.blocks": "<xml xmlns=\"http://www.w3.org/1999/xhtml\"></xml>",
             "main.ts": m[2]
-        }
+        },
+        dependencies: dependencies
     };
 }
 function parseGalleryMardown(md) {

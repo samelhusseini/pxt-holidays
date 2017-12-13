@@ -5325,6 +5325,14 @@ var ts;
                 ThumbProcessor.prototype.peephole = function (ln, lnNext, lnNext2) {
                     var lb11 = this.encoders["$lb11"];
                     var lb = this.encoders["$lb"];
+                    // +/-8 bytes is because the code size can slightly change due to .balign directives
+                    // inserted by literal generation code; see https://github.com/Microsoft/pxt-adafruit/issues/514
+                    // Most likely 4 would be enough, but we play it safe
+                    function fits(enc, ln) {
+                        return (enc.encode(ln.numArgs[0] + 8) != null &&
+                            enc.encode(ln.numArgs[0] - 8) != null &&
+                            enc.encode(ln.numArgs[0]) != null);
+                    }
                     var lnop = ln.getOp();
                     var isSkipBranch = false;
                     if (lnop == "bne" || lnop == "beq") {
@@ -5333,7 +5341,7 @@ var ts;
                         if (lnNext.getOp() == "bb" && ln.numArgs[0] == 2)
                             isSkipBranch = true;
                     }
-                    if (lnop == "bb" && lb11.encode(ln.numArgs[0]) != null) {
+                    if (lnop == "bb" && fits(lb11, ln)) {
                         // RULE: bb .somewhere -> b .somewhere (if fits)
                         ln.update("b " + ln.words[1]);
                     }
@@ -5341,12 +5349,12 @@ var ts;
                         // RULE: b .somewhere; .somewhere: -> .somewhere:
                         ln.update("");
                     }
-                    else if (lnop == "bne" && isSkipBranch && lb.encode(lnNext.numArgs[0]) != null) {
+                    else if (lnop == "bne" && isSkipBranch && fits(lb, lnNext)) {
                         // RULE: bne .next; b .somewhere; .next: -> beq .somewhere
                         ln.update("beq " + lnNext.words[1]);
                         lnNext.update("");
                     }
-                    else if (lnop == "beq" && isSkipBranch && lb.encode(lnNext.numArgs[0]) != null) {
+                    else if (lnop == "beq" && isSkipBranch && fits(lb, lnNext)) {
                         // RULE: beq .next; b .somewhere; .next: -> bne .somewhere
                         ln.update("bne " + lnNext.words[1]);
                         lnNext.update("");
@@ -11640,7 +11648,7 @@ var ts;
                     m = /^:..(....)00/.exec(hex[i]);
                     if (m) {
                         var newAddr = parseInt(upperAddr + m[1], 16);
-                        if (newAddr >= 0x3C000)
+                        if (opts.flashUsableEnd && newAddr >= opts.flashUsableEnd)
                             hitEnd();
                         lastIdx = i;
                         lastAddr = newAddr;
