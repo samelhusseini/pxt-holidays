@@ -19617,7 +19617,7 @@ var MainApp = /** @class */ (function (_super) {
         var shareButton = document.getElementById('share-button');
         if (shareButton) {
             shareButton.style.top = newTop + newHeight + 15 + "px";
-            shareButton.style.left = left + newWidth - 200 + "px";
+            shareButton.style.left = left + newWidth - 170 + "px";
         }
     };
     MainApp.prototype.toggleTrace = function () {
