@@ -2611,6 +2611,7 @@ var Editor = /** @class */ (function (_super) {
         var flyoutOnly = !this.editor.toolbox_ && this.editor.flyout_;
         this.editor.getTopBlocks(false).forEach(function (b) {
             var tp = b.getBoundingRectangle().topLeft;
+            console.log(tp);
             if (minX === undefined || tp.x < minX) {
                 minX = tp.x;
             }
@@ -2619,7 +2620,7 @@ var Editor = /** @class */ (function (_super) {
             }
             needsLayout = needsLayout || (b.type != ts.pxtc.ON_START_TYPE && tp.x == 0 && tp.y == 0);
         });
-        if (needsLayout) {
+        if (needsLayout && !flyoutOnly) {
             // If the blocks file has no location info (e.g. it's from the decompiler), format the code.
             pxt.blocks.layout.flow(this.editor, { useViewWidth: true });
         }

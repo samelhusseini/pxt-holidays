@@ -19567,44 +19567,6 @@ var MainApp = /** @class */ (function (_super) {
         window.addEventListener("resize", this.resize.bind(this), false);
         this.resize();
     };
-    // resize(setHeight?: number) {
-    //     const fullHeight = window.innerHeight;
-    //     const fullWidth = window.innerWidth;
-    //     const additionalTopPadding = 40;
-    //     const defaultPadding = 15;
-    //     const maxHeight = fullHeight / (this.state.isSharing ? 1.5 : 2) - (defaultPadding * 2) - (additionalTopPadding);
-    //     let ratio = 0.4;
-    //     let hasTop = false;
-    //     let newWidth = fullWidth / 2;
-    //     let newHeight = newWidth / 4 * 3;
-    //     if (newHeight > maxHeight) {
-    //         newHeight = maxHeight;
-    //         newWidth = (newHeight / 3 * 4);
-    //         hasTop = true;
-    //     }
-    //     // Center the frame
-    //     const left = (fullWidth / 2) - (newWidth / 2);
-    //     const top = (fullHeight / 4) - (newHeight / 2);
-    //     const contentFrame = document.getElementById('contentFrame');
-    //     contentFrame.style.height = `${newHeight}px`;
-    //     contentFrame.style.width = `${newWidth}px`;
-    //     contentFrame.style.left = `${left}px`;
-    //     const newTop = hasTop ? top + additionalTopPadding / 2 : defaultPadding + additionalTopPadding;
-    //     contentFrame.style.top = `${newTop}px`;
-    //     // Resize the editor workspace
-    //     const scale = 0.3 + (fullWidth / 1000 * 0.3);
-    //     this.sendMessage("setscale", {
-    //         scale: scale
-    //     });
-    //     const innerCard = document.getElementById('inner-card');
-    //     this.sendMessage("proxytosim", {
-    //         type: "resize",
-    //         top: newTop + innerCard.offsetTop + 15,
-    //         left: left + innerCard.offsetLeft + 15,
-    //         width: innerCard.offsetWidth + 20,
-    //         height: innerCard.offsetHeight + 20
-    //     });
-    // }
     MainApp.prototype.isSharing = function () {
         return this.state.isSharing;
     };
@@ -19646,6 +19608,17 @@ var MainApp = /** @class */ (function (_super) {
             width: innerCard.offsetWidth + 20,
             height: innerCard.offsetHeight + 20
         });
+        // Resize the play button
+        var playButton = document.getElementById('play-button');
+        if (playButton) {
+            playButton.style.top = newTop + newHeight + 15 + "px";
+            playButton.style.left = left + 10 + "px";
+        }
+        var shareButton = document.getElementById('share-button');
+        if (shareButton) {
+            shareButton.style.top = newTop + newHeight + 15 + "px";
+            shareButton.style.left = left + newWidth - 200 + "px";
+        }
     };
     MainApp.prototype.toggleTrace = function () {
         this.sendMessage("toggletrace", {});
@@ -19849,7 +19822,9 @@ var MainApp = /** @class */ (function (_super) {
             this.sendMessage("proxytosim", {
                 type: "showmaineditor"
             });
-            this.resize();
+            this.sendMessage("proxytosim", {
+                type: "showmaineditor"
+            });
             this.stopSharing();
         }
         setTimeout(function () {
@@ -19960,15 +19935,12 @@ var MainApp = /** @class */ (function (_super) {
                     React.createElement("div", { className: "frame" },
                         React.createElement("div", { id: "inner-card", className: "inner-card" }))),
                 React.createElement("div", { className: "right-back" }),
-                !isSharing && !loadShareURL ? React.createElement("div", { className: "sim-buttons" },
-                    React.createElement(semantic_ui_react_1.Grid, { divided: true, inverted: true, stackable: true, centered: true },
-                        React.createElement(semantic_ui_react_1.Grid.Row, null,
-                            React.createElement(semantic_ui_react_1.Grid.Column, { width: 8, textAlign: "center" },
-                                React.createElement("div", { className: "play-button" },
-                                    React.createElement(semantic_ui_react_1.Button, { color: "green", circular: true, size: "massive", icon: 'play', onClick: this.play.bind(this) }))),
-                            React.createElement(semantic_ui_react_1.Grid.Column, { width: 8, textAlign: "center" },
-                                React.createElement("div", { className: "share-button" },
-                                    React.createElement(semantic_ui_react_1.Button, { color: "red", circular: true, size: "huge", icon: 'right arrow', labelPosition: 'right', content: 'Share', onClick: this.toggleSharing.bind(this) })))))) : undefined,
+                !isSharing && !loadShareURL ?
+                    React.createElement("div", { id: "play-button" },
+                        React.createElement(semantic_ui_react_1.Button, { color: "green", circular: true, size: "massive", icon: 'play', onClick: this.play.bind(this) })) : undefined,
+                !isSharing && !loadShareURL ?
+                    React.createElement("div", { id: "share-button" },
+                        React.createElement(semantic_ui_react_1.Button, { color: "red", circular: true, size: "huge", icon: 'right arrow', labelPosition: 'right', content: 'Share', onClick: this.toggleSharing.bind(this) })) : undefined,
                 isSharing && shareURL ? React.createElement("div", { className: "sharing-dialog ui container text" },
                     React.createElement(semantic_ui_react_1.Form, { size: 'huge' },
                         React.createElement(semantic_ui_react_1.Form.Field, null,
