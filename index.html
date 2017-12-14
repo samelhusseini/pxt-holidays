@@ -1,218 +1,199 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="en" manifest="/pxt-holidays/release.manifest" data-framework="typescript">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-
-    <title>MakeCode for Holidays</title>
-    <meta name="description" content="Code your own Holiday Card this season and share with family and friends!" />
-    <meta property="og:title" content="Happy Holidays from Microsoft MakeCode" />
-    <meta property="og:site_name" content="MakaCode for Holidays" />
-    <meta property="og:description" content="Code your own Holiday Card this season and share with family and friends!" />
-    <meta property="og:image" content="https://microsoftsam.github.io/pxt-holidays/docs/static/cardlogo.png" />
-
-    <meta name="twitter:card" content="Code your own Holiday Card this season and share with family and friends!" />
-    <meta name="twitter:site" content="https://microsoftsam.github.io/pxt-holidays/controller.html" />
-    <meta name="twitter:title" content="Happy Holidays from Microsoft MakeCode" />
-    <meta name="twitter:description" content="Code your own Holiday Card this season and share with family and friends!" />
-    <meta name="twitter:image" content="https://microsoftsam.github.io/pxt-holidays/docs/static/cardlogo.png" />
-
     <meta name="viewport" content="width=device-width,height=device-height,user-scalable=no,initial-scale=1.0,maximum-scale=1.0,minimum-scale=1.0">
-    <title></title>
 
+    
+<!-- include appmeta.html -->
+
+<!-- include robotsmeta.html -->
+
+<!-- end include robotsmeta.html -->
+
+<title>MakeCode Holidays</title>
+<meta name="description" content="" />
+<link rel="manifest" href="/pxt-holidays/sim.webmanifest">
+
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="MakeCode Holidays">
+<meta name="apple-mobile-web-app-status-bar-style" content="translucent-black">
+<meta name="format-detection" content="telephone=no">
+<meta name="application-name" content="MakeCode Holidays">
+
+<meta name="msapplication-TileColor" content="">
+<meta name="msapplication-TileImage" content="">
+<meta name="msapplication-config" content="/static/icons/browserconfig.xml">
+<meta name="theme-color" content="">
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:site" content="" />
+<meta name="twitter:title" content="MakeCode Holidays" />
+<meta name="twitter:description" content="" />
+<meta name="twitter:image" content="" />
+
+<meta property="og:title" content="MakeCode Holidays" />
+<meta property="og:site_name" content="MakeCode Holidays" />
+<meta property="og:description" content="" />
+<meta property="og:image" content="" />
+
+<link rel="apple-touch-icon" href="">
+<link rel="icon" type="image/png" href="">
+<link rel="shortcut icon" href="">
+
+<!-- end include appmeta.html -->
+
+
+    <link id="blocklycss" rel="stylesheet" data-rtl="/pxt-holidays/rtlblockly.css" href="/pxt-holidays/blockly.css" type="text/css">
+    <link rel="stylesheet" data-rtl="/pxt-holidays/rtlsemantic.css" href="/pxt-holidays/semantic.css" type="text/css">
     <style type="text/css">
-        @import "./semantic.css";
+        @import "/pxt-holidays/custom.css";
+        @import "/pxt-holidays/icons.css";
     </style>
-
-    <style>
-        #root,
-        #iframe {
-            position: absolute;
-            left: 0;
-            top: 0rem;
-            width: 100%;
-            height: 100%;
-            border: 0;
-        }
-
-        #root {
-            background: #2c3e50;
-        }
-
-        .pushable>.pusher {
-            background: #46D3EF;
-            /*#55D7F3;*/
-        }
-
-        #iframe {
-            top: 0;
-            max-height: 100%;
-            -moz-user-select: none;
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        .over {
-            z-index: 10;
-        }
-
-        .card-content {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            right: 0;
-            bottom: 0;
-        }
-
-        .sharing-dialog {
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 25%;
-            bottom: 0;
-        }
-
-        .sharing-footer {
-            position: absolute !important;
-            bottom: 4rem !important;
-            left: 0 !important;
-            right: 0 !important;
-            text-align: center;
-        }
-
-        .shadow {
-            position: relative;
-            border: solid 0.7rem black;
-            height: 100%;
-            opacity: .15;
-            top: 8px;
-            left: 8px;
-            border-radius: 2px;
-        }
-
-        .frame {
-            position: absolute;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            border: 20px solid white;
-            padding: 0;
-            border-radius: 2px;
-            background: white;
-        }
-
-        .inner-card {
-            width: 100%;
-            height: 100%;
-        }
-
-        .sim-buttons {
-            text-align: center;
-            position: absolute;
-            width: 50%;
-            z-index: 100;
-            bottom: 35%;
-            right: 0;
-        }
-
-        .back-button {
-            position: absolute;
-            z-index: 100;
-            top: 50%;
-            left: 2rem;
-        }
-
-        #play-button,
-        #share-button {
-            position: absolute;
-            z-index: 100;
-        }
-
-        .left-back {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            background-image: url('./docs/static/left-back.svg');
-            background-size: cover;
-            width: 200px;
-            height: 300px;
-            z-index: 1;
-        }
-
-        .loading-screen {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            left: 0;
-            background: black;
-            z-index: 100;
-        }
-
-        .cookie-msg {
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            z-index: 10000;
-            font-size: 13px;
-            max-width: 45%;
-            background: #2c3e50;
-            color: white;
-            padding: 10px;
-            border-radius: 3px;
-        }
-
-        .cookie-msg .close {
-            float: right;
-            cursor: pointer;
-            color: white;
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/JQuery-Snowfall/1.7.4/snowfall.min.js"></script>
-    <script>
-        function foo(response) {
-            var meta = response.meta;
-            var data = response.data;
-            console.log(meta);
-            console.log(data);
-        }
-    </script>
 </head>
 
-<body>
-    <div id="root"></div>
+<body class="main">
+    <div id='loading' class="ui active dimmer">
+        <div class="ui large loader"></div>
+    </div>
 
-    <!-- Dependencies -->
-    <script src="./react/react.min.js"></script>
-    <script src="./react/react-dom.min.js"></script>
+    <div id='custom-content'>
+    </div>
 
-    <script type="text/javascript" src="./tonejs/tone.min.js"></script>
+    <div id='content' class="ui dimmable full-abs">
+    </div>
 
-    <!-- Main -->
-    <script src="./site/main_bundle.js"></script>
+    <div id='msg' aria-live="polite">
+        <div id='errmsg' class="ui red inverted segment"></div>
+        <div id='warnmsg' class="ui orange inverted segment"></div>
+        <div id='infomsg' class="ui teal inverted segment"></div>
+        <div id='compilemsg' class="ui ignored info message"></div>
+    </div>
 
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-109929105-1"></script>
     <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-
-        gtag('config', 'UA-109929105-1');
+        // This line gets patched up by the cloud
+        var pxtConfig = {
+    "relprefix": "/pxt-holidays/",
+    "workerjs": "/pxt-holidays/worker.js",
+    "tdworkerjs": "/pxt-holidays/tdworker.js",
+    "monacoworkerjs": "/pxt-holidays/monacoworker.js",
+    "pxtVersion": "3.0.1",
+    "pxtRelId": "",
+    "pxtCdnUrl": "/pxt-holidays/",
+    "commitCdnUrl": "/pxt-holidays/",
+    "blobCdnUrl": "/pxt-holidays/",
+    "cdnUrl": "/pxt-holidays/",
+    "targetVersion": "0.0.0",
+    "targetRelId": "",
+    "targetUrl": "",
+    "targetId": "holidays",
+    "simUrl": "/pxt-holidays/simulator.html",
+    "partsUrl": "/pxt-holidays/siminstructions.html",
+    "runUrl": "/pxt-holidays/run.html",
+    "docsUrl": "/pxt-holidays/docs.html",
+    "isStatic": true
+};
     </script>
+    
+<!-- include apptracking.html -->
 
-    <script type="text/javascript">
-        window._urq = window._urq || [];
-        _urq.push(['initSite', 'becd27b4-7952-40fd-8073-4d03598a34df']);
-        (function () {
-            var ur = document.createElement('script'); ur.type = 'text/javascript'; ur.async = true;
-            ur.src = ('https:' == document.location.protocol ? 'https://cdn.userreport.com/userreport.js' : 'http://cdn.userreport.com/userreport.js');
-            var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ur, s);
-        })();
+<!-- include tracking.html -->
+<script type="text/javascript">
+    var appInsights=window.appInsights||function(config){
+        function i(config){t[config]=function(){var i=arguments;t.queue.push(function(){t[config].apply(t,i)})}}var t={config:config},u=document,e=window,o="script",s="AuthenticatedUserContext",h="start",c="stop",l="Track",a=l+"Event",v=l+"Page",y=u.createElement(o),r,f;y.src=config.url||"https://az416426.vo.msecnd.net/scripts/a/ai.0.js";u.getElementsByTagName(o)[0].parentNode.appendChild(y);try{t.cookie=u.cookie}catch(p){}for(t.queue=[],t.version="1.0",r=["Event","Exception","Metric","PageView","Trace","Dependency"];r.length;)i("track"+r.pop());return i("set"+s),i("clear"+s),i(h+a),i(c+a),i(h+v),i(c+v),i("flush"),config.disableExceptionTracking||(r="onerror",i("_"+r),f=e[r],e[r]=function(config,i,u,e,o){var s=f&&f(config,i,u,e,o);return s!==!0&&t["_"+r](config,i,u,e,o),s}),t
+    }({
+        instrumentationKey:"9801ed01-c40f-46ec-aa40-2a1742a9e71c",
+        disableAjaxTracking: true,
+        overridePageViewDuration: false,
+        disableExceptionTracking: true,
+        isCookieUseDisabled: true,
+        isStorageUseDisabled: true
+    });
+    window.appInsights=appInsights;
+    appInsights.queue.push(function () {
+        appInsights.context.addTelemetryInitializer(function (envelope) {
+            if (typeof pxtConfig === "undefined") return;
+            var telemetryItem = envelope.data.baseData;
+            telemetryItem.properties = telemetryItem.properties || {};
+            telemetryItem.properties["target"] = pxtConfig.targetId;
+            telemetryItem.properties["version"] = pxtConfig.targetVersion;
+            telemetryItem.properties["stage"] = (pxtConfig.relprefix || "/--").replace(/[^a-z]/ig, '')
+            if (typeof window !== "undefined" && window.location && /[?&]electron=1/i.test(window.location.href))
+                telemetryItem.properties["electron"] = 1;
+            if (typeof Windows !== "undefined")
+                telemetryItem.properties["WindowsApp"] = 1;
+        });
+    });
+    appInsights.trackPageView(null, scrubUrl(window.location.toString()), {urlReferrer: scrubUrl(document.referrer.toString())});
+
+    var scriptIdRegex = /(?:\d{5}-\d{5}-\d{5}-\d{5})|(?:_[0-9a-zA-Z]{12})/g;
+    function scrubUrl(url) {
+        return url.replace(scriptIdRegex, "xxxxx-xxxxx-xxxxx-xxxxx");
+    }
+</script>
+
+<!-- end include tracking.html -->
+
+
+<!-- end include apptracking.html -->
+
+    <!-- patch to load JS in electron -->
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script type="text/javascript" src="/pxt-holidays/jquery.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/blockly_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/blocks_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/blockly/msg/js/en.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/smoothie/smoothie_compressed.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/semantic.js"></script>
+    <!-- unpatch to load JS in electron -->
+    <script>if (window.module) module = window.module;</script>
+
+    <script type="text/javascript" src="/pxt-holidays/pxtlib.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtblocks.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtwinrt.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxteditor.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/pxtsim.js"></script>
+    <script type="text/javascript" src="/pxt-holidays/target.js"></script>
+    <script id="mainscript" type="text/javascript" src="/pxt-holidays/main.js"></script>
+    <xml id="blocklyToolboxDefinitionCategory" style="display: none">
+        <!-- An empty category is required so that Blockly launches in category mode -->
+        <category name="">
+        </category>
+    </xml>
+    <xml id="blocklyToolboxDefinitionFlyout" style="display: none">
+    </xml>
+    <script>
+        // Before loading vs/editor/editor.main, define a global MonacoEnvironment that overwrites
+        // the default worker url location (used when creating WebWorkers). The problem here is that
+        // HTML5 does not (yet) allow cross-domain web workers, so we need to proxy the instantion of
+        // a web worker through a same-domain script
+        window.MonacoEnvironment = {
+            getWorkerUrl: function(workerId, label) {
+                return pxt.webConfig.monacoworkerjs;
+            }
+        };
+
+        // this get rewritten to blob URLs with SHAs while uploading to the cloud
+        // keep in sync with release.manifest
+        window.MonacoPaths = {
+            "vs/loader": "/pxt-holidays/vs/loader.js",
+            "vs/base/worker/workerMain": "/pxt-holidays/vs/base/worker/workerMain.js",
+            "vs/basic-languages/src/bat": "/pxt-holidays/vs/basic-languages/src/bat.js",
+            "vs/basic-languages/src/cpp": "/pxt-holidays/vs/basic-languages/src/cpp.js",
+            "vs/editor/editor.main.css": "/pxt-holidays/vs/editor/editor.main.css",
+            "vs/editor/editor.main": "/pxt-holidays/vs/editor/editor.main.js",
+            "vs/editor/editor.main.nls": "/pxt-holidays/vs/editor/editor.main.nls.js",
+            "vs/language/json/jsonMode": "/pxt-holidays/vs/language/json/jsonMode.js",
+            "vs/language/json/jsonWorker": "/pxt-holidays/vs/language/json/jsonWorker.js",
+            "vs/language/typescript/lib/typescriptServices": "/pxt-holidays/vs/language/typescript/lib/typescriptServices.js",
+            "vs/language/typescript/src/mode": "/pxt-holidays/vs/language/typescript/src/mode.js",
+            "vs/language/typescript/src/worker": "/pxt-holidays/vs/language/typescript/src/worker.js",
+            "lzma/lzma_worker-min.js": "/pxt-holidays/lzma/lzma_worker-min.js"
+        }
     </script>
-
 </body>
 
 </html>
