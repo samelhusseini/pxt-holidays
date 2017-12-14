@@ -19753,14 +19753,14 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.handleFacebook = function () {
         console.log("sharing with facebook");
-        ga('send', 'event', 'Sharing', 'facebook', 'Shared');
+        gtag('event', 'sharing', { 'method': 'facebook' });
         var url = window.location.href;
         var fbUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url);
         this.popupWindow(fbUrl, "Share on Facebook", 600, 600);
     };
     MainApp.prototype.handleTwitter = function () {
         console.log("sharing with twitter");
-        ga('send', 'event', 'Sharing', 'twitter', 'Shared');
+        gtag('event', 'sharing', { 'method': 'twitter' });
         var url = window.location.href;
         var twitterText = "Check out what I made with @MSMakeCode (experimental)!";
         var twitterUrl = "https://twitter.com/intent/tweet?url=" + encodeURIComponent(url) +
@@ -19854,7 +19854,7 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.publishGist = function () {
         var _this = this;
-        ga('send', 'event', 'Sharing', 'publish', 'Shared');
+        gtag('event', 'sharing', { 'method': 'gist' });
         var data = {
             "description": 'My MakeCode Holiday project',
             "public": false,
