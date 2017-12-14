@@ -19515,7 +19515,7 @@ var MainApp = /** @class */ (function (_super) {
         _this.background = "FE6666";
         _this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
         _this.showLights = false;
-        var hasCookie = _this.readCookie("cookie-msg");
+        var hasCookie = _this.readCookie("makecode-holiday-cookie-msg");
         var shareURL = window.location.hash ? window.location.hash.substring(3) : undefined;
         _this.state = {
             isLoading: true,
@@ -19928,7 +19928,7 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.closeCookie = function () {
         this.setState({ cookieMsg: true });
-        this.createCookie("cookie-msg", "true", 30);
+        this.createCookie("makecode-holiday-cookie-msg", "true", 30);
     };
     MainApp.prototype.render = function () {
         var _this = this;
