@@ -19742,6 +19742,7 @@ var MainApp = /** @class */ (function (_super) {
         }
     };
     MainApp.prototype.startOver = function () {
+        gtag('event', 'startover', { 'method': 'sim' });
         if (this.isSharing())
             this.toggleSharing();
         this.initDefaultProject();
@@ -19838,6 +19839,7 @@ var MainApp = /** @class */ (function (_super) {
         }, 300);
     };
     MainApp.prototype.play = function () {
+        gtag('event', 'play', { 'method': 'sim' });
         this.sendMessage("startsimulator", {});
     };
     MainApp.prototype.copy = function () {
@@ -19977,6 +19979,7 @@ var MainApp = /** @class */ (function (_super) {
                     React.createElement("div", { id: "share-button" },
                         React.createElement(semantic_ui_react_1.Button, { color: "red", circular: true, size: "huge", icon: 'right arrow', labelPosition: 'right', content: 'Share', onClick: this.toggleSharing.bind(this) })) : undefined,
                 isSharing && shareURL ? React.createElement("div", { className: "sharing-dialog ui container text" },
+                    React.createElement("p", { className: "ui inverted segment", style: { fontSize: '20px', textAlign: 'center' } }, "Copy the link below and share it with family and friends!"),
                     React.createElement(semantic_ui_react_1.Form, { size: 'huge' },
                         React.createElement(semantic_ui_react_1.Form.Field, null,
                             React.createElement(semantic_ui_react_1.Input, { label: React.createElement(semantic_ui_react_1.Button, { content: 'Copy', color: 'green', onClick: this.copy.bind(this) }), labelPosition: 'right', id: "share-url", value: shareURL })))) : undefined,
