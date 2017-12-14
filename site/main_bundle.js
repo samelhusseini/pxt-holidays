@@ -19515,12 +19515,14 @@ var MainApp = /** @class */ (function (_super) {
         _this.background = "FE6666";
         _this.lightBuffer = ["0xffce54", "0xed5564", "0xa0d468"];
         _this.showLights = false;
+        var hasCookie = _this.readCookie("cookie-msg");
         var shareURL = window.location.hash ? window.location.hash.substring(3) : undefined;
         _this.state = {
             isLoading: true,
             loadShareURL: shareURL,
             shareURL: undefined,
-            isSharing: !!shareURL
+            isSharing: !!shareURL,
+            cookieMsg: !!hasCookie
         };
         _this.initDefaultProject();
         _this.filters = {
@@ -19896,18 +19898,50 @@ var MainApp = /** @class */ (function (_super) {
         return window.open(url, title, "resizable=no, copyhistory=no, " +
             ("width=" + width + ", height=" + height + ", top=" + ((screen.height / 2) - (height / 2)) + ", left=" + ((screen.width / 2) - (width / 2))));
     };
+    // Create cookie
+    MainApp.prototype.createCookie = function (name, value, days) {
+        var expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toGMTString();
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    };
+    // Read cookie
+    MainApp.prototype.readCookie = function (name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1, c.length);
+            }
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    };
+    MainApp.prototype.closeCookie = function () {
+        this.setState({ cookieMsg: true });
+        this.createCookie("cookie-msg", "true", 30);
+    };
     MainApp.prototype.render = function () {
         var _this = this;
-        var _a = this.state, sidebarVisible = _a.sidebarVisible, isLoading = _a.isLoading, isSharing = _a.isSharing, shareURL = _a.shareURL, loadShareURL = _a.loadShareURL, isCreditsOpen = _a.isCreditsOpen;
+        var _a = this.state, sidebarVisible = _a.sidebarVisible, isLoading = _a.isLoading, isSharing = _a.isSharing, shareURL = _a.shareURL, loadShareURL = _a.loadShareURL, isCreditsOpen = _a.isCreditsOpen, cookieMsg = _a.cookieMsg;
         return React.createElement(semantic_ui_react_1.Sidebar.Pushable, null,
             React.createElement(semantic_ui_react_1.Sidebar, { as: semantic_ui_react_1.Menu, animation: 'scale down', width: 'thin', visible: sidebarVisible, icon: 'labeled', vertical: true, inverted: true },
                 React.createElement(semantic_ui_react_1.Menu.Item, { name: 'home', onClick: function () { return _this.setState({ sidebarVisible: false }); } },
                     React.createElement(semantic_ui_react_1.Icon, { name: 'home' }),
                     "Home"),
-                React.createElement(semantic_ui_react_1.Menu.Item, { name: 'terms' },
+                React.createElement(semantic_ui_react_1.Menu.Item, { name: 'terms', onClick: function () { return window.open("https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx"); } },
                     React.createElement(semantic_ui_react_1.Icon, { name: 'legal' }),
                     "Terms"),
-                React.createElement(semantic_ui_react_1.Menu.Item, { name: 'privacy' },
+                React.createElement(semantic_ui_react_1.Menu.Item, { name: 'privacy', onClick: function () { return window.open("https://privacy.microsoft.com/en-us/privacystatement"); } },
                     React.createElement(semantic_ui_react_1.Icon, { name: 'privacy' }),
                     "Privacy Policy"),
                 React.createElement(semantic_ui_react_1.Menu.Item, { name: 'credits', onClick: function () { return _this.setState({ isCreditsOpen: true, sidebarVisible: false }); } },
@@ -19945,9 +19979,11 @@ var MainApp = /** @class */ (function (_super) {
                     React.createElement(semantic_ui_react_1.Form, { size: 'huge' },
                         React.createElement(semantic_ui_react_1.Form.Field, null,
                             React.createElement(semantic_ui_react_1.Input, { label: React.createElement(semantic_ui_react_1.Button, { content: 'Copy', color: 'green', onClick: this.copy.bind(this) }), labelPosition: 'right', id: "share-url", value: shareURL })))) : undefined,
-                isSharing ?
-                    React.createElement("div", null)
-                    : undefined,
+                !cookieMsg ?
+                    React.createElement("div", { className: "ui inline cookie-msg" },
+                        "By using this site you agree to the use of cookies for analytics. ",
+                        React.createElement("a", { href: "https://privacy.microsoft.com/en-us/privacystatement", target: "_blank" }, "Learn More"),
+                        React.createElement(semantic_ui_react_1.Icon, { name: "close", onClick: this.closeCookie.bind(this) })) : undefined,
                 isSharing ? React.createElement(semantic_ui_react_1.Segment, { className: "sharing-footer", inverted: true, vertical: true, style: { padding: '1em 0em' } },
                     React.createElement(semantic_ui_react_1.Container, null,
                         React.createElement(semantic_ui_react_1.Grid, { divided: true, inverted: true, stackable: true, centered: true },
