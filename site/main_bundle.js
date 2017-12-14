@@ -19667,6 +19667,7 @@ var MainApp = /** @class */ (function (_super) {
                             _this.loaded = true;
                             if (!_this.state.loadShareURL)
                                 _this.setState({ isLoading: false });
+                            gtag('event', 'lookup', { 'method': 'gist' });
                         });
                     }
                     else {
@@ -19753,14 +19754,14 @@ var MainApp = /** @class */ (function (_super) {
     };
     MainApp.prototype.handleFacebook = function () {
         console.log("sharing with facebook");
-        gtag('event', 'sharing', { 'method': 'facebook' });
+        gtag('event', 'sharingfb', { 'method': 'facebook' });
         var url = window.location.href;
         var fbUrl = "https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(url);
         this.popupWindow(fbUrl, "Share on Facebook", 600, 600);
     };
     MainApp.prototype.handleTwitter = function () {
         console.log("sharing with twitter");
-        gtag('event', 'sharing', { 'method': 'twitter' });
+        gtag('event', 'sharingtw', { 'method': 'twitter' });
         var url = window.location.href;
         var twitterText = "Check out what I made with @MSMakeCode (experimental)!";
         var twitterUrl = "https://twitter.com/intent/tweet?url=" + encodeURIComponent(url) +
