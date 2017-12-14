@@ -299,6 +299,9 @@ var ProjectView = /** @class */ (function (_super) {
         // (e.g. from the URL hash or from WinRT activation arguments)
         var skipStartScreen = pxt.appTarget.appTheme.allowParentController
             || window.location.hash == "#editor";
+        if (pxt.appTarget.appTheme.allowParentController && pxt.shell.layoutTypeClass() != 'widget') {
+            window.location.href = './controller.html';
+        }
         return !isSandbox && !skipStartScreen && !isProjectRelatedHash(hash);
     };
     ProjectView.prototype.updateVisibility = function () {

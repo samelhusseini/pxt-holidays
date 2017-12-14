@@ -19960,7 +19960,7 @@ var MainApp = /** @class */ (function (_super) {
                             React.createElement(semantic_ui_react_1.Icon, { name: 'twitter', size: "large", style: { color: '#00aced' } })),
                         React.createElement(semantic_ui_react_1.Menu.Item, { name: 'facebook', onClick: this.handleFacebook.bind(this) },
                             React.createElement(semantic_ui_react_1.Icon, { name: 'facebook', size: "large", style: { color: '#3b5998' } })))),
-                React.createElement("iframe", { ref: function (e) { return _this.editorFrame = e; }, id: "iframe", src: "index.html?editorlayout=ide" }),
+                React.createElement("iframe", { ref: function (e) { return _this.editorFrame = e; }, id: "iframe", src: "index.html?editorlayout=widget" }),
                 React.createElement("div", { className: "left-back" }),
                 isSharing ? React.createElement("div", { className: "back-button" },
                     React.createElement(semantic_ui_react_1.Button, { color: "purple", circular: true, size: "huge", icon: 'edit', labelPosition: 'left', content: 'Remix', onClick: this.toggleSharing.bind(this) })) : undefined,
