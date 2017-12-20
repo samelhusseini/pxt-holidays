@@ -46,6 +46,8 @@ pxt serve
 
 Normally, you would test your page from http://localhost:3232/index.html but since the editor is in "controller" mode, we would instead test it from a page were it's embedded in an iframe, use http://localhost:3232/controller.html instead.
 
+[Follow these instructions](site/README.md) to build and test the React site.
+
 After making a change in the source, refresh the page in the browser.
 
 ## Updating the tools
