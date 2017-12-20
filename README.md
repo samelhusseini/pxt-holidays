@@ -1,8 +1,8 @@
-# A "Holiday Card" sample target for a Microsoft MakeCode Editor
+# A "Holiday Card" target for a Microsoft MakeCode Editor
 
 This repo contains a "Holiday card" target built with Microsoft MakeCode (PXT). The editor is hosted on the GitHub pages at https://microsoftsam.github.io/pxt-holidays/controller.html
 
-The repo serves as a sample to anyone trying to integrate PXT into their own application without using the PXT frontend.
+The repo serves as a demonstration to anyone trying to integrate PXT into their own application without using the PXT frontend.
 
 Using the "editor controller" mode of PXT, you can embed PXT inside an iframe in your application and send and receive messages query project state and control PXT using a pre-defined protocol. 
 The protocol for communicating with PXT in that mode is defined here: 
@@ -10,8 +10,8 @@ https://github.com/Microsoft/pxt/blob/master/pxteditor/editorcontroller.ts
 
 This repo also contains a separate site built with React.js that demonstrates how to communicate with PXT. The site is built under /site. You would mostly likely not use this if you're trying to integrate PXT into your application.
 
-If you'd like to start your own editor, fork this repo and fix all the TODOs.
-- [ ] Fork repo and setup local server (see below)
+If you'd like to start your own editor, create a copy of this repo and fix all the TODOs.
+- [ ] Setup local server (see below)
 - [ ] [Follow these instructions](site/README.md) to build and test the React site.
 - [ ] Update metadata in ``pxtarget.json``. Change the id, title, name, etc... to your taste.
 - [ ] Update the JavaScript runtime in ``sim/simulator.ts``. If needed add additional JS library under ``sim/public/**``
@@ -22,7 +22,7 @@ and edit ``sim/public/simulator.html`` with additional ``script`` tags.
 
 ## Running locally
 
-These instructions allow to run locally to modify the sample.
+These instructions allow to run locally to modify this target.
 
 ## Setup
 
