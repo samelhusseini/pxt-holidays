@@ -4,7 +4,7 @@ This repo contains a "Holiday card" target built with Microsoft MakeCode (PXT). 
 
 The repo serves as a sample to anyone trying to integrate PXT into their own application without using the PXT frontend.
 
-Using the "editor controller" mode of PXT, you can embed PXT inside an iframe in your application and send and receive messages about project state using a pre-defined protocol. 
+Using the "editor controller" mode of PXT, you can embed PXT inside an iframe in your application and send and receive messages query project state and control PXT using a pre-defined protocol. 
 The protocol for communicating with PXT in that mode is defined here: 
 https://github.com/Microsoft/pxt/blob/master/pxteditor/editorcontroller.ts
 
