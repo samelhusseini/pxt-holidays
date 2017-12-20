@@ -77,9 +77,9 @@ declare const enum Icon {
     //% blockIdentity=main._iconPicker blockImage=1
     Hebrew1, 
     //% blockIdentity=main._iconPicker blockImage=1
-    Hebrew2,
+    Hebrew2
     //% blockIdentity=main._iconPicker blockImage=1
-    Hebrew3,
+    //Hebrew3,
     //% blockIdentity=main._iconPicker blockImage=1
-    Yarmulke
+    //Yarmulke
 }

@@ -6,13 +6,11 @@ import * as ReactDOM from "react-dom";
 
 import { Header, Menu, Icon, Button, Sidebar, Segment, Dimmer, Loader, Form, Input, Container, Grid, List, Modal } from "semantic-ui-react";
 
-import { MainSidebar } from "./sidebar";
-
 declare let snowFall: any;
 
 declare let Tone: any;
 
-declare let ga: any;
+declare let gtag: any;
 
 export interface MainAppProps {
 }
@@ -24,6 +22,7 @@ export interface MainAppState {
     shareURL?: string;
     loadShareURL?: string;
     isCreditsOpen?: boolean;
+    cookieMsg?: boolean;
 }
 
 export class MainApp extends React.Component<MainAppProps, MainAppState> {
@@ -41,13 +40,17 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     constructor(props: MainAppProps) {
         super(props);
 
+        const hasCookie = this.readCookie("makecode-holiday-cookie-msg");
+
         const shareURL = window.location.hash ? window.location.hash.substring(3) : undefined;
         this.state = {
             isLoading: true,
             loadShareURL: shareURL,
             shareURL: undefined,
-            isSharing: !!shareURL
+            isSharing: !!shareURL,
+            cookieMsg: !!hasCookie
         }
+
 
         this.initDefaultProject();
 
@@ -96,54 +99,6 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
         window.addEventListener("resize", this.resize.bind(this), false);
         this.resize();
     }
-
-    // resize(setHeight?: number) {
-    //     const fullHeight = window.innerHeight;
-    //     const fullWidth = window.innerWidth;
-
-    //     const additionalTopPadding = 40;
-    //     const defaultPadding = 15;
-    //     const maxHeight = fullHeight / (this.state.isSharing ? 1.5 : 2) - (defaultPadding * 2) - (additionalTopPadding);
-
-    //     let ratio = 0.4;
-    //     let hasTop = false;
-
-    //     let newWidth = fullWidth / 2;
-    //     let newHeight = newWidth / 4 * 3;
-
-    //     if (newHeight > maxHeight) {
-    //         newHeight = maxHeight;
-    //         newWidth = (newHeight / 3 * 4);
-    //         hasTop = true;
-    //     }
-
-    //     // Center the frame
-    //     const left = (fullWidth / 2) - (newWidth / 2);
-    //     const top = (fullHeight / 4) - (newHeight / 2);
-
-    //     const contentFrame = document.getElementById('contentFrame');
-    //     contentFrame.style.height = `${newHeight}px`;
-    //     contentFrame.style.width = `${newWidth}px`;
-    //     contentFrame.style.left = `${left}px`;
-    //     const newTop = hasTop ? top + additionalTopPadding / 2 : defaultPadding + additionalTopPadding;
-    //     contentFrame.style.top = `${newTop}px`;
-
-    //     // Resize the editor workspace
-
-    //     const scale = 0.3 + (fullWidth / 1000 * 0.3);
-    //     this.sendMessage("setscale", {
-    //         scale: scale
-    //     });
-
-    //     const innerCard = document.getElementById('inner-card');
-    //     this.sendMessage("proxytosim", {
-    //         type: "resize",
-    //         top: newTop + innerCard.offsetTop + 15,
-    //         left: left + innerCard.offsetLeft + 15,
-    //         width: innerCard.offsetWidth + 20,
-    //         height: innerCard.offsetHeight + 20
-    //     });
-    // }
 
     isSharing() {
         return this.state.isSharing;
@@ -196,6 +151,18 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
             width: innerCard.offsetWidth + 20,
             height: innerCard.offsetHeight + 20
         });
+
+        // Resize the play button
+        const playButton = document.getElementById('play-button');
+        if (playButton) {
+            playButton.style.top = `${newTop + newHeight + 15}px`;
+            playButton.style.left = `${left + 10}px`;
+        }
+        const shareButton = document.getElementById('share-button');
+        if (shareButton) {
+            shareButton.style.top = `${newTop + newHeight + 15}px`;
+            shareButton.style.left = `${left + newWidth - 170}px`;
+        }
     }
 
     toggleTrace() {
@@ -249,6 +216,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                                 editor.postMessage(msg, "*")
                                 this.loaded = true;
                                 if (!this.state.loadShareURL) this.setState({ isLoading: false });
+                                gtag('event', 'lookup', {'method': 'gist'});
                             })
                     } else {
                         const currentProject = localStorage.getItem('currentProject');
@@ -321,6 +289,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     startOver() {
+        gtag('event', 'startover', {'method': 'sim'});
         if (this.isSharing()) this.toggleSharing();
         this.initDefaultProject();
         this.sendMessage('importproject', {
@@ -339,7 +308,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     handleFacebook() {
         console.log("sharing with facebook");
-        ga('send', 'event', 'Sharing', 'facebook', 'Shared');
+        gtag('event', 'sharingfb', {'method': 'facebook'});
         const url = window.location.href;
         const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         this.popupWindow(fbUrl, "Share on Facebook", 600, 600);
@@ -347,7 +316,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     handleTwitter() {
         console.log("sharing with twitter");
-        ga('send', 'event', 'Sharing', 'twitter', 'Shared');
+        gtag('event', 'sharingtw', {'method': 'twitter'});
         const url = window.location.href;
         const twitterText = "Check out what I made with @MSMakeCode (experimental)!";
         const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}` +
@@ -387,7 +356,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     private player: any;
     beginSharing() {
         // Begin music
-        this.player = new Tone.Player("/sounds/Jingle_Bells_Instrumental.mp3").toMaster();
+        this.player = new Tone.Player("./sounds/Jingle_Bells_Instrumental.mp3").toMaster();
         this.player.autostart = true;
         // Begin snowing
         setTimeout(() => {
@@ -417,6 +386,9 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
             this.sendMessage("proxytosim", {
                 type: "showmaineditor"
             });
+            this.sendMessage("proxytosim", {
+                type: "showmaineditor"
+            });
             this.stopSharing();
         }
         setTimeout(() => {
@@ -428,6 +400,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     play() {
+        gtag('event', 'play', {'method': 'sim'});
         this.sendMessage("startsimulator", {});
     }
 
@@ -446,7 +419,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     publishGist() {
-        ga('send', 'event', 'Sharing', 'publish', 'Shared');
+        gtag('event', 'sharing', {'method': 'gist'});
         const data = {
             "description": 'My MakeCode Holiday project',
             "public": false,
@@ -493,8 +466,43 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
             `width=${width}, height=${height}, top=${(screen.height / 2) - (height / 2)}, left=${(screen.width / 2) - (width / 2)}`);
     }
 
+    // Create cookie
+    createCookie(name, value, days) {
+        var expires;
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + (date as any).toGMTString();
+        }
+        else {
+            expires = "";
+        }
+        document.cookie = name + "=" + value + expires + "; path=/";
+    }
+
+    // Read cookie
+    readCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) === ' ') {
+                c = c.substring(1, c.length);
+            }
+            if (c.indexOf(nameEQ) === 0) {
+                return c.substring(nameEQ.length, c.length);
+            }
+        }
+        return null;
+    }
+
+    closeCookie() {
+        this.setState({cookieMsg: true});
+        this.createCookie("makecode-holiday-cookie-msg", "true", 30);
+    }
+
     render() {
-        const { sidebarVisible, isLoading, isSharing, shareURL, loadShareURL, isCreditsOpen } = this.state;
+        const { sidebarVisible, isLoading, isSharing, shareURL, loadShareURL, isCreditsOpen, cookieMsg } = this.state;
 
         return <Sidebar.Pushable>
             <Sidebar as={Menu} animation='scale down' width='thin' visible={sidebarVisible} icon='labeled' vertical inverted>
@@ -502,11 +510,11 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                     <Icon name='home' />
                     Home
         </Menu.Item>
-                <Menu.Item name='terms'>
+                <Menu.Item name='terms' onClick={() => window.open("https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx")}>
                     <Icon name='legal' />
                     Terms
         </Menu.Item>
-                <Menu.Item name='privacy'>
+                <Menu.Item name='privacy' onClick={() => window.open("https://privacy.microsoft.com/en-us/privacystatement")}>
                     <Icon name='privacy' />
                     Privacy Policy
         </Menu.Item>
@@ -535,7 +543,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
-                <iframe ref={e => this.editorFrame = e} id="iframe" src="index.html?editorlayout=ide"></iframe>
+                <iframe ref={e => this.editorFrame = e} id="iframe" src="index.html?editorlayout=widget"></iframe>
                 <div className="left-back" />
 
                 {isSharing ? <div className="back-button">
@@ -550,24 +558,18 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                 </div>
 
                 <div className="right-back" />
-                {!isSharing && !loadShareURL ? <div className="sim-buttons">
-                    <Grid divided inverted stackable centered>
-                        <Grid.Row>
-                            <Grid.Column width={8} textAlign="center">
-                                <div className="play-button">
-                                    <Button color="green" circular size="massive" icon='play' onClick={this.play.bind(this)} />
-                                </div>
-                            </Grid.Column>
-                            <Grid.Column width={8} textAlign="center">
-                                <div className="share-button">
-                                    <Button color="red" circular size="huge" icon='right arrow' labelPosition='right' content='Share' onClick={this.toggleSharing.bind(this)} />
-                                </div>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
-                </div> : undefined}
+
+                {!isSharing && !loadShareURL ?
+                    <div id="play-button">
+                        <Button color="green" circular size="massive" icon='play' onClick={this.play.bind(this)} />
+                    </div> : undefined}
+                {!isSharing && !loadShareURL ?
+                    <div id="share-button">
+                        <Button color="red" circular size="huge" icon='right arrow' labelPosition='right' content='Share' onClick={this.toggleSharing.bind(this)} />
+                    </div> : undefined}
 
                 {isSharing && shareURL ? <div className="sharing-dialog ui container text">
+                    <p className="ui inverted segment" style={{fontSize: '20px', textAlign: 'center'}} >Copy the link below and share it with family and friends!</p>
                     <Form size='huge'>
                         <Form.Field>
                             <Input
@@ -579,11 +581,11 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                     </Form>
                 </div> : undefined}
 
-
-                {isSharing ?
-                    <div />
-                    : undefined}
-
+                {!cookieMsg ?
+                    <div className="ui inline cookie-msg">
+                        By using this site you agree to the use of cookies for analytics. <a href="https://privacy.microsoft.com/en-us/privacystatement" target="_blank">Learn More</a>
+                        <Icon name="close" onClick={this.closeCookie.bind(this)}/>
+                    </div> : undefined}
 
                 {isSharing ? <Segment className="sharing-footer" inverted vertical style={{ padding: '1em 0em' }}>
                     <Container>
