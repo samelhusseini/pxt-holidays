@@ -1,6 +1,6 @@
 # A "Holiday Card" target for a Microsoft MakeCode Editor
 
-This repo contains a "Holiday card" target built with Microsoft MakeCode (PXT). The editor is hosted on the GitHub pages at https://microsoftsam.github.io/pxt-holidays/controller.html
+This repo contains a "Holiday card" target built with Microsoft MakeCode (PXT). The editor is hosted on the GitHub pages at https://samelhusseini.github.io/pxt-holidays/controller.html
 
 The repo serves as a demonstration to anyone trying to integrate PXT into their own application without using the PXT frontend.
 
