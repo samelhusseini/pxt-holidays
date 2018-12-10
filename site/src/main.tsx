@@ -80,6 +80,20 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
             "fns": {
             }
         }
+
+        this.copy = this.copy.bind(this);
+        this.play = this.play.bind(this);
+        this.closeCookie = this.closeCookie.bind(this);
+        this.startOver = this.startOver.bind(this);
+        this.toggleSidebar = this.toggleSidebar.bind(this);
+        this.handleFacebook = this.handleFacebook.bind(this);
+        this.handleTwitter = this.handleTwitter.bind(this);
+        this.toggleSharing = this.toggleSharing.bind(this);
+        this.handleHomeClick = this.handleHomeClick.bind(this);
+        this.handleLegalLinkClick = this.handleLegalLinkClick.bind(this);
+        this.handleTermsLinkClick = this.handleTermsLinkClick.bind(this);
+        this.handleCreditsClick = this.handleCreditsClick.bind(this);
+        this.handleCreditsClose = this.handleCreditsClose.bind(this);
     }
 
     initDefaultProject() {
@@ -172,7 +186,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     sendMessage(action: string, args: Object) {
         let editor = this.editorFrame.contentWindow;
-        var msg = {
+        let msg = {
             type: "pxteditor",
             id: Math.random().toString(),
             action: action,
@@ -183,7 +197,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     receiveMessage(ev: MessageEvent) {
         let editor = this.editorFrame.contentWindow;
-        var msg = ev.data;
+        let msg = ev.data;
         // console.log('received...')
         // console.log(msg)
         if (msg.type == "pxthost") {
@@ -199,7 +213,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                     }
                     if (this.state.loadShareURL) {
                         this.lookupGist(this.state.loadShareURL)
-                            .then((content) => {
+                            .then((content: any) => {
                                 this.currentProject = {
                                     'text': {
                                         "main.blocks": JSON.parse(content["main.blocks"]['content']),
@@ -216,7 +230,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                                 editor.postMessage(msg, "*")
                                 this.loaded = true;
                                 if (!this.state.loadShareURL) this.setState({ isLoading: false });
-                                gtag('event', 'lookup', {'method': 'gist'});
+                                gtag('event', 'lookup', { 'method': 'gist' });
                             })
                     } else {
                         const currentProject = localStorage.getItem('currentProject');
@@ -289,7 +303,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     startOver() {
-        gtag('event', 'startover', {'method': 'sim'});
+        gtag('event', 'startover', { 'method': 'sim' });
         if (this.isSharing()) this.toggleSharing();
         this.initDefaultProject();
         this.sendMessage('importproject', {
@@ -308,7 +322,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     handleFacebook() {
         console.log("sharing with facebook");
-        gtag('event', 'sharingfb', {'method': 'facebook'});
+        gtag('event', 'sharingfb', { 'method': 'facebook' });
         const url = window.location.href;
         const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
         this.popupWindow(fbUrl, "Share on Facebook", 600, 600);
@@ -316,7 +330,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
     handleTwitter() {
         console.log("sharing with twitter");
-        gtag('event', 'sharingtw', {'method': 'twitter'});
+        gtag('event', 'sharingtw', { 'method': 'twitter' });
         const url = window.location.href;
         const twitterText = "Check out what I made with @MSMakeCode (experimental)!";
         const twitterUrl = `https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}` +
@@ -400,7 +414,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     play() {
-        gtag('event', 'play', {'method': 'sim'});
+        gtag('event', 'play', { 'method': 'sim' });
         this.sendMessage("startsimulator", {});
     }
 
@@ -410,8 +424,8 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
         copyForm.select();
 
         try {
-            var successful = document.execCommand('copy');
-            var msg = successful ? 'successful' : 'unsuccessful';
+            let successful = document.execCommand('copy');
+            let msg = successful ? 'successful' : 'unsuccessful';
             console.log('Copying text command was ' + msg);
         } catch (err) {
             console.log('Oops, unable to copy');
@@ -419,7 +433,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     publishGist() {
-        gtag('event', 'sharing', {'method': 'gist'});
+        gtag('event', 'sharing', { 'method': 'gist' });
         const data = {
             "description": 'My MakeCode Holiday project',
             "public": false,
@@ -467,10 +481,10 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     // Create cookie
-    createCookie(name, value, days) {
-        var expires;
+    createCookie(name: any, value: any, days: any) {
+        let expires;
         if (days) {
-            var date = new Date();
+            let date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             expires = "; expires=" + (date as any).toGMTString();
         }
@@ -481,11 +495,11 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     // Read cookie
-    readCookie(name) {
-        var nameEQ = name + "=";
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
+    readCookie(name: any) {
+        let nameEQ = name + "=";
+        let ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
             while (c.charAt(0) === ' ') {
                 c = c.substring(1, c.length);
             }
@@ -497,8 +511,32 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
     }
 
     closeCookie() {
-        this.setState({cookieMsg: true});
+        this.setState({ cookieMsg: true });
         this.createCookie("makecode-holiday-cookie-msg", "true", 30);
+    }
+
+    handleHomeClick() {
+        this.setState({ sidebarVisible: false });
+    }
+
+    handleLegalLinkClick() {
+        window.open("https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx");
+    }
+
+    handleTermsLinkClick() {
+        window.open("https://privacy.microsoft.com/en-us/privacystatement");
+    }
+
+    handleCreditsClick() {
+        this.setState({ isCreditsOpen: true, sidebarVisible: false });
+    }
+
+    handleCreditsClose() {
+        this.setState({ isCreditsOpen: false });
+    }
+
+    private handleEditorFrameRef = (e: HTMLIFrameElement) => {
+        this.editorFrame = e
     }
 
     render() {
@@ -506,19 +544,19 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
         return <Sidebar.Pushable>
             <Sidebar as={Menu} animation='scale down' width='thin' visible={sidebarVisible} icon='labeled' vertical inverted>
-                <Menu.Item name='home' onClick={() => this.setState({ sidebarVisible: false })}>
+                <Menu.Item name='home' onClick={this.handleHomeClick}>
                     <Icon name='home' />
                     Home
         </Menu.Item>
-                <Menu.Item name='terms' onClick={() => window.open("https://www.microsoft.com/en-us/legal/intellectualproperty/copyright/default.aspx")}>
+                <Menu.Item name='terms' onClick={this.handleLegalLinkClick}>
                     <Icon name='legal' />
                     Terms
         </Menu.Item>
-                <Menu.Item name='privacy' onClick={() => window.open("https://privacy.microsoft.com/en-us/privacystatement")}>
+                <Menu.Item name='privacy' onClick={this.handleTermsLinkClick}>
                     <Icon name='privacy' />
                     Privacy Policy
         </Menu.Item>
-                <Menu.Item name='credits' onClick={() => this.setState({ isCreditsOpen: true, sidebarVisible: false })}>
+                <Menu.Item name='credits' onClick={this.handleCreditsClick}>
                     <Icon name='align justify' />
                     About
         </Menu.Item>
@@ -528,26 +566,28 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                     <Loader size="large" />
                 </Dimmer> : undefined}
                 <Menu fixed="top" borderless size="mini">
-                    <Menu.Item onClick={this.toggleSidebar.bind(this)}>
+                    <Menu.Item onClick={this.toggleSidebar}>
                         <Icon name="sidebar" size="large" style={{ color: '#F6252D' }} />
                     </Menu.Item>
-                    {!isSharing ? <Menu.Item onClick={this.startOver.bind(this)}>
+                    {!isSharing ? <Menu.Item onClick={this.startOver}>
                         <Button color="red" content="Start Over" />
                     </Menu.Item> : undefined}
                     <Menu.Menu position='right'>
-                        <Menu.Item name='twitter' onClick={this.handleTwitter.bind(this)}>
+                        <Menu.Item name='twitter' onClick={this.handleTwitter}>
                             <Icon name='twitter' size="large" style={{ color: '#00aced' }} />
                         </Menu.Item>
-                        <Menu.Item name='facebook' onClick={this.handleFacebook.bind(this)}>
+                        <Menu.Item name='facebook' onClick={this.handleFacebook}>
                             <Icon name='facebook' size="large" style={{ color: '#3b5998' }} />
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
-                <iframe ref={e => this.editorFrame = e} id="iframe" src="index.html?editorlayout=widget"></iframe>
+                {/* tslint:disable:react-iframe-missing-sandbox */}
+                <iframe ref={this.handleEditorFrameRef} id="iframe" src="index.html?editorlayout=widget&newtoolbox" sandbox="allow-scripts allow-same-origin"></iframe>
+                {/* tslint:enable:react-iframe-missing-sandbox */}
                 <div className="left-back" />
 
                 {isSharing ? <div className="back-button">
-                    <Button color="purple" circular size="huge" icon='edit' labelPosition='left' content='Remix' onClick={this.toggleSharing.bind(this)} />
+                    <Button color="purple" circular size="huge" icon='edit' labelPosition='left' content='Remix' onClick={this.toggleSharing} />
                 </div> : undefined}
                 <div id="contentFrame" className={`card-content`} style={{ transition: isSharing ? 'all 1s' : '' }}>
                     <div className="shadow"></div>
@@ -561,19 +601,19 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
                 {!isSharing && !loadShareURL ?
                     <div id="play-button">
-                        <Button color="green" circular size="massive" icon='play' onClick={this.play.bind(this)} />
+                        <Button color="green" circular size="massive" icon='play' onClick={this.play} />
                     </div> : undefined}
                 {!isSharing && !loadShareURL ?
                     <div id="share-button">
-                        <Button color="red" circular size="huge" icon='right arrow' labelPosition='right' content='Share' onClick={this.toggleSharing.bind(this)} />
+                        <Button color="red" circular size="huge" icon='right arrow' labelPosition='right' content='Share' onClick={this.toggleSharing} />
                     </div> : undefined}
 
                 {isSharing && shareURL ? <div className="sharing-dialog ui container text">
-                    <p className="ui inverted segment" style={{fontSize: '20px', textAlign: 'center'}} >Copy the link below and share it with family and friends!</p>
+                    <p className="ui inverted segment" style={{ fontSize: '20px', textAlign: 'center' }} >Copy the link below and share it with family and friends!</p>
                     <Form size='huge'>
                         <Form.Field>
                             <Input
-                                label={<Button content='Copy' color='green' onClick={this.copy.bind(this)} />}
+                                label={<Button content='Copy' color='green' onClick={this.copy} />}
                                 labelPosition='right'
                                 id="share-url"
                                 value={shareURL} />
@@ -583,8 +623,8 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
                 {!cookieMsg ?
                     <div className="ui inline cookie-msg">
-                        By using this site you agree to the use of cookies for analytics. <a href="https://privacy.microsoft.com/en-us/privacystatement" target="_blank">Learn More</a>
-                        <Icon name="close" onClick={this.closeCookie.bind(this)}/>
+                        By using this site you agree to the use of cookies for analytics. <a href="https://privacy.microsoft.com/en-us/privacystatement" target="_blank" rel="noopener noreferrer">Learn More</a>
+                        <Icon name="close" onClick={this.closeCookie} />
                     </div> : undefined}
 
                 {isSharing ? <Segment className="sharing-footer" inverted vertical style={{ padding: '1em 0em' }}>
@@ -592,7 +632,7 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
                         <Grid divided inverted stackable centered>
                             <Grid.Row>
                                 <Grid.Column width={16} textAlign="center">
-                                    <Header as='h4' inverted>Powered by <a href="https://www.makecode.com" target="_blank" style={{ color: '#b4019E' }}>Microsoft MakeCode</a></Header>
+                                    <Header as='h4' inverted>Powered by <a href="https://www.makecode.com" target="_blank" rel="noopener noreferrer" style={{ color: '#b4019E' }}>Microsoft MakeCode</a></Header>
                                 </Grid.Column>
                             </Grid.Row>
                         </Grid>
@@ -601,21 +641,21 @@ export class MainApp extends React.Component<MainAppProps, MainAppState> {
 
                 {isLoading ? <div className="loading-screen" /> : undefined}
 
-                <Modal open={isCreditsOpen} closeIcon={true} onClose={() => this.setState({ isCreditsOpen: false })} dimmer={true}>
+                <Modal open={isCreditsOpen} closeIcon={true} onClose={this.handleCreditsClose} dimmer={true}>
                     <Modal.Header>About</Modal.Header>
                     <Modal.Content>
                         <Modal.Description>
-                            <p>A Blocks / JavaScript code editor for the holidays powered by <a href="www.makecode.com" target="_blank">Microsoft MakeCode.</a></p>
-                            <p><a href="https://github.com/microsoftsam/pxt-holidays" target="_blank">microsoftsam.github.io/pxt-holidays</a> version: 0.0.1</p>
+                            <p>A Blocks / JavaScript code editor for the holidays powered by <a href="www.makecode.com" target="_blank" rel="noopener noreferrer">Microsoft MakeCode.</a></p>
+                            <p><a href="https://github.com/microsoftsam/pxt-holidays" target="_blank" rel="noopener noreferrer">microsoftsam.github.io/pxt-holidays</a> version: 0.0.1</p>
                             <p>Microsoft MakeCode version: 2.2.4</p>
 
                             <b> Built with:</b>
                             <List bulleted>
-                                <List.Item> Microsoft MakeCode: <a href="https://github.com/Microsoft/pxt" target="_blank">https://github.com/Microsoft/pxt</a> </List.Item>
-                                <List.Item> Semantic UI Less: <a href="https://github.com/Semantic-Org/Semantic-UI-LESS" target="_blank">https://github.com/Semantic-Org/Semantic-UI-LESS</a></List.Item>
-                                <List.Item> Semantic UI React: <a href="https://github.com/Semantic-Org/Semantic-UI-React" target="_blank">https://github.com/Semantic-Org/Semantic-UI-React </a></List.Item>
-                                <List.Item>Icons made by <a href="https://www.freepik.com/" target="_blank">Freepik</a> from <a href="www.flaticon.com" target="_blank">www.flaticon.com</a></List.Item>
-                                <List.Item>Kwanzaa icons from: <a rel="nofollow" href="https://www.Vecteezy.com/">Vector Art by www.vecteezy.com</a></List.Item>
+                                <List.Item> Microsoft MakeCode: <a href="https://github.com/Microsoft/pxt" target="_blank" rel="noopener noreferrer">https://github.com/Microsoft/pxt</a> </List.Item>
+                                <List.Item> Semantic UI Less: <a href="https://github.com/Semantic-Org/Semantic-UI-LESS" target="_blank" rel="noopener noreferrer">https://github.com/Semantic-Org/Semantic-UI-LESS</a></List.Item>
+                                <List.Item> Semantic UI React: <a href="https://github.com/Semantic-Org/Semantic-UI-React" target="_blank" rel="noopener noreferrer">https://github.com/Semantic-Org/Semantic-UI-React </a></List.Item>
+                                <List.Item>Icons made by <a href="https://www.freepik.com/" target="_blank" rel="noopener noreferrer">Freepik</a> from <a href="www.flaticon.com" target="_blank" rel="noopener noreferrer">www.flaticon.com</a></List.Item>
+                                <List.Item>Kwanzaa icons from: <a href="https://www.Vecteezy.com/" target="_blank" rel="noopener noreferrer">Vector Art by www.vecteezy.com</a></List.Item>
                             </List>
                         </Modal.Description>
                     </Modal.Content>

@@ -337,7 +337,8 @@ namespace pxsim {
         kill() {
             super.kill();
             if (this.game) {
-                this.game.world.removeAll();
+                if (this.game.world)
+                    this.game.world.removeAll();
                 this.game.destroy();
                 this.game = null;
                 this.gameLoaded = false;

@@ -10,7 +10,7 @@ namespace card {
      * Get the color wheel field editor
      * @param color color, eg: #ff0000
      */
-    //% blockId=colorNumberPicker block="%value"
+    //% blockId=colorNumberPicker2 block="%value"
     //% blockHidden=true
     //% shim=TD_ID colorSecondary="#FFFFFF"
     //% value.fieldEditor="colornumber" value.fieldOptions.decompileLiterals=true
@@ -23,7 +23,7 @@ namespace card {
      * Get the color wheel field editor
      * @param value value between 0 to 255 to get a color value, eg: 10
      */
-    //% blockId=colorWheelPicker block="%value"
+    //% blockId=colorWheelPicker2 block="%value"
     //% blockHidden=true
     //% shim=TD_ID colorSecondary="#FFFFFF"
     //% value.fieldEditor="colorwheel" value.fieldOptions.decompileLiterals=true
@@ -37,10 +37,10 @@ namespace card {
      * Get the color wheel field editor
      * @param color color, eg: #ff0000
      */
-    //% blockId=colorPicker block="%value"
+    //% blockId=colorPicker2 block="%value"
     //% blockHidden=true
     //% shim=TD_ID colorSecondary="#FFFFFF"
-    //% value.fieldEditor="colorpicker" value.fieldOptions.decompileLiterals=true
+    //% value.fieldEditor="colorpicker2" value.fieldOptions.decompileLiterals=true
     //% value.defl='#ff0000'
     export function colorPicker(value: string) {
         return value;

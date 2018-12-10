@@ -12,7 +12,7 @@
     ],
     "runtime": {
       "mathBlocks": false,
-      "loopsBlocks": false,
+      "loopsBlocks": true,
       "logicBlocks": false,
       "variablesBlocks": false,
       "functionBlocks": false,

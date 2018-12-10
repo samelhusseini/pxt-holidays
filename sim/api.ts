@@ -16,7 +16,7 @@ namespace pxsim.card {
      * Set the card background
      */
     //% weight=89
-    //% blockId="setBackground" block="set background %color=colorNumberPicker"
+    //% blockId="setBackground" block="set background %color=colorNumberPicker2"
     export function setBackground(color: number) {
         board().getGame().stage.backgroundColor = `0x${color.toString(16)}`;
     }
@@ -76,7 +76,7 @@ namespace pxsim.lights {
      * Set the lights
      */
     //% weight=89
-    //% blockId="setLightColor" block="set lights %color=colorNumberPicker"
+    //% blockId="setLightColor" block="set lights %color=colorNumberPicker2"
     export function setLightColor(color: number) {
         board().drawLights([color.toString()]);
     }
@@ -103,19 +103,5 @@ namespace pxsim.lights {
     //% blockHidden=true
     export function _animationPicker(animation: LightAnimation): number {
         return animation;
-    }
-}
-
-function logMsg(m: string) { console.log(m) }
-
-namespace pxsim.console {
-    /**
-     * Print out message
-     */
-    //% 
-    export function log(msg: string) {
-        logMsg("CONSOLE: " + msg)
-        // why doesn't that work?
-        board().writeSerial(msg + "\n")
     }
 }

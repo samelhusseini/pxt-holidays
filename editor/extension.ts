@@ -1,14 +1,11 @@
 /// <reference path="../node_modules/pxt-core/built/pxteditor.d.ts" />
 
-const blocklyToolboxXML = `<xml id="blocklyToolboxDefinition" style="display: none">
-<block type="controls_repeat_ext" gap="8">
-<value name="TIMES">
-    <shadow type="math_number">
-        <field name="NUM">4</field>
-    </shadow>
-</value>
-</block>
-</xml>`;
+
+const blocklyInitialToolbox = {
+  loops: {
+    blocks: [] as pxt.editor.ToolboxBlockDefinition[]
+  }
+};
 
 window.addEventListener("message", ev => {
   let m = ev.data as pxsim.SimulatorMessage;
@@ -50,7 +47,8 @@ pxt.editor.initExtensionsAsync = function (opts: pxt.editor.ExtensionOptions): P
   }
   const res: pxt.editor.ExtensionResult = {
     toolboxOptions: {
-      //blocklyXml: blocklyToolboxXML
+      // Define the blocks mode toolbox
+      blocklyToolbox: blocklyInitialToolbox
     }
   };
   return Promise.resolve<pxt.editor.ExtensionResult>(res);

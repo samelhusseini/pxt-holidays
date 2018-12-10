@@ -13,7 +13,7 @@ declare namespace card {
      * Set the card background
      */
     //% weight=89
-    //% blockId="setBackground" block="set background %color=colorNumberPicker"
+    //% blockId="setBackground" block="set background %color=colorNumberPicker2"
     //% shim=card::setBackground
     function setBackground(color: number): void;
 
@@ -63,7 +63,7 @@ declare namespace lights {
      * Set the lights
      */
     //% weight=89
-    //% blockId="setLightColor" block="set lights %color=colorNumberPicker"
+    //% blockId="setLightColor" block="set lights %color=colorNumberPicker2"
     //% shim=lights::setLightColor
     function setLightColor(color: number): void;
 
@@ -87,15 +87,6 @@ declare namespace lights {
     //% blockHidden=true
     //% shim=lights::_animationPicker
     function _animationPicker(animation: LightAnimation): number;
-
-}
-declare namespace console {
-    /**
-     * Print out message
-     */
-    //%
-    //% shim=console::log
-    function log(msg: string): void;
 
 }
 
