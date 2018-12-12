@@ -1,5 +1,7 @@
 {
   "Array": "Add, remove, and replace items in lists.\n\nAdd, remove, and replace items in lists.",
+  "Array.concat": "Concatenates the values with another array.",
+  "Array.concat|param|arr": "The other array that is being concatenated with",
   "Array.every": "Tests whether all elements in the array pass the test implemented by the provided function.",
   "Array.every|param|callbackfn": "A function that accepts up to two arguments. The every method calls the callbackfn function one time for each element in the array.",
   "Array.filter": "Return the elements of an array that meet the condition specified in a callback function.",
